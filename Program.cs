@@ -1,4 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using System.CommandLine;
 using System.Globalization;
 using CsvHelper;
 
@@ -12,11 +13,11 @@ namespace Bison {
             return unixEpoch;
         }
 
-        public static Int32 DateTimeToUnixTimeStamp( DateTime dateTime )
+        public static int DateTimeToUnixTimeStamp( DateTime dateTime )
         {
             DateTime unixEpoch = new(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             TimeSpan diff = dateTime.ToUniversalTime() - unixEpoch;
-            return (Int32) Math.Floor(diff.TotalSeconds);
+            return (int) Math.Floor(diff.TotalSeconds);
         }
     }
 
@@ -24,7 +25,7 @@ namespace Bison {
     {
         public required string Author { get; set; }
         public required string Observation { get; set; }
-        public Int32 Timestamp { get; set; }
+        public int Timestamp { get; set; }
 
         public DateTime GetAsDateTime()
         {
@@ -38,30 +39,25 @@ namespace Bison {
     public class Program {
         const string CSV_FILE_PATH = "bison_observe_cli_db.csv";
 
-        static void Main(string[] args)
-        {
-            if (args.Length == 0)
+        static RootCommand GetRootCommand() {
+            RootCommand root = new("Bison.CLI app");
+
+            Command read = new("read", "read the saved observations");
+            read.SetAction(result =>
             {
-                // TODO; add a help with list of available commands
-                Console.WriteLine("Please give a command!");
-                return;
-            }
+                ReadFromCSV();
+            });
+            root.Subcommands.Add(read);
 
-            var command = args[0];
+            return root;
+        }
 
-            switch (command) {
-                case "read":
-                    {
-                        ReadFromCSV();
-                        return;
-                    }
-                default:
-                    {
-                        // TODO; add a help with list of available commands
-                        Console.WriteLine("Please give a valid command!");
-                        return;
-                    }
-            }
+        static int Main(string[] args)
+        {
+            var root = GetRootCommand();
+
+            var result = root.Parse(args);
+            return result.Invoke();
         }
 
         static void ReadFromCSV() {
