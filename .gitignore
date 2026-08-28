@@ -485,3 +485,17 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Devenv
+.devenv*
+devenv.local.nix
+devenv.local.yaml
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml
+
+# our files
+bison_observe_cli_db.csv
