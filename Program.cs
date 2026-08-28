@@ -2,6 +2,7 @@
 using System.CommandLine;
 using System.Globalization;
 using CsvHelper;
+using CsvHelper.Configuration;
 
 namespace Bison {
     public class Utilities {
@@ -49,6 +50,15 @@ namespace Bison {
             });
             root.Subcommands.Add(read);
 
+            Command observe = new("observe", "adds an observation to the database");
+            Argument<string> observation = new("observation")
+            {
+                Description = "the observation you observed"
+            };
+            observe.Arguments.Add(observation);
+            observe.SetAction(result=> AddObservation(result, observation));
+            root.Subcommands.Add(observe);
+
             return root;
         }
 
@@ -60,7 +70,8 @@ namespace Bison {
             return result.Invoke();
         }
 
-        static void ReadFromCSV() {
+        static void ReadFromCSV()
+        {
             using var reader = new StreamReader(CSV_FILE_PATH);
             using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
 
@@ -69,6 +80,26 @@ namespace Bison {
             {
                 Console.WriteLine(record);
             }
+        }
+
+        static void AddObservation(ParseResult result, Argument<string> obsArg)
+        {
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    // Don't write the header again.
+                    HasHeaderRecord = false,
+                };
+            using var stream = File.Open(CSV_FILE_PATH, FileMode.Append);
+            using var writer = new StreamWriter(stream);
+            using var csv = new CsvWriter(writer, config);
+
+            csv.WriteRecords([new ObservationRecord
+                {
+                    Author = Environment.UserName,
+                    Observation = result.GetRequiredValue(obsArg),
+                    Timestamp = Utilities.DateTimeToUnixTimeStamp(DateTime.Now),
+                }
+            ]);
         }
     }
 }
