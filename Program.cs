@@ -2,9 +2,12 @@
 using System.CommandLine;
 using System.Globalization;
 using CsvHelper;
+using CsvHelper.Configuration;
 
-namespace Bison {
-    public class Utilities {
+namespace Bison
+{
+    public class Utilities
+    {
         public static DateTime UnixTimeStampToDateTime(Int32 unixTimeStamp)
         {
             // taken from https://stackoverflow.com/questions/249760/how-can-i-convert-a-unix-timestamp-to-datetime-and-vice-versa
@@ -13,11 +16,11 @@ namespace Bison {
             return unixEpoch;
         }
 
-        public static int DateTimeToUnixTimeStamp( DateTime dateTime )
+        public static int DateTimeToUnixTimeStamp(DateTime dateTime)
         {
             DateTime unixEpoch = new(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
             TimeSpan diff = dateTime.ToUniversalTime() - unixEpoch;
-            return (int) Math.Floor(diff.TotalSeconds);
+            return (int)Math.Floor(diff.TotalSeconds);
         }
     }
 
@@ -32,25 +35,15 @@ namespace Bison {
             return Utilities.UnixTimeStampToDateTime(Timestamp);
         }
 
-        public override string ToString() {
+        public override string ToString()
+        {
             return Author + " @ " + GetAsDateTime().ToString() + ": " + Observation;
         }
     }
-    public class Program {
+
+    public class Program
+    {
         const string CSV_FILE_PATH = "bison_observe_cli_db.csv";
-
-        static RootCommand GetRootCommand() {
-            RootCommand root = new("Bison.CLI app");
-
-            Command read = new("read", "read the saved observations");
-            read.SetAction(result =>
-            {
-                ReadFromCSV();
-            });
-            root.Subcommands.Add(read);
-
-            return root;
-        }
 
         static int Main(string[] args)
         {
@@ -60,7 +53,31 @@ namespace Bison {
             return result.Invoke();
         }
 
-        static void ReadFromCSV() {
+        static RootCommand GetRootCommand()
+        {
+            RootCommand root = new("Bison.CLI app");
+
+            Command read = new("read", "read the saved observations");
+            read.SetAction(result =>
+            {
+                ReadFromCSV();
+            });
+            root.Subcommands.Add(read);
+
+            Command observe = new("observe", "adds an observation to the database");
+            Argument<string> observation = new("observation")
+            {
+                Description = "the observation you observed"
+            };
+            observe.Arguments.Add(observation);
+            observe.SetAction(result => AddObservation(result, observation));
+            root.Subcommands.Add(observe);
+
+            return root;
+        }
+
+        static void ReadFromCSV()
+        {
             using var reader = new StreamReader(CSV_FILE_PATH);
             using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
 
@@ -69,6 +86,26 @@ namespace Bison {
             {
                 Console.WriteLine(record);
             }
+        }
+
+        static void AddObservation(ParseResult result, Argument<string> obsArg)
+        {
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                // Don't write the header again.
+                HasHeaderRecord = false,
+            };
+            using var stream = File.Open(CSV_FILE_PATH, FileMode.Append);
+            using var writer = new StreamWriter(stream);
+            using var csv = new CsvWriter(writer, config);
+
+            csv.WriteRecords([new ObservationRecord
+                {
+                    Author = Environment.UserName,
+                    Observation = result.GetRequiredValue(obsArg),
+                    Timestamp = Utilities.DateTimeToUnixTimeStamp(DateTime.Now),
+                }
+            ]);
         }
     }
 }
