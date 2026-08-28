@@ -496,3 +496,6 @@ devenv.local.yaml
 
 # pre-commit
 .pre-commit-config.yaml
+
+# our files
+bison_observe_cli_db.csv
