@@ -1,6 +1,7 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using System.CommandLine;
 using System.Globalization;
+
 using CsvHelper;
 using CsvHelper.Configuration;
 
