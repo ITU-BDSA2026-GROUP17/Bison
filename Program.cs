@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using System.CommandLine;
+using System.Data.Common;
 using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -43,7 +44,7 @@ namespace Bison
 
     public class Program
     {
-        const string CSV_FILE_PATH = "bison_observe_cli_db.csv";
+        SimpleDB.CSVDatabase<ObservationRecord>  db = new SimpleDB.CSVDatabase<ObservationRecord>();  
 
         static int Main(string[] args)
         {
@@ -78,34 +79,24 @@ namespace Bison
 
         static void ReadFromCSV()
         {
-            using var reader = new StreamReader(CSV_FILE_PATH);
-            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-
-            var records = csv.GetRecords<ObservationRecord>();
-            foreach (var record in records)
+            // var records = db.Read();
+            /* foreach (var record in records)
             {
                 Console.WriteLine(record);
-            }
+            } */
         }
 
         static void AddObservation(ParseResult result, Argument<string> obsArg)
         {
-            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                // Don't write the header again.
-                HasHeaderRecord = false,
-            };
-            using var stream = File.Open(CSV_FILE_PATH, FileMode.Append);
-            using var writer = new StreamWriter(stream);
-            using var csv = new CsvWriter(writer, config);
-
-            csv.WriteRecords([new ObservationRecord
+            //send this record to the database
+            var record = new ObservationRecord
                 {
                     Author = Environment.UserName,
                     Observation = result.GetRequiredValue(obsArg),
                     Timestamp = Utilities.DateTimeToUnixTimeStamp(DateTime.Now),
-                }
-            ]);
+                };
+
+            //db.Store(record);
         }
     }
 }
