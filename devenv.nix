@@ -15,10 +15,10 @@
         '';
         packages = [ pkgs.watchexec ];
     };
-    
+
     # https://devenv.sh/basics/
     enterShell = '''';
-    
+
     # https://devenv.sh/tests/
     # https://devenv.sh/services/
     # https://devenv.sh/tasks/
