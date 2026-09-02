@@ -1,0 +1,38 @@
+name: .NET CI
+
+on:
+    push:
+        branches:
+            - main
+            - dev
+    pull_request:
+        branches:
+            - main
+            - dev
+
+env:
+    DOTNET_VERSION: "8.0.x"
+
+jobs:
+    build:
+        name: build-and-test-${{matrix.os}}
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os: [ubuntu-latest, windows-latest, macOS-latest]
+
+        steps:
+            - uses: actions/checkout@v7
+            - name: Setup .NET
+              uses: actions/setup-dotnet@6
+              with:
+                  dotnet-version: ${{ env.DOTNET_VERSION }}
+
+            - name: Install Dependencies
+              run: dotnet restore
+
+            - name: Build
+              run: dotnet build --no-restore
+
+            - name: Test
+              run: dotnet test --no-build --verbosity normal
