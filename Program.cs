@@ -1,13 +1,8 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using System.CommandLine;
-using System.Globalization;
-
-using CsvHelper;
-using CsvHelper.Configuration;
 
 namespace Bison
 {
-    public class Utilities
+    class Utilities
     {
         public static DateTime UnixTimeStampToDateTime(int unixTimeStamp)
         {
@@ -44,69 +39,12 @@ namespace Bison
 
     public class Program
     {
-        const string CSV_FILE_PATH = "bison_observe_cli_db.csv";
-
         static int Main(string[] args)
         {
-            var root = GetRootCommand();
+            var root = UserInterface.GetRootCommand();
 
             var result = root.Parse(args);
             return result.Invoke();
-        }
-
-        static RootCommand GetRootCommand()
-        {
-            RootCommand root = new("Bison.CLI app");
-
-            Command read = new("read", "read the saved observations");
-            read.SetAction(result =>
-            {
-                ReadFromCSV();
-            });
-            root.Subcommands.Add(read);
-
-            Command observe = new("observe", "adds an observation to the database");
-            Argument<string> observation = new("observation")
-            {
-                Description = "the observation you observed"
-            };
-            observe.Arguments.Add(observation);
-            observe.SetAction(result => AddObservation(result, observation));
-            root.Subcommands.Add(observe);
-
-            return root;
-        }
-
-        static void ReadFromCSV()
-        {
-            using var reader = new StreamReader(CSV_FILE_PATH);
-            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-
-            var records = csv.GetRecords<ObservationRecord>();
-            foreach (var record in records)
-            {
-                Console.WriteLine(record);
-            }
-        }
-
-        static void AddObservation(ParseResult result, Argument<string> obsArg)
-        {
-            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                // Don't write the header again.
-                HasHeaderRecord = false,
-            };
-            using var stream = File.Open(CSV_FILE_PATH, FileMode.Append);
-            using var writer = new StreamWriter(stream);
-            using var csv = new CsvWriter(writer, config);
-
-            csv.WriteRecords([new ObservationRecord
-                {
-                    Author = Environment.UserName,
-                    Observation = result.GetRequiredValue(obsArg),
-                    Timestamp = Utilities.DateTimeToUnixTimeStamp(DateTime.Now),
-                }
-            ]);
         }
     }
 }
