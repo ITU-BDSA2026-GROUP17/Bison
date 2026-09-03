@@ -54,13 +54,13 @@ namespace Bison
             observe.Arguments.Add(obsArg);
             observe.SetAction(result =>
             {
-                DataBase.Store([new ObservationRecord
+                DataBase.Store(new ObservationRecord
                     {
                         Author = Environment.UserName,
                         Observation = result.GetRequiredValue(obsArg),
                         Timestamp = Utilities.DateTimeToUnixTimeStamp(DateTime.Now),
                     }
-                ]);
+                );
             });
 
             return observe;
