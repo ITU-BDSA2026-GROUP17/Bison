@@ -5,7 +5,7 @@ using System.Globalization;
 namespace SimpleDB;
 public class CSVDatabase<T> : IDatabaseRepository<T>
 {
-    const string CSV_FILE_PATH = "bison_observe_cli_db.csv";
+    const string CSV_FILE_PATH = "SimpleDB/bison_observe_cli_db.csv";
 
      public IEnumerable<T> Read(int? limit = null)
     {
@@ -14,7 +14,9 @@ public class CSVDatabase<T> : IDatabaseRepository<T>
         
         var records = csv.GetRecords<T>();
         
-        return records;
+        foreach(var record in records){
+            yield return record;
+        }
     }
     public void Store(T record)
     {

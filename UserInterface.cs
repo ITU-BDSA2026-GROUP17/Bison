@@ -1,6 +1,7 @@
 using System.CommandLine;
 using System.Globalization;
 
+using SimpleDB;
 using CsvHelper;
 using CsvHelper.Configuration;
 
@@ -9,6 +10,7 @@ namespace Bison
     public sealed class UserInterface
     {
         const string CSV_FILE_PATH = "SimpleDB/bison_observe_cli_db.csv";
+        static CSVDatabase<ObservationRecord> DataBase = new CSVDatabase<ObservationRecord>();
 
         private UserInterface()
         {
@@ -37,11 +39,7 @@ namespace Bison
             Command read = new("read", "read the saved observations");
             read.SetAction(result =>
             {
-                using var reader = new StreamReader(CSV_FILE_PATH);
-                using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-
-                var records = csv.GetRecords<ObservationRecord>();
-                PrintObservations(records);
+                PrintObservations(DataBase.Read());
             });
             return read;
         }
