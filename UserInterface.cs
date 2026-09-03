@@ -54,16 +54,7 @@ namespace Bison
             observe.Arguments.Add(obsArg);
             observe.SetAction(result =>
             {
-                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-                {
-                    // Don't write the header again.
-                    HasHeaderRecord = false,
-                };
-                using var stream = File.Open(CSV_FILE_PATH, FileMode.Append);
-                using var writer = new StreamWriter(stream);
-                using var csv = new CsvWriter(writer, config);
-
-                csv.WriteRecords([new ObservationRecord
+                DataBase.Store([new ObservationRecord
                     {
                         Author = Environment.UserName,
                         Observation = result.GetRequiredValue(obsArg),
