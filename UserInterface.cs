@@ -8,7 +8,7 @@ namespace Bison
 {
     public sealed class UserInterface
     {
-        const string CSV_FILE_PATH = "bison_observe_cli_db.csv";
+        const string CSV_FILE_PATH = "SimpleDB/bison_observe_cli_db.csv";
 
         private UserInterface()
         {
