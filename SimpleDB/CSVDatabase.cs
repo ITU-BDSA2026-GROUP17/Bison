@@ -20,16 +20,18 @@ public class CSVDatabase<T> : IDatabaseRepository<T>
     }
     public void Store(T record)
     {
-       var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-        {
-            // Don't write the header again.
-            HasHeaderRecord = false,
-        };
+        var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                // Don't write the header again.
+                HasHeaderRecord = false,
+            };
+        if(!File.Exists(CSV_FILE_PATH)){            
+            config = new CsvConfiguration(CultureInfo.InvariantCulture);
+        }
+                using var stream = File.Open(CSV_FILE_PATH, FileMode.Append);
+                using var writer = new StreamWriter(stream);
+                using var csv = new CsvWriter(writer, config);
 
-        using var stream = File.Open(CSV_FILE_PATH, FileMode.Append);
-        using var writer = new StreamWriter(stream);
-        using var csv = new CsvWriter(writer, config);
-
-        csv.WriteRecord(record);
+                csv.WriteRecords([record]);
     }
 }
