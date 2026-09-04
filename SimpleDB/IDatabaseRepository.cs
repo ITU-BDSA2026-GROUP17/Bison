@@ -1,4 +1,4 @@
-﻿namespace SimpleDB;
+﻿namespace Bison.SimpleDB;
 
 public interface IDatabaseRepository<T>
 {
