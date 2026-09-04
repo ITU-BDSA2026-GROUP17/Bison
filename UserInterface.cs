@@ -1,6 +1,8 @@
 using System.CommandLine;
 using System.Globalization;
 
+using Bison.Models;
+
 using SimpleDB;
 
 namespace Bison
