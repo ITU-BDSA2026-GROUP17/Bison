@@ -14,6 +14,22 @@ env:
     DOTNET_VERSION: "8.0.x"
 
 jobs:
+    meta:
+        name: meta-tests
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v7
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v6
+              with:
+                  dotnet-version: ${{ env.DOTNET_VERSION }}
+
+            - name: Install Dependencies
+              run: dotnet restore
+
+            - name: Format
+              run: dotnet format --verify-no-changes --verbosity diagnostic
     build:
         name: build-and-test-${{matrix.os}}
         runs-on: ${{ matrix.os }}
