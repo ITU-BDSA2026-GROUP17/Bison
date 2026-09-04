@@ -1,6 +1,7 @@
 namespace Bison.Models;
 
-public record CommentRecord {
+public record CommentRecord
+{
     public required int ObservationId { get; set; }
     public required string Author { get; set; }
     public required string Comment { get; set; }

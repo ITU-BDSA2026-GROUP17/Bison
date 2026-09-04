@@ -3,15 +3,15 @@ using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 
-namespace SimpleDB;
+namespace Bison.SimpleDB;
 
-public class CSVDatabase<T> : IDatabaseRepository<T>
+public class CSVDatabase<T>(string filePath) : IDatabaseRepository<T>
 {
-    const string CSV_FILE_PATH = "SimpleDB/bison_observe_cli_db.csv";
+    readonly string _filePath = filePath;
 
     public IEnumerable<T> Read(int? limit = null)
     {
-        using var reader = new StreamReader(CSV_FILE_PATH);
+        using var reader = new StreamReader(_filePath);
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
 
         var records = csv.GetRecords<T>();
@@ -28,11 +28,12 @@ public class CSVDatabase<T> : IDatabaseRepository<T>
             // Don't write the header again.
             HasHeaderRecord = false,
         };
-        if (!File.Exists(CSV_FILE_PATH))
+        if (!File.Exists(_filePath))
         {
             config = new CsvConfiguration(CultureInfo.InvariantCulture);
+            Directory.CreateDirectory(Path.GetDirectoryName(_filePath));
         }
-        using var stream = File.Open(CSV_FILE_PATH, FileMode.Append);
+        using var stream = File.Open(_filePath, FileMode.Append);
         using var writer = new StreamWriter(stream);
         using var csv = new CsvWriter(writer, config);
 

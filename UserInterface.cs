@@ -2,14 +2,13 @@ using System.CommandLine;
 using System.Globalization;
 
 using Bison.Models;
-
-using SimpleDB;
+using Bison.SimpleDB;
 
 namespace Bison
 {
     public sealed class UserInterface
     {
-        static readonly CSVDatabase<ObservationRecord> DataBase = new();
+        static readonly CSVDatabase<ObservationRecord> DataBase = new("data/bison_observe_cli_db.csv");
 
         private UserInterface()
         {
@@ -50,6 +49,7 @@ namespace Bison
             observe.Arguments.Add(obsArg);
             observe.SetAction(result => DataBase.Store(new ObservationRecord
             {
+                Id = 100,
                 Author = Environment.UserName,
                 Observation = result.GetRequiredValue(obsArg),
                 Timestamp = Utilities.DateTimeToUnixTimeStamp(DateTime.Now),
