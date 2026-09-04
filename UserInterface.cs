@@ -2,15 +2,12 @@ using System.CommandLine;
 using System.Globalization;
 
 using SimpleDB;
-using CsvHelper;
-using CsvHelper.Configuration;
 
 namespace Bison
 {
     public sealed class UserInterface
     {
-        const string CSV_FILE_PATH = "SimpleDB/bison_observe_cli_db.csv";
-        static CSVDatabase<ObservationRecord> DataBase = new CSVDatabase<ObservationRecord>();
+        static readonly CSVDatabase<ObservationRecord> DataBase = new();
 
         private UserInterface()
         {
@@ -37,10 +34,7 @@ namespace Bison
         static Command ReadCommand()
         {
             Command read = new("read", "read the saved observations");
-            read.SetAction(result =>
-            {
-                PrintObservations(DataBase.Read());
-            });
+            read.SetAction(result => PrintObservations(DataBase.Read()));
             return read;
         }
 
@@ -52,16 +46,13 @@ namespace Bison
                 Description = "the observation you observed"
             };
             observe.Arguments.Add(obsArg);
-            observe.SetAction(result =>
+            observe.SetAction(result => DataBase.Store(new ObservationRecord
             {
-                DataBase.Store(new ObservationRecord
-                    {
-                        Author = Environment.UserName,
-                        Observation = result.GetRequiredValue(obsArg),
-                        Timestamp = Utilities.DateTimeToUnixTimeStamp(DateTime.Now),
-                    }
-                );
-            });
+                Author = Environment.UserName,
+                Observation = result.GetRequiredValue(obsArg),
+                Timestamp = Utilities.DateTimeToUnixTimeStamp(DateTime.Now),
+            }
+            ));
 
             return observe;
         }
