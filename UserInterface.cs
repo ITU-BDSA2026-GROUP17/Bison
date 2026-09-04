@@ -48,11 +48,14 @@ namespace Bison
         static Command ReadCommand()
         {
             Command read = new("read", "read the saved observations");
-            read.SetAction(result => {
+            read.SetAction(result =>
+            {
                 try
                 {
                     PrintCheeps(ObservationDB.Read());
-                } catch {
+                }
+                catch
+                {
                     Console.WriteLine("Could not find any observations.");
                 }
             });
@@ -79,7 +82,8 @@ namespace Bison
             return observe;
         }
 
-        static Command CommentCommand() {
+        static Command CommentCommand()
+        {
             Command comment = new("comment", "adds a comment to the specified observation in the database");
             Argument<string> commentArg = new("comment")
             {
@@ -91,9 +95,11 @@ namespace Bison
             };
             comment.Arguments.Add(obsIdArg);
             comment.Arguments.Add(commentArg);
-            comment.SetAction(result => {
+            comment.SetAction(result =>
+            {
                 var obsId = result.GetRequiredValue(obsIdArg);
-                if (GetObservationById(obsId) is not null) {
+                if (GetObservationById(obsId) is not null)
+                {
                     CommentDB.Store(new CommentRecord
                     {
                         ObservationId = obsId,
@@ -102,7 +108,9 @@ namespace Bison
                         Timestamp = Utilities.DateTimeToUnixTimeStamp(DateTime.Now),
                     }
                     );
-                } else {
+                }
+                else
+                {
                     Console.WriteLine("Observation id {0} does not exist", obsId);
                 }
             });
@@ -130,7 +138,8 @@ namespace Bison
                         Console.WriteLine();
                         PrintCheeps(FilterComments(obsId, CommentDB.Read()));
                     }
-                    else {
+                    else
+                    {
                         Console.WriteLine("Observation does not exist.");
                     }
                 }
@@ -155,9 +164,12 @@ namespace Bison
             return null;
         }
 
-        static IEnumerable<CommentRecord> FilterComments(int id, IEnumerable<CommentRecord> comments) {
-            foreach (var comment in comments) {
-                if (comment.ObservationId == id) {
+        static IEnumerable<CommentRecord> FilterComments(int id, IEnumerable<CommentRecord> comments)
+        {
+            foreach (var comment in comments)
+            {
+                if (comment.ObservationId == id)
+                {
                     yield return comment;
                 }
             }

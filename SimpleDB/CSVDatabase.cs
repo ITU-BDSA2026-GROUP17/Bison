@@ -5,7 +5,7 @@ using CsvHelper.Configuration;
 
 namespace Bison.SimpleDB;
 
-public class CSVDatabase<T>(string filePath) : IDatabaseRepository<T>
+public sealed class CSVDatabase<T>(string filePath) : IDatabaseRepository<T>
 {
     readonly string _filePath = filePath;
 

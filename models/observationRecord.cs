@@ -1,6 +1,6 @@
 namespace Bison.Models;
 
-public record ObservationRecord
+public sealed record ObservationRecord
 {
     public required int Id { get; set; }
     public required string Author { get; set; }
@@ -14,6 +14,6 @@ public record ObservationRecord
 
     public override string ToString()
     {
-        return Author + " : " + Id + " @ " + GetAsDateTime().ToString() + ": " + Observation;
+        return string.Format("{0} : {1} @ {2}: {3}", Author, Id, GetAsDateTime().ToString(), Observation);
     }
 }

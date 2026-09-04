@@ -1,6 +1,6 @@
 namespace Bison.Models;
 
-public record CommentRecord
+public sealed record CommentRecord
 {
     public required int ObservationId { get; set; }
     public required string Author { get; set; }
@@ -14,6 +14,6 @@ public record CommentRecord
 
     public override string ToString()
     {
-        return Author + " @ " + GetAsDateTime().ToString() + ": " + Comment;
+        return string.Format("{0} @ {1}: {2}", Author, GetAsDateTime().ToString(), Comment);
     }
 }

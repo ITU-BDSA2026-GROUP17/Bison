@@ -1,6 +1,6 @@
 namespace Bison.SimpleDB;
 
-public class SimpleCounter
+public sealed class SimpleCounter
 {
     readonly string _filePath;
 
