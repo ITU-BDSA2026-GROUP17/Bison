@@ -4,6 +4,8 @@ using System.Globalization;
 using Bison.Models;
 using Bison.SimpleDB;
 
+#nullable enable
+
 namespace Bison
 {
     public sealed class UserInterface
@@ -83,40 +85,74 @@ namespace Bison
             {
                 Description = "the comment to add"
             };
-            Argument<int> obsId = new("observation-id")
+            Argument<int> obsIdArg = new("observation-id")
             {
                 Description = "the id of the observation you want to comment on"
             };
-            comment.Arguments.Add(obsId);
+            comment.Arguments.Add(obsIdArg);
             comment.Arguments.Add(commentArg);
-            comment.SetAction(result => CommentDB.Store(new CommentRecord
-            {
-                ObservationId = result.GetRequiredValue(obsId),
-                Author = Environment.UserName,
-                Comment = result.GetRequiredValue(commentArg),
-                Timestamp = Utilities.DateTimeToUnixTimeStamp(DateTime.Now),
-            }
-            ));
+            comment.SetAction(result => {
+                var obsId = result.GetRequiredValue(obsIdArg);
+                if (GetObservationById(obsId) is not null) {
+                    CommentDB.Store(new CommentRecord
+                    {
+                        ObservationId = obsId,
+                        Author = Environment.UserName,
+                        Comment = result.GetRequiredValue(commentArg),
+                        Timestamp = Utilities.DateTimeToUnixTimeStamp(DateTime.Now),
+                    }
+                    );
+                } else {
+                    Console.WriteLine("Observation id {0} does not exist", obsId);
+                }
+            });
 
             return comment;
         }
 
-        static Command DiscussionCommand() {
+        static Command DiscussionCommand()
+        {
             Command discussion = new("discussion", "read comments made on an observation");
-            Argument<int> obsId = new("observation-id")
+            Argument<int> obsIdArg = new("observation-id")
             {
                 Description = "the id of the observation you want to read comments about"
             };
-            discussion.Arguments.Add(obsId);
-            discussion.SetAction(result => {
-                try {
-                    PrintCheeps(FilterComments(result.GetRequiredValue(obsId), CommentDB.Read()));
-                } catch {
+            discussion.Arguments.Add(obsIdArg);
+            discussion.SetAction(result =>
+            {
+                try
+                {
+                    var obsId = result.GetRequiredValue(obsIdArg);
+                    var obs = GetObservationById(obsId);
+                    if (obs is not null)
+                    {
+                        Console.WriteLine(obs);
+                        Console.WriteLine();
+                        PrintCheeps(FilterComments(obsId, CommentDB.Read()));
+                    }
+                    else {
+                        Console.WriteLine("Observation does not exist.");
+                    }
+                }
+                catch
+                {
                     Console.WriteLine("Could not find any comments.");
                 }
             });
 
             return discussion;
+        }
+
+        static ObservationRecord? GetObservationById(int id)
+        {
+            foreach (var observation in ObservationDB.Read())
+            {
+                if (observation.Id == id)
+                {
+                    return observation;
+                }
+            }
+            return null;
         }
 
         static IEnumerable<CommentRecord> FilterComments(int id, IEnumerable<CommentRecord> comments) {
