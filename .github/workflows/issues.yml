@@ -37,7 +37,7 @@ jobs:
                   This PR has automatically been assigned to @$USER"
               env:
                   TITLE: ${{ github.event.issue.title }}
-                  LABELS: ${{ join(github.event.issue.labels.*.name, ",") }}
+                  LABELS: ${{ join(github.event.issue.labels.*.name, ',') }}
                   USER: ${{ github.event.issue.user.login }}
 
     # pr_commented:
