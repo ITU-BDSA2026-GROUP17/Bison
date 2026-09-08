@@ -10,7 +10,7 @@ env:
     DOTNET_VERSION: "8.0.x"
 
 jobs:
-    issue_opened:
+    weekly_issue_opened:
         name: Weekly Issue Opened
         if: ${{ github.event.action == "opened" && startsWith(github.event.issue.title, "weekly/") }}
         runs-on: ubuntu-latest
