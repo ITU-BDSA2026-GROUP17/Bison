@@ -12,7 +12,7 @@ env:
 jobs:
     weekly_issue_opened:
         name: Weekly Issue Opened
-        if: ${{ github.event.action == "opened" && startsWith(github.event.issue.title, "weekly/") }}
+        if: ${{ github.event.action == 'opened' && startsWith(github.event.issue.title, 'weekly/') }}
         runs-on: ubuntu-latest
         env:
             GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -43,7 +43,7 @@ jobs:
     # pr_commented:
         # # This job only runs for pull request comments (could be useful later)
         # name: PR comment
-        # if: ${{ github.event.action == "created" && github.event.issue.pull_request }}
+        # if: ${{ github.event.action == 'created' && github.event.issue.pull_request }}
         # runs-on: ubuntu-latest
         # steps:
             # - run: |
@@ -54,7 +54,7 @@ jobs:
     # issue_commented:
         # # This job only runs for issue comments (could be useful later)
         # name: Issue comment
-        # if: ${{ github.event.action == "created" && !github.event.issue.pull_request }}
+        # if: ${{ github.event.action == 'created' && !github.event.issue.pull_request }}
         # runs-on: ubuntu-latest
         # steps:
             # - run: |
