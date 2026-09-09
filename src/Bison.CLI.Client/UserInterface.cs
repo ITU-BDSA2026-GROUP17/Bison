@@ -2,11 +2,12 @@ using System.CommandLine;
 using System.Globalization;
 
 using Bison.Models;
-using Bison.SimpleDB;
+using Bison.Database;
+using Bison.Utilities;
 
 #nullable enable
 
-namespace Bison
+namespace Bison.CLI.Client
 {
     public sealed class UserInterface
     {
@@ -75,7 +76,7 @@ namespace Bison
                 Id = ObservationIdCounter.NextNumber(),
                 Author = Environment.UserName,
                 Observation = result.GetRequiredValue(obsArg),
-                Timestamp = Utilities.DateTimeToUnixTimeStamp(DateTime.Now),
+                Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
             }
             ));
 
@@ -105,7 +106,7 @@ namespace Bison
                         ObservationId = obsId,
                         Author = Environment.UserName,
                         Comment = result.GetRequiredValue(commentArg),
-                        Timestamp = Utilities.DateTimeToUnixTimeStamp(DateTime.Now),
+                        Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
                     }
                     );
                 }

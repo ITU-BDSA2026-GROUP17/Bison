@@ -3,7 +3,7 @@ using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 
-namespace Bison.SimpleDB;
+namespace Bison.Database;
 
 public sealed class CSVDatabase<T>(string filePath) : IDatabaseRepository<T>
 {

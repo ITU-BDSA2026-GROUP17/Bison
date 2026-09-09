@@ -34,13 +34,7 @@ jobs:
             - name: Publish and Zip
               run: |
                   make all
-                  rm -rf data/*.zip
-                  zip -j data/bison-linux-x64.zip bin/Release/net8.0/linux-x64/publish/Bison
-                  zip -j data/bison-linux-arm64.zip bin/Release/net8.0/linux-arm64/publish/Bison
-                  zip -j data/bison-osx-x64.zip bin/Release/net8.0/osx-x64/publish/Bison
-                  zip -j data/bison-osx-arm64.zip bin/Release/net8.0/osx-arm64/publish/Bison
-                  zip -j data/bison-win-x64.zip bin/Release/net8.0/win-x64/publish/Bison.exe
-                  zip -j data/bison-win-arm64.zip bin/Release/net8.0/win-arm64/publish/Bison.exe
+                  make zip
               env:
                   BISON_VERSION: ${{ github.ref_name }}
 
