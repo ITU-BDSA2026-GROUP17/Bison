@@ -1,8 +1,8 @@
 using System.CommandLine;
 using System.Globalization;
 
-using Bison.Models;
 using Bison.Database;
+using Bison.Models;
 using Bison.Utilities;
 
 #nullable enable
