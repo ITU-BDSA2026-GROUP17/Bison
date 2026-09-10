@@ -1,4 +1,4 @@
-namespace Bison.SimpleDB;
+namespace Bison.Database;
 
 public sealed class SimpleCounter
 {

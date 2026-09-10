@@ -11,8 +11,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="33.1.0" />
     <PackageReference Include="System.CommandLine" Version="2.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Bison.Database\Bison.Database.csproj" />
+    <ProjectReference Include="..\Bison.Models\Bison.Models.csproj" />
+    <ProjectReference Include="..\Bison.Utilities\Bison.Utilities.csproj" />
   </ItemGroup>
 
 </Project>

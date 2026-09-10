@@ -1,4 +1,12 @@
-.PHONY: all build clean
+.PHONY: all build clean zip
+
+BUILD_PROJECT := Bison.CLI.Client
+BASE_PATH := src/$(BUILD_PROJECT)/
+OS := linux win osx
+ARCH := x64 arm64
+PLATFORMS := $(foreach os,$(OS),$(foreach arch,$(ARCH),$(os)-$(arch)))
+
+get_ext = $(if $(filter win-%,$(1)),.exe)
 
 ifdef BISON_VERSION
 version := $(BISON_VERSION:v%=%)
@@ -8,25 +16,25 @@ endif
 
 all: build
 
-bin/Release/net8.0/linux-x64/publish/Bison: Program.cs Bison.csproj
-	dotnet publish -r linux-x64 -p FileVersion=${version}
+${BASE_PATH}bin/Release/net8.0/%/publish/$(BUILD_PROJECT): ${BASE_PATH}Program.cs $(wildcard ${BASE_PATH}*.csproj)
+	@echo "Publishing for $*..."
+	dotnet publish ${BASE_PATH} -c Release -r $* -p:FileVersion=${version}
 
-bin/Release/net8.0/linux-arm64/publish/Bison: Program.cs Bison.csproj
-	dotnet publish -r linux-arm64 -p FileVersion=${version}
+${BASE_PATH}bin/Release/net8.0/win-%/publish/$(BUILD_PROJECT).exe: ${BASE_PATH}Program.cs $(wildcard ${BASE_PATH}*.csproj)
+	@echo "Publishing for win-$*..."
+	dotnet publish ${BASE_PATH} -c Release -r win-$* -p:FileVersion=${version}
 
-bin/Release/net8.0/win-x64/publish/Bison.exe: Program.cs Bison.csproj
-	dotnet publish -r win-x64 -p FileVersion=${version}
+build: $(foreach platform,$(PLATFORMS),${BASE_PATH}bin/Release/net8.0/$(platform)/publish/$(BUILD_PROJECT)$(call get_ext,$(platform)))
 
-bin/Release/net8.0/win-arm64/publish/Bison.exe: Program.cs Bison.csproj
-	dotnet publish -r win-arm64 -p FileVersion=${version}
+zip:
+	rm -rf data/*.zip
+	@mkdir -p data
+	@$(foreach platform,$(PLATFORMS),\
+		ext="$(call get_ext,$(platform))"; \
+		zip -j data/bison-$(platform).zip ${BASE_PATH}bin/Release/net8.0/$(platform)/publish/$(BUILD_PROJECT)$$ext; \
+	)
 
-bin/Release/net8.0/osx-x64/publish/Bison: Program.cs Bison.csproj
-	dotnet publish -r osx-x64 -p FileVersion=${version}
-
-bin/Release/net8.0/osx-arm64/publish/Bison: Program.cs Bison.csproj
-	dotnet publish -r osx-arm64 -p FileVersion=${version}
-
-build: bin/Release/net8.0/linux-x64/publish/Bison bin/Release/net8.0/linux-arm64/publish/Bison bin/Release/net8.0/win-x64/publish/Bison.exe bin/Release/net8.0/win-arm64/publish/Bison.exe bin/Release/net8.0/osx-x64/publish/Bison bin/Release/net8.0/osx-arm64/publish/Bison
+ci: build zip
 
 clean:
-	rm -r ./bin/ ./obj/
+	rm -rf ./src/**/bin/ ./src/**/obj/ ./data/*.zip

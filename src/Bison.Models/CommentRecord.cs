@@ -1,5 +1,7 @@
 namespace Bison.Models;
 
+using Bison.Utilities;
+
 public sealed record CommentRecord
 {
     public required int ObservationId { get; set; }
@@ -9,7 +11,7 @@ public sealed record CommentRecord
 
     public DateTime GetAsDateTime()
     {
-        return Utilities.UnixTimeStampToDateTime(Timestamp);
+        return DateTimeUtilities.UnixTimeStampToDateTime(Timestamp);
     }
 
     public override string ToString()
