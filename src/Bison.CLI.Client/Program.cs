@@ -4,6 +4,12 @@ namespace Bison.CLI.Client
 {
     public class Program
     {
+        static readonly UserInterface UserInterface = new(
+            "data/bison_observation_db.csv",
+            "data/bison_comment_db.csv",
+            "data/observation_id.txt"
+        );
+
         static int Main(string[] args)
         {
             var root = UserInterface.GetRootCommand();

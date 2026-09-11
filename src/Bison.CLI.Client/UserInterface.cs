@@ -9,15 +9,11 @@ using Bison.Utilities;
 
 namespace Bison.CLI.Client
 {
-    public sealed class UserInterface
+    public sealed class UserInterface(string observationDBPath, string commentDBPath, string observationIdCounterPath)
     {
-        static readonly CSVDatabase<ObservationRecord> ObservationDB = new("data/bison_observation_db.csv");
-        static readonly CSVDatabase<CommentRecord> CommentDB = new("data/bison_comment_db.csv");
-        static readonly SimpleCounter ObservationIdCounter = new("data/observation_id.txt");
-
-        private UserInterface()
-        {
-        }
+        public readonly CSVDatabase<ObservationRecord> ObservationDB = new(observationDBPath);
+        public readonly CSVDatabase<CommentRecord> CommentDB = new(commentDBPath);
+        public readonly SimpleCounter ObservationIdCounter = new(observationIdCounterPath);
 
         public static void PrintCheeps<T>(IEnumerable<T> cheeps)
         {
@@ -34,7 +30,7 @@ namespace Bison.CLI.Client
             }
         }
 
-        public static RootCommand GetRootCommand()
+        public RootCommand GetRootCommand()
         {
             RootCommand root = new("Bison.CLI app");
 
@@ -46,7 +42,7 @@ namespace Bison.CLI.Client
             return root;
         }
 
-        static Command ReadCommand()
+        Command ReadCommand()
         {
             Command read = new("read", "read the saved observations");
             read.SetAction(result =>
@@ -63,7 +59,7 @@ namespace Bison.CLI.Client
             return read;
         }
 
-        static Command ObservationCommand()
+        Command ObservationCommand()
         {
             Command observe = new("observe", "adds an observation to the database");
             Argument<string> obsArg = new("observation")
@@ -83,7 +79,7 @@ namespace Bison.CLI.Client
             return observe;
         }
 
-        static Command CommentCommand()
+        Command CommentCommand()
         {
             Command comment = new("comment", "adds a comment to the specified observation in the database");
             Argument<string> commentArg = new("comment")
@@ -119,7 +115,7 @@ namespace Bison.CLI.Client
             return comment;
         }
 
-        static Command DiscussionCommand()
+        Command DiscussionCommand()
         {
             Command discussion = new("discussion", "read comments made on an observation");
             Argument<int> obsIdArg = new("observation-id")
@@ -153,7 +149,7 @@ namespace Bison.CLI.Client
             return discussion;
         }
 
-        static ObservationRecord? GetObservationById(int id)
+        ObservationRecord? GetObservationById(int id)
         {
             foreach (var observation in ObservationDB.Read())
             {
@@ -165,7 +161,7 @@ namespace Bison.CLI.Client
             return null;
         }
 
-        static IEnumerable<CommentRecord> FilterComments(int id, IEnumerable<CommentRecord> comments)
+        public static IEnumerable<CommentRecord> FilterComments(int id, IEnumerable<CommentRecord> comments)
         {
             foreach (var comment in comments)
             {
