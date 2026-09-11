@@ -23,8 +23,8 @@ public class UnitTests
             }
         }
 
-        CSVDatabase<ObservationRecord> observationDB = new("data/test/obs_db.csv");
-        CSVDatabase<CommentRecord> commentDB = new("data/test/com_db.csv");
+        CSVDatabase<ObservationRecord> observationDB = CSVDatabase<ObservationRecord>.GetInstance("data/test/obs_db.csv");
+        CSVDatabase<CommentRecord> commentDB = CSVDatabase<CommentRecord>.GetInstance("data/test/com_db.csv");
         SimpleCounter observationIdCounter = new("data/test/obs_id_db.txt");
 
         observationDB.Store(

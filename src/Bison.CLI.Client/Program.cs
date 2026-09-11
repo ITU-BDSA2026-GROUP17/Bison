@@ -13,9 +13,9 @@ namespace Bison.CLI.Client
 {
     public class Program
     {
-        public static readonly CSVDatabase<ObservationRecord> ObservationDB = new("data/bison_observation_db.csv");
-        public static readonly CSVDatabase<CommentRecord> CommentDB = new("data/bison_comment_db.csv");
-        public static readonly SimpleCounter ObservationIdCounter = new("data/observation_id.txt");
+        static readonly CSVDatabase<ObservationRecord> ObservationDB = CSVDatabase<ObservationRecord>.GetInstance("data/bison_observation_db.csv");
+        static readonly CSVDatabase<CommentRecord> CommentDB = CSVDatabase<CommentRecord>.GetInstance("data/bison_comment_db.csv");
+        static readonly SimpleCounter ObservationIdCounter = new("data/observation_id.txt");
 
         static int Main(string[] args)
         {
