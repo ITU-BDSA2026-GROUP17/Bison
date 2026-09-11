@@ -1,9 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.CommandLine;
-using System.Globalization;
-
-using Bison.Database;
-using Bison.Models;
-using Bison.Utilities;
+using System.Linq;
 
 #nullable enable
 
@@ -11,29 +9,6 @@ namespace Bison.CLI.Client
 {
     public sealed class UserInterface
     {
-        static readonly CSVDatabase<ObservationRecord> ObservationDB = new("data/bison_observation_db.csv");
-        static readonly CSVDatabase<CommentRecord> CommentDB = new("data/bison_comment_db.csv");
-        static readonly SimpleCounter ObservationIdCounter = new("data/observation_id.txt");
-
-        private UserInterface()
-        {
-        }
-
-        public static void PrintCheeps<T>(IEnumerable<T> cheeps)
-        {
-            if (!cheeps.Any())
-            {
-                throw new("Could not find any cheeps");
-            }
-            else
-            {
-                foreach (var cheep in cheeps)
-                {
-                    Console.WriteLine(cheep);
-                }
-            }
-        }
-
         public static RootCommand GetRootCommand()
         {
             RootCommand root = new("Bison.CLI app");
@@ -51,13 +26,10 @@ namespace Bison.CLI.Client
             Command read = new("read", "read the saved observations");
             read.SetAction(result =>
             {
-                try
+                var res = Program.ReadObservations();
+                if (res is not null)
                 {
-                    PrintCheeps(ObservationDB.Read());
-                }
-                catch
-                {
-                    Console.WriteLine("Could not find any observations.");
+                    Console.WriteLine(res);
                 }
             });
             return read;
@@ -71,13 +43,8 @@ namespace Bison.CLI.Client
                 Description = "the observation you observed"
             };
             observe.Arguments.Add(obsArg);
-            observe.SetAction(result => ObservationDB.Store(new ObservationRecord
-            {
-                Id = ObservationIdCounter.NextNumber(),
-                Author = Environment.UserName,
-                Observation = result.GetRequiredValue(obsArg),
-                Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
-            }
+            observe.SetAction(result => Console.WriteLine(
+                Program.StoreObservation(result.GetRequiredValue(obsArg))
             ));
 
             return observe;
@@ -97,24 +64,11 @@ namespace Bison.CLI.Client
             comment.Arguments.Add(obsIdArg);
             comment.Arguments.Add(commentArg);
             comment.SetAction(result =>
-            {
-                var obsId = result.GetRequiredValue(obsIdArg);
-                if (GetObservationById(obsId) is not null)
-                {
-                    CommentDB.Store(new CommentRecord
-                    {
-                        ObservationId = obsId,
-                        Author = Environment.UserName,
-                        Comment = result.GetRequiredValue(commentArg),
-                        Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
-                    }
-                    );
-                }
-                else
-                {
-                    Console.WriteLine("Observation id {0} does not exist", obsId);
-                }
-            });
+                Console.WriteLine(Program.TryComment(
+                    result.GetRequiredValue(obsIdArg),
+                    result.GetRequiredValue(commentArg)
+                ))
+            );
 
             return comment;
         }
@@ -129,49 +83,27 @@ namespace Bison.CLI.Client
             discussion.Arguments.Add(obsIdArg);
             discussion.SetAction(result =>
             {
-                try
+                var res = Program.ReadComments(result.GetRequiredValue(obsIdArg));
+                if (res is not null)
                 {
-                    var obsId = result.GetRequiredValue(obsIdArg);
-                    var obs = GetObservationById(obsId);
-                    if (obs is not null)
-                    {
-                        Console.WriteLine(obs);
-                        Console.WriteLine();
-                        PrintCheeps(FilterComments(obsId, CommentDB.Read()));
-                    }
-                    else
-                    {
-                        Console.WriteLine("Observation does not exist.");
-                    }
-                }
-                catch
-                {
-                    Console.WriteLine("Could not find any comments.");
+                    Console.WriteLine(res);
                 }
             });
 
             return discussion;
         }
 
-        static ObservationRecord? GetObservationById(int id)
+        public static void PrintCheeps<T>(IEnumerable<T> cheeps)
         {
-            foreach (var observation in ObservationDB.Read())
+            if (!cheeps.Any())
             {
-                if (observation.Id == id)
-                {
-                    return observation;
-                }
+                throw new("Could not find any cheeps");
             }
-            return null;
-        }
-
-        static IEnumerable<CommentRecord> FilterComments(int id, IEnumerable<CommentRecord> comments)
-        {
-            foreach (var comment in comments)
+            else
             {
-                if (comment.ObservationId == id)
+                foreach (var cheep in cheeps)
                 {
-                    yield return comment;
+                    Console.WriteLine(cheep);
                 }
             }
         }
