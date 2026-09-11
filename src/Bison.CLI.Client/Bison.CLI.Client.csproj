@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <PublishSingleFile>true</PublishSingleFile> <!-- Compiles all files into one executable -->
+    <SelfContained>false</SelfContained> <!-- But require the .NET runtime (assumed everyone has it) -->
+    <PublishReadyToRun>false</PublishReadyToRun> <!-- Maybe update to true later if needed -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Bison.Database\Bison.Database.csproj" />
+    <ProjectReference Include="..\Bison.Models\Bison.Models.csproj" />
+    <ProjectReference Include="..\Bison.Utilities\Bison.Utilities.csproj" />
+  </ItemGroup>
+
+</Project>

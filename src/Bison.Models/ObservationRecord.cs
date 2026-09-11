@@ -1,15 +1,18 @@
 namespace Bison.Models;
 
+using Bison.Utilities;
+
 public sealed record ObservationRecord
 {
     public required int Id { get; set; }
     public required string Author { get; set; }
     public required string Observation { get; set; }
-    public int Timestamp { get; set; }
+    public required string Location { get; set; }
+    public required int Timestamp { get; set; }
 
     public DateTime GetAsDateTime()
     {
-        return Utilities.UnixTimeStampToDateTime(Timestamp);
+        return DateTimeUtilities.UnixTimeStampToDateTime(Timestamp);
     }
 
     public override string ToString()
