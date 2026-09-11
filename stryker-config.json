@@ -1,0 +1,49 @@
+{
+    "stryker-config": {
+        "concurrency": 5,
+        "mutation-level": "Standard",
+        "language-version": "latest",
+        "additional-timeout": 5000,
+        "mutate": ["**/*"],
+        "solution": "./Bison.sln",
+        "configuration": null,
+        "target-framework": null,
+        "project": null,
+        "coverage-analysis": "perTest",
+        "disable-bail": false,
+        "disable-mix-mutants": false,
+        "thresholds": {
+            "high": 80,
+            "low": 60,
+            "break": 0
+        },
+        "verbosity": "debug",
+        "reporters": ["Progress", "Html"],
+        "since": {
+            "enabled": false,
+            "ignore-changes-in": [],
+            "target": "master"
+        },
+        "baseline": {
+            "enabled": false,
+            "provider": "disk",
+            "azure-fileshare-url": "",
+            "s3-bucket-name": "",
+            "s3-endpoint": "",
+            "s3-region": "",
+            "fallback-version": "master"
+        },
+        "dashboard-url": "https://dashboard.stryker-mutator.io",
+        "test-projects": [
+            "./test/Bison.CLI.Client.Tests/Bison.CLI.Client.Tests.csproj",
+            "./test/Bison.Database.Tests/Bison.Database.Tests.csproj",
+            "./test/Bison.Utilities.Tests/Bison.Utilities.Tests.csproj"
+        ],
+        "test-case-filter": "",
+        "test-runner": null,
+        "ignore-mutations": [],
+        "ignore-methods": [],
+        "report-file-name": "mutation-report",
+        "break-on-initial-test-failure": false
+    }
+}
