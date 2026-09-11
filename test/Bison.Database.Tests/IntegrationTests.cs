@@ -32,7 +32,7 @@ public class SavingRetrievingTest
     {
         CreateFileIfNotExists("data/test/saving_test.csv");
         CreateFileIfNotExists("data/test/saving_test.txt");
-        CSVDatabase<ObservationRecord> observationDB = new("data/test/saving_test.csv");
+        CSVDatabase<ObservationRecord> observationDB = CSVDatabase<ObservationRecord>.GetInstance("data/test/saving_test.csv");
         SimpleCounter obsIdCounter = new("data/test/saving_test.txt");
         var observation = new ObservationRecord
         {
@@ -53,7 +53,7 @@ public class SavingRetrievingTest
         DeleteFileIfExists("data/test/saving_test.csv");
         DeleteFileIfExists("data/test/saving_test.txt");
 
-        CSVDatabase<ObservationRecord> observationDB = new("data/test/saving_test.csv");
+        CSVDatabase<ObservationRecord> observationDB = CSVDatabase<ObservationRecord>.GetInstance("data/test/saving_test.csv");
         observationDB.Read().Count().Should().Be(0);
 
         SimpleCounter obsIdCounter = new("data/test/saving_test.txt");

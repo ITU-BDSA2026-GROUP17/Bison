@@ -5,17 +5,33 @@ using CsvHelper.Configuration;
 
 namespace Bison.Database;
 
-public sealed class CSVDatabase<T>(string filePath) : IDatabaseRepository<T>
+public sealed class CSVDatabase<T> : IDatabaseRepository<T>
 {
-    readonly string _filePath = filePath;
+    static readonly Dictionary<string, CSVDatabase<T>> dict = [];
+    string FilePath { get; init; }
+
+    private CSVDatabase() { }
+
+    public static CSVDatabase<T> GetInstance(string filePath)
+    {
+        if (!dict.TryGetValue(filePath, out var value))
+        {
+            value = new()
+            {
+                FilePath = filePath
+            };
+            dict[filePath] = value;
+        }
+        return value;
+    }
 
     public IEnumerable<T> Read(int? limit = null)
     {
-        if (!File.Exists(_filePath))
+        if (!File.Exists(FilePath))
         {
             yield break;
         }
-        using var reader = new StreamReader(_filePath);
+        using var reader = new StreamReader(FilePath);
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
 
         var records = csv.GetRecords<T>();
@@ -32,12 +48,12 @@ public sealed class CSVDatabase<T>(string filePath) : IDatabaseRepository<T>
             // Don't write the header again.
             HasHeaderRecord = false,
         };
-        if (!File.Exists(_filePath))
+        if (!File.Exists(FilePath))
         {
             config = new CsvConfiguration(CultureInfo.InvariantCulture);
-            Directory.CreateDirectory(Path.GetDirectoryName(_filePath));
+            Directory.CreateDirectory(Path.GetDirectoryName(FilePath));
         }
-        using var stream = File.Open(_filePath, FileMode.Append);
+        using var stream = File.Open(FilePath, FileMode.Append);
         using var writer = new StreamWriter(stream);
         using var csv = new CsvWriter(writer, config);
 
