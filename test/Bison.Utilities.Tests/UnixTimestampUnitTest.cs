@@ -1,4 +1,4 @@
-namespace Bison.CLI.Client.Tests;
+namespace Bison.Utilities.Tests;
 
 using Bison.Utilities;
 
