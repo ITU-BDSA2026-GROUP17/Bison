@@ -33,6 +33,7 @@ public class UnitTests
                 Id = observationIdCounter.NextNumber(),
                 Author = "lrec",
                 Observation = "Eurasien jay",
+                Location = "Assistentens Kirkegård",
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
             }
         );
@@ -61,6 +62,7 @@ public class UnitTests
                 Id = observationIdCounter.NextNumber(),
                 Author = "mawb",
                 Observation = "Ghost",
+                Location = "Here",
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
             }
         );
@@ -89,6 +91,7 @@ public class UnitTests
                 Id = observationIdCounter.NextNumber(),
                 Author = "toov",
                 Observation = "Magnus",
+                Location = "ITU",
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
             }
         );
@@ -117,6 +120,7 @@ public class UnitTests
                 Id = observationIdCounter.NextNumber(),
                 Author = "pask",
                 Observation = "Saw a group of crows",
+                Location = "Tivoli",
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
             }
         );
@@ -127,6 +131,7 @@ public class UnitTests
                 Id = observationIdCounter.NextNumber(),
                 Author = "lrec",
                 Observation = "Peanut Butter Baby",
+                Location = "The Table",
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
             }
         );

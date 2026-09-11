@@ -38,13 +38,14 @@ namespace Bison.CLI.Client
             }
         }
 
-        public static string StoreObservation(string observation)
+        public static string StoreObservation(string observation, string location)
         {
             ObservationDB.Store(new ObservationRecord
             {
                 Id = ObservationIdCounter.NextNumber(),
                 Author = Environment.UserName,
                 Observation = observation,
+                Location = location,
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
             });
             return "Observation has been saved.";

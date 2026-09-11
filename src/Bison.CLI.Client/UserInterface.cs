@@ -42,9 +42,14 @@ namespace Bison.CLI.Client
             {
                 Description = "the observation you observed"
             };
+            Argument<string> locationArg = new("location")
+            {
+                Description = "location of the observation you observed"
+            };
             observe.Arguments.Add(obsArg);
+            observe.Arguments.Add(locationArg);
             observe.SetAction(result => Console.WriteLine(
-                Program.StoreObservation(result.GetRequiredValue(obsArg))
+                Program.StoreObservation(result.GetRequiredValue(obsArg), result.GetRequiredValue(locationArg))
             ));
 
             return observe;
