@@ -11,6 +11,10 @@ public sealed class CSVDatabase<T>(string filePath) : IDatabaseRepository<T>
 
     public IEnumerable<T> Read(int? limit = null)
     {
+        if (!File.Exists(_filePath))
+        {
+            yield break;
+        }
         using var reader = new StreamReader(_filePath);
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
 
