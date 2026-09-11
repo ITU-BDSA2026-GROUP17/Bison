@@ -47,7 +47,7 @@ public class E2E
 
         output.Trim().Should().Be("Observation has been saved.");
     }
-    
+
     [Fact]
     public async void CommentOnExistentObservationWorks()
     {

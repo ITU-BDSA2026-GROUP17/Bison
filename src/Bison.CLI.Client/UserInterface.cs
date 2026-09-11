@@ -81,9 +81,11 @@ namespace Bison.CLI.Client
                 Description = "the id of the observation you want to read comments about"
             };
             discussion.Arguments.Add(obsIdArg);
-            discussion.SetAction(result => {
+            discussion.SetAction(result =>
+            {
                 var res = Program.ReadComments(result.GetRequiredValue(obsIdArg));
-                if (res is not null) {
+                if (res is not null)
+                {
                     Console.WriteLine(res);
                 }
             });

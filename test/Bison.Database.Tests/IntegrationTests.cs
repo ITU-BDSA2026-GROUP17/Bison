@@ -19,13 +19,14 @@ public class SavingRetrievingTest
         File.Create(filePath);
     }
 
-    static void DeleteFileIfExists(string filePath) {
+    static void DeleteFileIfExists(string filePath)
+    {
         if (File.Exists(filePath))
         {
             File.Delete(filePath);
         }
     }
-    
+
     [Fact]
     public static void SavingAndRetreivingWorksIfFileExists()
     {
@@ -47,13 +48,14 @@ public class SavingRetrievingTest
     }
 
     [Fact]
-    public static void SavingAndRetreivingWorksIfFileDoesNotExists() {
+    public static void SavingAndRetreivingWorksIfFileDoesNotExists()
+    {
         DeleteFileIfExists("data/test/saving_test.csv");
         DeleteFileIfExists("data/test/saving_test.txt");
-        
+
         CSVDatabase<ObservationRecord> observationDB = new("data/test/saving_test.csv");
         observationDB.Read().Count().Should().Be(0);
-        
+
         SimpleCounter obsIdCounter = new("data/test/saving_test.txt");
         var observation = new ObservationRecord
         {
