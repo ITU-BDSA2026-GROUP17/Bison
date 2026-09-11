@@ -39,6 +39,7 @@ public class SavingRetrievingTest
             Id = obsIdCounter.NextNumber(),
             Author = "Test Person 1",
             Observation = "WOAH WOAH",
+            Location = "Nowhere",
             Timestamp = 0 // January 1st, 1970 at 00:00:00
         };
 
@@ -62,6 +63,7 @@ public class SavingRetrievingTest
             Id = obsIdCounter.NextNumber(),
             Author = "Test Person 1",
             Observation = "WOAH WOAH",
+            Location = "Nowhere",
             Timestamp = 0 // January 1st, 1970 at 00:00:00
         };
 

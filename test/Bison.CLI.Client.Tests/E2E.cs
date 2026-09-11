@@ -37,7 +37,7 @@ public class E2E
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             FileName = "dotnet",
-            Arguments = "run --project src/Bison.CLI.Client -- observe \"Penguin\"",
+            Arguments = "run --project src/Bison.CLI.Client -- observe \"Penguin\" \"At zoo\"",
             WorkingDirectory = "../../../../../"
         });
         Assert.True(process is not null);
