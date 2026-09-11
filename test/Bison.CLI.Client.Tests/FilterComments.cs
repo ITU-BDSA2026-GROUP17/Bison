@@ -1,5 +1,7 @@
 namespace Bison.CLI.Client.Tests;
 
+using System.IO;
+
 using Bison.CLI.Client;
 using Bison.Models;
 using Bison.Utilities;
@@ -10,6 +12,16 @@ public class FilterComments
 {
     static UserInterface SetupTestDatabase()
     {
+        DirectoryInfo di = new("data/test");
+        foreach (FileInfo file in di.GetFiles())
+        {
+            file.Delete(); 
+        }
+        foreach (DirectoryInfo dir in di.GetDirectories())
+        {
+            dir.Delete(true);
+        }
+        
         UserInterface userInterface = new(
             "data/test/obs_db.csv",
             "data/test/com_db.csv",
