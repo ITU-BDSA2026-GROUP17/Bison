@@ -1,43 +1,42 @@
 namespace Bison.CLI.Client.Tests;
 
-using System.IO;
-
-using Bison.CLI.Client;
+using Bison.Database;
 using Bison.Models;
 using Bison.Utilities;
 
 using FluentAssertions;
 
-public class FilterComments
+public class UnitTests
 {
-    static UserInterface SetupTestDatabase()
+    static (CSVDatabase<ObservationRecord>, CSVDatabase<CommentRecord>, SimpleCounter) SetupTestDatabase()
     {
-        DirectoryInfo di = new("data/test");
-        foreach (FileInfo file in di.GetFiles())
+        if (Directory.Exists("data/test"))
         {
-            file.Delete(); 
+            DirectoryInfo di = new("data/test");
+            foreach (FileInfo file in di.GetFiles())
+            {
+                file.Delete();
+            }
+            foreach (DirectoryInfo dir in di.GetDirectories())
+            {
+                dir.Delete(true);
+            }
         }
-        foreach (DirectoryInfo dir in di.GetDirectories())
-        {
-            dir.Delete(true);
-        }
-        
-        UserInterface userInterface = new(
-            "data/test/obs_db.csv",
-            "data/test/com_db.csv",
-            "data/test/obs_id_db.txt"
-        );
 
-        userInterface.ObservationDB.Store(
+        CSVDatabase<ObservationRecord> observationDB = new("data/test/obs_db.csv");
+        CSVDatabase<CommentRecord> commentDB = new("data/test/com_db.csv");
+        SimpleCounter observationIdCounter = new("data/test/obs_id_db.txt");
+
+        observationDB.Store(
             new ObservationRecord
             {
-                Id = userInterface.ObservationIdCounter.NextNumber(),
+                Id = observationIdCounter.NextNumber(),
                 Author = "lrec",
                 Observation = "Eurasien jay",
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
             }
         );
-        userInterface.CommentDB.Store(
+        commentDB.Store(
             new CommentRecord
             {
                 ObservationId = 0,
@@ -46,7 +45,7 @@ public class FilterComments
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now)
             }
         );
-        userInterface.CommentDB.Store(
+        commentDB.Store(
             new CommentRecord
             {
                 ObservationId = 0,
@@ -55,17 +54,17 @@ public class FilterComments
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now)
             }
         );
-        
-        userInterface.ObservationDB.Store(
+
+        observationDB.Store(
             new ObservationRecord
             {
-                Id = userInterface.ObservationIdCounter.NextNumber(),
+                Id = observationIdCounter.NextNumber(),
                 Author = "mawb",
                 Observation = "Ghost",
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
             }
         );
-        userInterface.CommentDB.Store(
+        commentDB.Store(
             new CommentRecord
             {
                 ObservationId = 1,
@@ -74,7 +73,7 @@ public class FilterComments
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now)
             }
         );
-        userInterface.CommentDB.Store(
+        commentDB.Store(
             new CommentRecord
             {
                 ObservationId = 1,
@@ -83,17 +82,17 @@ public class FilterComments
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now)
             }
         );
-        
-        userInterface.ObservationDB.Store(
+
+        observationDB.Store(
             new ObservationRecord
             {
-                Id = userInterface.ObservationIdCounter.NextNumber(),
+                Id = observationIdCounter.NextNumber(),
                 Author = "toov",
                 Observation = "Magnus",
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
             }
         );
-        userInterface.CommentDB.Store(
+        commentDB.Store(
             new CommentRecord
             {
                 ObservationId = 2,
@@ -102,7 +101,7 @@ public class FilterComments
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now)
             }
         );
-        userInterface.CommentDB.Store(
+        commentDB.Store(
             new CommentRecord
             {
                 ObservationId = 2,
@@ -111,27 +110,27 @@ public class FilterComments
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now)
             }
         );
-        
-        userInterface.ObservationDB.Store(
+
+        observationDB.Store(
             new ObservationRecord
             {
-                Id = userInterface.ObservationIdCounter.NextNumber(),
+                Id = observationIdCounter.NextNumber(),
                 Author = "pask",
                 Observation = "Saw a group of crows",
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
             }
         );
-        
-        userInterface.ObservationDB.Store(
+
+        observationDB.Store(
             new ObservationRecord
             {
-                Id = userInterface.ObservationIdCounter.NextNumber(),
+                Id = observationIdCounter.NextNumber(),
                 Author = "lrec",
                 Observation = "Peanut Butter Baby",
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
             }
         );
-        userInterface.CommentDB.Store(
+        commentDB.Store(
             new CommentRecord
             {
                 ObservationId = 4,
@@ -141,23 +140,31 @@ public class FilterComments
             }
         );
 
-        return userInterface;
+        return (observationDB, commentDB, observationIdCounter);
     }
 
     [Fact]
     public static void UnitTest()
     {
-        var ui = SetupTestDatabase();
+        var (observationDB, commentDB, observationIdCounter) = SetupTestDatabase();
 
-        var commentsForFirstObservation = UserInterface.FilterComments(0, ui.CommentDB.Read()).ToArray();
+        var commentsForFirstObservation = Program.FilterComments(0, commentDB.Read()).ToArray();
         commentsForFirstObservation.Length.Should().Be(2);
-        var commentsForSecondObservation = UserInterface.FilterComments(1, ui.CommentDB.Read()).ToArray();
+        var commentsForSecondObservation = Program.FilterComments(1, commentDB.Read()).ToArray();
         commentsForSecondObservation.Length.Should().Be(2);
-        var commentsForThirdObservation = UserInterface.FilterComments(2, ui.CommentDB.Read()).ToArray();
+        var commentsForThirdObservation = Program.FilterComments(2, commentDB.Read()).ToArray();
         commentsForThirdObservation.Length.Should().Be(2);
-        var commentsForFourthObservation = UserInterface.FilterComments(3, ui.CommentDB.Read()).ToArray();
+        var commentsForFourthObservation = Program.FilterComments(3, commentDB.Read()).ToArray();
         commentsForFourthObservation.Length.Should().Be(0);
-        var commentsForFifthObservation = UserInterface.FilterComments(4, ui.CommentDB.Read()).ToArray();
+        var commentsForFifthObservation = Program.FilterComments(4, commentDB.Read()).ToArray();
         commentsForFifthObservation.Length.Should().Be(1);
+    }
+
+    [Fact]
+    public void CommentsOnInvalidObservationsShouldFail()
+    {
+        var output = Program.TryComment(2147483647, "Test comment");
+
+        output.Should().Be("Observation id 2147483647 does not exist");
     }
 }
