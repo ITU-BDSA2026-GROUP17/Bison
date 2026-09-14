@@ -7,7 +7,7 @@ using FluentAssertions;
 public class E2E
 {
     [Fact]
-    public async void CommentOnNonExistentObservationTest()
+    public async Task CommentOnNonExistentObservationTest()
     {
         using var process = Process.Start(new ProcessStartInfo()
         {
@@ -28,7 +28,7 @@ public class E2E
     }
 
     [Fact]
-    public async void TestObservationWorks()
+    public async Task TestObservationWorks()
     {
         using var process = Process.Start(new ProcessStartInfo()
         {
@@ -49,7 +49,7 @@ public class E2E
     }
 
     [Fact]
-    public async void CommentOnExistentObservationWorks()
+    public async Task CommentOnExistentObservationWorks()
     {
         using var process = Process.Start(new ProcessStartInfo()
         {
