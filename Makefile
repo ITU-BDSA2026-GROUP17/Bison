@@ -16,11 +16,11 @@ endif
 
 all: build
 
-${BASE_PATH}bin/Release/net8.0/%/publish/$(BUILD_PROJECT): ${BASE_PATH}Program.cs $(wildcard ${BASE_PATH}*.csproj)
+${BASE_PATH}bin/Release/net8.0/%/publish/$(BUILD_PROJECT): ${BASE_PATH}Program.cs ${BASE_PATH}${BUILD_PROJECT}.csproj
 	@echo "Publishing for $*..."
 	dotnet publish ${BASE_PATH} -c Release -r $* -p:FileVersion=${version}
 
-${BASE_PATH}bin/Release/net8.0/win-%/publish/$(BUILD_PROJECT).exe: ${BASE_PATH}Program.cs $(wildcard ${BASE_PATH}*.csproj)
+${BASE_PATH}bin/Release/net8.0/win-%/publish/$(BUILD_PROJECT).exe: ${BASE_PATH}Program.cs ${BASE_PATH}${BUILD_PROJECT}.csproj
 	@echo "Publishing for win-$*..."
 	dotnet publish ${BASE_PATH} -c Release -r win-$* -p:FileVersion=${version}
 
