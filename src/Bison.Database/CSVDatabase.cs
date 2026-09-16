@@ -25,6 +25,20 @@ public sealed class CSVDatabase : IDatabaseService
         _observationIDCounter = new(observationIDCounter);
     }
 
+#nullable enable
+    private static ObservationRecord? GetObservationById(int id, IEnumerable<ObservationRecord> observations)
+    {
+        foreach (var observation in observations)
+        {
+            if (observation.Id == id)
+            {
+                return observation;
+            }
+        }
+        return null;
+    }
+#nullable restore
+
     public IEnumerable<ObservationRecord> ReadObservations(int? limit = null)
     {
         if (!File.Exists(_observationFilePath) || new FileInfo(_observationFilePath).Length == 0)
@@ -84,6 +98,10 @@ public sealed class CSVDatabase : IDatabaseService
     }
     public void StoreComment(CommentRecord record)
     {
+        if (GetObservationById(record.ObservationId, ReadObservations()) is null)
+        {
+            throw new ObservationDoesNotExist(record.ObservationId);
+        }
         var config = new CsvConfiguration(CultureInfo.InvariantCulture)
         {
             // Don't write the header again.
@@ -101,4 +119,9 @@ public sealed class CSVDatabase : IDatabaseService
 
         csv.WriteRecords([record]);
     }
+}
+
+public class ObservationDoesNotExist(int id) : ArgumentException(string.Format("Observation with id {0} does not exist", id))
+{
+    public int Id = id;
 }
