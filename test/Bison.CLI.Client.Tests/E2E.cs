@@ -6,7 +6,8 @@ using FluentAssertions;
 
 public class E2E
 {
-    public static Process StartDatabase() {
+    public static Process StartDatabase()
+    {
         using var process = Process.Start(new ProcessStartInfo()
         {
             UseShellExecute = false,
