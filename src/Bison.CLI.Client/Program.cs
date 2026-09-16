@@ -91,8 +91,8 @@ namespace Bison.CLI.Client
         {
             try
             {
-                var comments = await DBClient.GetFromJsonAsync<List<CommentRecord>>("/observations/{0}/comments");
-                var obs = await DBClient.GetFromJsonAsync<ObservationRecord>($"/observations/{observationId}");
+                var comments = await DBClient.GetFromJsonAsync<List<CommentRecord>>("/observation/{0}/comments");
+                var obs = await DBClient.GetFromJsonAsync<ObservationRecord>($"/observation/{observationId}");
                 if (comments is not null && obs is not null)
                 {
                     Console.WriteLine(obs);

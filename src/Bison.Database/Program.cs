@@ -12,7 +12,7 @@ var app = builder.Build();
 app.MapGet("/", () => "Hello World");
 
 app.MapGet("/observations", (IDatabaseService dbService) => dbService.ReadObservations().ToArray());
-app.MapGet("/observations/{id}", (int id, IDatabaseService dbService) =>
+app.MapGet("/observation/{id}", (int id, IDatabaseService dbService) =>
 {
     foreach (var observation in dbService.ReadObservations())
     {
@@ -66,3 +66,4 @@ public class CSVFiles
     public required string Comments { get; set; }
     public required string ObservationIds { get; set; }
 }
+public partial class Program { }
