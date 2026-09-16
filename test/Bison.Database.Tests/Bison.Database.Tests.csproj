@@ -29,6 +29,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Bison.Database\Bison.Database.csproj" />
     <ProjectReference Include="..\..\src\Bison.Models\Bison.Models.csproj" />
+    <ProjectReference Include="..\..\src\Bison.Utilities\Bison.Utilities.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

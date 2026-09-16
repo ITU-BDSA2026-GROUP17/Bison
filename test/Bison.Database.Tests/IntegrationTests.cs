@@ -9,7 +9,7 @@ namespace Bison.Database.Tests;
 
 public class SavingRetrievingTest
 {
-    static void CreateFileIfNotExists(string filePath)
+    internal static void CreateFileIfNotExists(string filePath)
     {
         if (File.Exists(filePath))
         {
@@ -22,7 +22,7 @@ public class SavingRetrievingTest
         File.Create(filePath);
     }
 
-    static void DeleteFileIfExists(string filePath)
+    internal static void DeleteFileIfExists(string filePath)
     {
         if (File.Exists(filePath))
         {
@@ -31,63 +31,70 @@ public class SavingRetrievingTest
     }
 
     [Fact]
-    public static void SavingAndRetreivingWorksIfFileExists()
+    public static void SavingAndRetrievingWorksIfFileExists()
     {
-        CreateFileIfNotExists("data/test/saving_test.csv");
-        CreateFileIfNotExists("data/test/saving_test.txt");
-        CSVDatabase<ObservationRecord> observationDB = CSVDatabase<ObservationRecord>.GetInstance("data/test/saving_test.csv");
+        var obsPath = Path.GetTempFileName();
+        var comPath = Path.GetTempFileName();
+        var obsIdPath = Path.GetTempFileName();
+        CSVDatabase db = new(obsPath, comPath, obsIdPath);
 
-        SimpleCounter obsIdCounter = new("data/test/saving_test.txt");
         var observation = new ObservationRecord
         {
-            Id = obsIdCounter.NextNumber(),
             Author = "Test Person 1",
             Observation = "WOAH WOAH",
             Location = "Nowhere",
             Timestamp = 0 // January 1st, 1970 at 00:00:00 UTC
         };
 
-        observationDB.Store(observation);
+        observation.Id = db.StoreObservation(observation);
 
-        observationDB.Read().Any(obs => obs.Equals(observation)).Should().BeTrue();
+        db.ReadObservations().Any(obs => obs.Equals(observation)).Should().BeTrue();
+        DeleteFileIfExists(obsPath);
+        DeleteFileIfExists(comPath);
+        DeleteFileIfExists(obsIdPath);
     }
 
     [Fact]
-    public static void SavingAndRetreivingWorksIfFileDoesNotExists()
+    public static void SavingAndRetrievingWorksIfFileDoesNotExists()
     {
-        DeleteFileIfExists("data/test/saving_test.csv");
-        DeleteFileIfExists("data/test/saving_test.txt");
-        CSVDatabase<ObservationRecord> observationDB = CSVDatabase<ObservationRecord>.GetInstance("data/test/saving_test.csv");
-        observationDB.Read().Count().Should().Be(0);
+        var obsPath = Path.GetTempFileName();
+        var comPath = Path.GetTempFileName();
+        var obsIdPath = Path.GetTempFileName();
+        DeleteFileIfExists(obsPath);
+        DeleteFileIfExists(comPath);
+        DeleteFileIfExists(obsIdPath);
+        CSVDatabase db = new(obsPath, comPath, obsIdPath);
+        db.ReadObservations().Count().Should().Be(0);
 
-        SimpleCounter obsIdCounter = new("data/test/saving_test.txt");
         var observation = new ObservationRecord
         {
-            Id = obsIdCounter.NextNumber(),
             Author = "Test Person 1",
             Observation = "WOAH WOAH",
             Location = "Nowhere",
             Timestamp = 0 // January 1st, 1970 at 00:00:00 UTC
         };
 
-        observationDB.Store(observation);
+        observation.Id = db.StoreObservation(observation);
 
-        var arr = observationDB.Read().ToArray();
+        var arr = db.ReadObservations().ToArray();
         arr[0].Should().Be(observation);
+
+        DeleteFileIfExists(obsPath);
+        DeleteFileIfExists(comPath);
+        DeleteFileIfExists(obsIdPath);
     }
 
     [Fact]
-    public static void SavingAndRetreivingWorksForMultipleItems()
+    public static void SavingAndRetrievingWorksForMultipleItems()
     {
-        DeleteFileIfExists("data/test/saving_test.csv");
-        DeleteFileIfExists("data/test/saving_test.txt");
-        CSVDatabase<ObservationRecord> observationDB = CSVDatabase<ObservationRecord>.GetInstance("data/test/saving_test.csv");
-        observationDB.Read().Count().Should().Be(0);
+        var obsPath = Path.GetTempFileName();
+        var comPath = Path.GetTempFileName();
+        var obsIdPath = Path.GetTempFileName();
+        CSVDatabase db = new(obsPath, comPath, obsIdPath);
+        db.ReadObservations().Count().Should().Be(0);
 
-        SimpleCounter obsIdCounter = new("data/test/saving_test.txt");
         var obs1 = new ObservationRecord
         {
-            Id = obsIdCounter.NextNumber(),
             Author = "Test Person 1",
             Observation = "WOAH WOAH",
             Location = "Nowhere",
@@ -95,42 +102,75 @@ public class SavingRetrievingTest
         };
         var obs2 = new ObservationRecord
         {
-            Id = obsIdCounter.NextNumber(),
             Author = "Test Person 2",
             Observation = "A heron!!",
             Location = "By DR Byen",
             Timestamp = 1788264000 // September 1st, 2026 at 12:00:00 UTC
         };
 
-        observationDB.Store(obs1);
-        observationDB.Store(obs2);
+        obs1.Id = db.StoreObservation(obs1);
+        obs2.Id = db.StoreObservation(obs2);
 
-        var arr = observationDB.Read().ToArray();
+        var arr = db.ReadObservations().ToArray();
         arr[0].Should().Be(obs1);
         arr[1].Should().Be(obs2);
+
+        DeleteFileIfExists(obsPath);
+        DeleteFileIfExists(comPath);
+        DeleteFileIfExists(obsIdPath);
     }
 
     [Property]
-    public static void SavingAndRetreivingWorksForRandomData(NonEmptyString author, NonEmptyString observation, NonEmptyString location)
+    public static void SavingAndRetrievingWorksForRandomData(NonEmptyString author, NonEmptyString observation, NonEmptyString location)
     {
-        DeleteFileIfExists("data/test/saving_test.csv");
-        DeleteFileIfExists("data/test/saving_test.txt");
-        CSVDatabase<ObservationRecord> observationDB = CSVDatabase<ObservationRecord>.GetInstance("data/test/saving_test.csv");
-        observationDB.Read().Count().Should().Be(0);
+        var obsPath = Path.GetTempFileName();
+        var comPath = Path.GetTempFileName();
+        var obsIdPath = Path.GetTempFileName();
+        CSVDatabase db = new(obsPath, comPath, obsIdPath);
+        db.ReadObservations().Count().Should().Be(0);
 
-        SimpleCounter obsIdCounter = new("data/test/saving_test.txt");
         var obs = new ObservationRecord
         {
-            Id = obsIdCounter.NextNumber(),
             Author = author.ToString(),
             Observation = observation.ToString(),
             Location = location.ToString(),
             Timestamp = 0 // January 1st, 1970 at 00:00:00 UTC
         };
 
-        observationDB.Store(obs);
+        obs.Id = db.StoreObservation(obs);
 
-        var arr = observationDB.Read().ToArray();
+        var arr = db.ReadObservations().ToArray();
         arr[0].Should().Be(obs);
+
+        DeleteFileIfExists(obsPath);
+        DeleteFileIfExists(comPath);
+        DeleteFileIfExists(obsIdPath);
+    }
+
+    [Property]
+    public static void CommentsOnInvalidObservationsShouldFail(int observationId)
+    {
+        var obsPath = Path.GetTempFileName();
+        var comPath = Path.GetTempFileName();
+        var obsIdPath = Path.GetTempFileName();
+        CSVDatabase db = new(obsPath, comPath, obsIdPath);
+        db.ReadObservations().Count().Should().Be(0);
+
+        try
+        {
+            db.StoreComment(new CommentRecord()
+            {
+                Author = "Test Person",
+                Comment = "Test Comment",
+                ObservationId = observationId,
+                Timestamp = 0
+            });
+        }
+        catch (ObservationDoesNotExist e)
+        {
+            e.Message.Should().Be($"Observation with id {observationId} does not exist");
+        }
+
+        db.ReadCommentsForObservation(observationId).Count().Should().Be(0);
     }
 }
