@@ -390,4 +390,63 @@ public class UnitTests
 
         finished();
     }
+
+    [Fact]
+    public static void TaxonomiesCanGetByID()
+    {
+        var taxonomies = new Taxonomies();
+        var taxon = taxonomies.GetTaxonRecordByID("MSTSNM:Arter:c18811f4-f785-ea11-aa77-501ac539d1ea");
+        taxon.Should().NotBeNull();
+        taxon.VernacularName.Should().Be("Sølvhejre");
+    }
+
+    [Fact]
+    public static void TaxonomiesCanGetByName()
+    {
+        var taxonomies = new Taxonomies();
+        var taxon = taxonomies.GetTaxonRecordByName("Sølvhejre");
+        taxon.Should().NotBeNull();
+        taxon.TaxonID.Should().Be("MSTSNM:Arter:c18811f4-f785-ea11-aa77-501ac539d1ea");
+    }
+
+    [Fact]
+    public static void TaxonomiesCanGetSuper()
+    {
+        var taxonomies = new Taxonomies();
+        var taxon = taxonomies.GetTaxonRecordByName("Sølvhejre");
+        taxon.Should().NotBeNull();
+        var parent = taxonomies.GetSuperTaxon(taxon);
+        parent.Should().NotBeNull();
+        parent.TaxonID.Should().Be("MSTSNM:Arter:7f9ef9f3-f785-ea11-aa77-501ac539d1ea");
+    }
+
+    [Fact]
+    public static void PelecaniformesShouldNotHaveSuper()
+    {
+        var taxonomies = new Taxonomies();
+        var taxon = taxonomies.GetTaxonRecordByName("Årefodede");
+        taxon.Should().NotBeNull();
+        var parent = taxonomies.GetSuperTaxon(taxon);
+        parent.Should().BeNull();
+    }
+
+    [Fact]
+    public static void TaxonomiesCanGetSubs()
+    {
+        var taxonomies = new Taxonomies();
+        var taxon = taxonomies.GetTaxonRecordByName("Årefodede");
+        taxon.Should().NotBeNull();
+        var children = taxonomies.GetSubTaxons(taxon).ToList();
+        children.Count.Should().Be(6);
+    }
+
+    [Fact]
+    public static void SpeciesDoesNotHaveSubs()
+    {
+        var taxonomies = new Taxonomies();
+        var taxon = taxonomies.GetTaxonRecordByName("Sølvhejre");
+        taxon.Should().NotBeNull();
+        var children = taxonomies.GetSubTaxons(taxon).ToList();
+        children.Count.Should().Be(0);
+    }
 }

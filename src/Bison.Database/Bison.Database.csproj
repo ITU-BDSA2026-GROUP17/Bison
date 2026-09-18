@@ -15,4 +15,8 @@
     <ProjectReference Include="..\Bison.Utilities\Bison.Utilities.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="resources/**/*"/>
+  </ItemGroup>
+
 </Project>
