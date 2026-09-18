@@ -24,9 +24,9 @@ namespace Bison.CLI.Client
         static Command ReadCommand()
         {
             Command read = new("read", "read the saved observations");
-            read.SetAction(result =>
+            read.SetAction(async result =>
             {
-                var res = Program.ReadObservations();
+                var res = await Program.ReadObservations();
                 if (res is not null)
                 {
                     Console.WriteLine(res);
@@ -48,8 +48,8 @@ namespace Bison.CLI.Client
             };
             observe.Arguments.Add(obsArg);
             observe.Arguments.Add(locationArg);
-            observe.SetAction(result => Console.WriteLine(
-                Program.StoreObservation(result.GetRequiredValue(obsArg), result.GetRequiredValue(locationArg))
+            observe.SetAction(async result => Console.WriteLine(
+                await Program.StoreObservation(result.GetRequiredValue(obsArg), result.GetRequiredValue(locationArg))
             ));
 
             return observe;
@@ -68,8 +68,8 @@ namespace Bison.CLI.Client
             };
             comment.Arguments.Add(obsIdArg);
             comment.Arguments.Add(commentArg);
-            comment.SetAction(result =>
-                Console.WriteLine(Program.TryComment(
+            comment.SetAction(async result =>
+                Console.WriteLine(await Program.TryComment(
                     result.GetRequiredValue(obsIdArg),
                     result.GetRequiredValue(commentArg)
                 ))
@@ -86,9 +86,9 @@ namespace Bison.CLI.Client
                 Description = "the id of the observation you want to read comments about"
             };
             discussion.Arguments.Add(obsIdArg);
-            discussion.SetAction(result =>
+            discussion.SetAction(async result =>
             {
-                var res = Program.ReadComments(result.GetRequiredValue(obsIdArg));
+                var res = await Program.ReadComments(result.GetRequiredValue(obsIdArg));
                 if (res is not null)
                 {
                     Console.WriteLine(res);

@@ -4,7 +4,7 @@ using Bison.Utilities;
 
 public sealed record ObservationRecord
 {
-    public required int Id { get; set; }
+    public int Id { get; set; }
     public required string Author { get; set; }
     public required string Observation { get; set; }
     public required string Location { get; set; }

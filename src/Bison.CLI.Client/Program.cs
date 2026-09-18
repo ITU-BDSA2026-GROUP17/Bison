@@ -1,9 +1,8 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using System;
-using System.Collections.Generic;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 
-using Bison.Database;
 using Bison.Models;
 using Bison.Utilities;
 
@@ -13,23 +12,32 @@ namespace Bison.CLI.Client
 {
     public class Program
     {
-        static readonly CSVDatabase<ObservationRecord> ObservationDB = CSVDatabase<ObservationRecord>.GetInstance("data/bison_observation_db.csv");
-        static readonly CSVDatabase<CommentRecord> CommentDB = CSVDatabase<CommentRecord>.GetInstance("data/bison_comment_db.csv");
-        static readonly SimpleCounter ObservationIdCounter = new("data/observation_id.txt");
+        static readonly HttpClient DBClient = new();
+        const string DATABASE_URI = "http://localhost:5001";
+
+        public static void InitializeDBClient()
+        {
+            DBClient.DefaultRequestHeaders.Accept.Clear();
+            DBClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            DBClient.BaseAddress = new(DATABASE_URI);
+        }
 
         static int Main(string[] args)
         {
+            InitializeDBClient();
             var root = UserInterface.GetRootCommand();
 
             var result = root.Parse(args);
             return result.Invoke();
         }
 
-        public static string? ReadObservations()
+        public async static Task<string?> ReadObservations()
         {
             try
             {
-                UserInterface.PrintCheeps(ObservationDB.Read());
+                var comments = await DBClient.GetFromJsonAsync<List<ObservationRecord>>("/observations");
+                ArgumentNullException.ThrowIfNull(comments);
+                UserInterface.PrintCheeps(comments);
                 return null;
             }
             catch
@@ -38,49 +46,58 @@ namespace Bison.CLI.Client
             }
         }
 
-        public static string StoreObservation(string observation, string location)
-        {
-            ObservationDB.Store(new ObservationRecord
-            {
-                Id = ObservationIdCounter.NextNumber(),
-                Author = Environment.UserName,
-                Observation = observation,
-                Location = location,
-                Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
-            });
-            return "Observation has been saved.";
-        }
-
-        public static string TryComment(int observationId, string comment)
-        {
-            if (GetObservationById(observationId, ObservationDB.Read()) is not null)
-            {
-                CommentDB.Store(new CommentRecord
-                {
-                    ObservationId = observationId,
-                    Author = Environment.UserName,
-                    Comment = comment,
-                    Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
-                }
-                );
-                return "Comment has been saved.";
-            }
-            else
-            {
-                return string.Format("Observation id {0} does not exist", observationId);
-            }
-        }
-
-        public static string? ReadComments(int observationId)
+        public async static Task<string> StoreObservation(string observation, string location)
         {
             try
             {
-                var obs = GetObservationById(observationId, ObservationDB.Read());
-                if (obs is not null)
+                var res = await DBClient.PostAsJsonAsync("/observation", new ObservationRecord
+                {
+                    Author = Environment.UserName,
+                    Observation = observation,
+                    Location = location,
+                    Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
+                });
+                res.EnsureSuccessStatusCode();
+                return "Observation has been saved.";
+            }
+            catch
+            {
+                return "Failed to save observation.";
+            }
+        }
+
+        public async static Task<string> TryComment(int observationId, string comment)
+        {
+            try
+            {
+                var res = await DBClient.PostAsJsonAsync($"/observation/{observationId}/comment", new CommentRecord()
+                {
+                    Author = Environment.UserName,
+                    Comment = comment,
+                    Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
+                });
+                res.EnsureSuccessStatusCode();
+                return "Comment has been saved.";
+            }
+            catch (HttpRequestException e)
+            {
+                return e.StatusCode == System.Net.HttpStatusCode.BadRequest
+                    ? string.Format("Observation id {0} does not exist", observationId)
+                    : "Could not save comment.";
+            }
+        }
+
+        public async static Task<string?> ReadComments(int observationId)
+        {
+            try
+            {
+                var comments = await DBClient.GetFromJsonAsync<List<CommentRecord>>("/observation/{0}/comments");
+                var obs = await DBClient.GetFromJsonAsync<ObservationRecord>($"/observation/{observationId}");
+                if (comments is not null && obs is not null)
                 {
                     Console.WriteLine(obs);
                     Console.WriteLine();
-                    UserInterface.PrintCheeps(FilterComments(observationId, CommentDB.Read()));
+                    UserInterface.PrintCheeps(comments);
                     return null;
                 }
                 else
@@ -91,29 +108,6 @@ namespace Bison.CLI.Client
             catch
             {
                 return "Could not find any comments.";
-            }
-        }
-
-        public static ObservationRecord? GetObservationById(int id, IEnumerable<ObservationRecord> observations)
-        {
-            foreach (var observation in observations)
-            {
-                if (observation.Id == id)
-                {
-                    return observation;
-                }
-            }
-            return null;
-        }
-
-        public static IEnumerable<CommentRecord> FilterComments(int observationId, IEnumerable<CommentRecord> comments)
-        {
-            foreach (var comment in comments)
-            {
-                if (comment.ObservationId == observationId)
-                {
-                    yield return comment;
-                }
             }
         }
     }

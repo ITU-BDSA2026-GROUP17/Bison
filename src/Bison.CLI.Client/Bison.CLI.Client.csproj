@@ -15,7 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Bison.Database\Bison.Database.csproj" />
     <ProjectReference Include="..\Bison.Models\Bison.Models.csproj" />
     <ProjectReference Include="..\Bison.Utilities\Bison.Utilities.csproj" />
   </ItemGroup>

@@ -1,62 +1,127 @@
 using System.Globalization;
 
+using Bison.Models;
+
 using CsvHelper;
 using CsvHelper.Configuration;
 
 namespace Bison.Database;
 
-public sealed class CSVDatabase<T> : IDatabaseRepository<T>
+public sealed class CSVDatabase : IDatabaseService
 {
-    static readonly Dictionary<string, CSVDatabase<T>> dict = [];
-    string FilePath { get; init; }
+    readonly string _observationFilePath;
+    readonly string _commentFilePath;
 
-    private CSVDatabase() { }
+    readonly SimpleCounter _observationIDCounter;
 
-    public static CSVDatabase<T> GetInstance(string filePath)
+    public CSVDatabase(string observationFilePath, string commentFilePath, string observationIDCounter)
     {
-        if (!dict.TryGetValue(filePath, out var value))
-        {
-            value = new()
-            {
-                FilePath = filePath
-            };
-            dict[filePath] = value;
-        }
-        return value;
+        ArgumentException.ThrowIfNullOrEmpty(observationFilePath);
+        ArgumentException.ThrowIfNullOrEmpty(commentFilePath);
+        ArgumentException.ThrowIfNullOrEmpty(observationIDCounter);
+
+        _observationFilePath = observationFilePath;
+        _commentFilePath = commentFilePath;
+        _observationIDCounter = new(observationIDCounter);
     }
 
-    public IEnumerable<T> Read(int? limit = null)
+#nullable enable
+    private static ObservationRecord? GetObservationById(int id, IEnumerable<ObservationRecord> observations)
     {
-        if (!File.Exists(FilePath))
+        foreach (var observation in observations)
+        {
+            if (observation.Id == id)
+            {
+                return observation;
+            }
+        }
+        return null;
+    }
+#nullable restore
+
+    public IEnumerable<ObservationRecord> ReadObservations(int? limit = null)
+    {
+        if (!File.Exists(_observationFilePath) || new FileInfo(_observationFilePath).Length == 0)
         {
             yield break;
         }
-        using var reader = new StreamReader(FilePath);
+        using var reader = new StreamReader(_observationFilePath);
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
 
-        var records = csv.GetRecords<T>();
+        var records = csv.GetRecords<ObservationRecord>();
 
         foreach (var record in records)
         {
             yield return record;
         }
     }
-    public void Store(T record)
+    public int StoreObservation(ObservationRecord record)
     {
         var config = new CsvConfiguration(CultureInfo.InvariantCulture)
         {
             // Don't write the header again.
             HasHeaderRecord = false,
         };
-        if (!File.Exists(FilePath))
+        if (!File.Exists(_observationFilePath) || new FileInfo(_observationFilePath).Length == 0)
         {
             config = new CsvConfiguration(CultureInfo.InvariantCulture);
-            Directory.CreateDirectory(Path.GetDirectoryName(FilePath));
+            Directory.CreateDirectory(Path.GetDirectoryName(_observationFilePath));
         }
-        using var stream = File.Open(FilePath, FileMode.Append);
+        record.Id = _observationIDCounter.NextNumber();
+
+        using var stream = File.Open(_observationFilePath, FileMode.Append);
+        using var writer = new StreamWriter(stream);
+        using var csv = new CsvWriter(writer, config);
+
+        csv.WriteRecords([record]);
+        return record.Id;
+    }
+
+    public IEnumerable<CommentRecord> ReadCommentsForObservation(int observationId, int? limit = null)
+    {
+        if (!File.Exists(_commentFilePath) || new FileInfo(_commentFilePath).Length == 0)
+        {
+            yield break;
+        }
+        using var reader = new StreamReader(_commentFilePath);
+        using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+        var records = csv.GetRecords<CommentRecord>();
+
+        foreach (var record in records)
+        {
+            if (record.ObservationId == observationId)
+            {
+                yield return record;
+            }
+        }
+    }
+    public void StoreComment(CommentRecord record)
+    {
+        if (GetObservationById(record.ObservationId, ReadObservations()) is null)
+        {
+            throw new ObservationDoesNotExist(record.ObservationId);
+        }
+        var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            // Don't write the header again.
+            HasHeaderRecord = false,
+        };
+        if (!File.Exists(_commentFilePath) || new FileInfo(_commentFilePath).Length == 0)
+        {
+            config = new CsvConfiguration(CultureInfo.InvariantCulture);
+            Directory.CreateDirectory(Path.GetDirectoryName(_commentFilePath));
+        }
+
+        using var stream = File.Open(_commentFilePath, FileMode.Append);
         using var writer = new StreamWriter(stream);
         using var csv = new CsvWriter(writer, config);
 
         csv.WriteRecords([record]);
     }
+}
+
+public class ObservationDoesNotExist(int id) : ArgumentException(string.Format("Observation with id {0} does not exist", id))
+{
+    public int Id = id;
 }
