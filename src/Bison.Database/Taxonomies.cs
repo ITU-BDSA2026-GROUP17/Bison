@@ -1,21 +1,20 @@
 namespace Bison.Database;
 
+using System.Globalization;
+using System.Reflection;
+
 using Bison.Models;
 
 using CsvHelper;
 
-
 using Microsoft.Extensions.FileProviders;
-
-using System.Globalization;
-
-using System.Reflection;
 
 public class Taxonomies
 {
     private readonly List<TaxonRecord> _taxonomies;
 
-    public Taxonomies() {
+    public Taxonomies()
+    {
         var embeddedProvider = new EmbeddedFileProvider(Assembly.GetExecutingAssembly());
         using var reader = embeddedProvider.GetFileInfo("./resources/joined.csv").CreateReadStream();
         using var sr = new StreamReader(reader);
@@ -23,10 +22,10 @@ public class Taxonomies
         _taxonomies = [.. csv.GetRecords<TaxonRecord>()];
     }
 
-    #nullable enable
+#nullable enable
     public TaxonRecord? GetTaxonRecordByID(string id)
     {
-        foreach(var taxon in _taxonomies)
+        foreach (var taxon in _taxonomies)
         {
             if (taxon.TaxonID == id)
             {
@@ -38,7 +37,7 @@ public class Taxonomies
 
     public TaxonRecord? GetTaxonRecordByName(string name)
     {
-        foreach(var taxon in _taxonomies)
+        foreach (var taxon in _taxonomies)
         {
             if (taxon.VernacularName == name)
             {
@@ -52,8 +51,8 @@ public class Taxonomies
     {
         return GetTaxonRecordByID(child.ParentNameUsageID);
     }
-    #nullable restore
-    
+#nullable restore
+
     public IEnumerable<TaxonRecord> GetSubTaxons(TaxonRecord parent)
     {
         foreach (var taxon in _taxonomies)
