@@ -1,1 +1,2 @@
 *.cs eol=crlf
+src/Bison.Database/resources/joined.csv filter=lfs diff=lfs merge=lfs -text
