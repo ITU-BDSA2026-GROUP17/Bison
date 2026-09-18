@@ -25,9 +25,7 @@ public class SavingRetrievingTest
     internal static void DeleteFileIfExists(string filePath)
     {
         if (File.Exists(filePath))
-        {
             File.Delete(filePath);
-        }
     }
 
     [Fact]
@@ -36,7 +34,8 @@ public class SavingRetrievingTest
         var obsPath = Path.GetTempFileName();
         var comPath = Path.GetTempFileName();
         var obsIdPath = Path.GetTempFileName();
-        CSVDatabase db = new(obsPath, comPath, obsIdPath);
+        var permutationPath = Path.GetTempFileName();
+        CSVDatabase db = new(obsPath, comPath, obsIdPath, permutationPath);
 
         var observation = new ObservationRecord
         {
@@ -52,6 +51,7 @@ public class SavingRetrievingTest
         DeleteFileIfExists(obsPath);
         DeleteFileIfExists(comPath);
         DeleteFileIfExists(obsIdPath);
+        DeleteFileIfExists(permutationPath);
     }
 
     [Fact]
@@ -60,10 +60,11 @@ public class SavingRetrievingTest
         var obsPath = Path.GetTempFileName();
         var comPath = Path.GetTempFileName();
         var obsIdPath = Path.GetTempFileName();
+        var permutationPath = Path.GetTempFileName();
         DeleteFileIfExists(obsPath);
         DeleteFileIfExists(comPath);
         DeleteFileIfExists(obsIdPath);
-        CSVDatabase db = new(obsPath, comPath, obsIdPath);
+        CSVDatabase db = new(obsPath, comPath, obsIdPath, permutationPath);
         db.ReadObservations().Count().Should().Be(0);
 
         var observation = new ObservationRecord
@@ -82,6 +83,7 @@ public class SavingRetrievingTest
         DeleteFileIfExists(obsPath);
         DeleteFileIfExists(comPath);
         DeleteFileIfExists(obsIdPath);
+        DeleteFileIfExists(permutationPath);
     }
 
     [Fact]
@@ -90,7 +92,8 @@ public class SavingRetrievingTest
         var obsPath = Path.GetTempFileName();
         var comPath = Path.GetTempFileName();
         var obsIdPath = Path.GetTempFileName();
-        CSVDatabase db = new(obsPath, comPath, obsIdPath);
+        var permutationPath = Path.GetTempFileName();
+        CSVDatabase db = new(obsPath, comPath, obsIdPath, permutationPath);
         db.ReadObservations().Count().Should().Be(0);
 
         var obs1 = new ObservationRecord
@@ -118,6 +121,7 @@ public class SavingRetrievingTest
         DeleteFileIfExists(obsPath);
         DeleteFileIfExists(comPath);
         DeleteFileIfExists(obsIdPath);
+        DeleteFileIfExists(permutationPath);
     }
 
     [Property]
@@ -126,7 +130,8 @@ public class SavingRetrievingTest
         var obsPath = Path.GetTempFileName();
         var comPath = Path.GetTempFileName();
         var obsIdPath = Path.GetTempFileName();
-        CSVDatabase db = new(obsPath, comPath, obsIdPath);
+        var permutationPath = Path.GetTempFileName();
+        CSVDatabase db = new(obsPath, comPath, obsIdPath, permutationPath);
         db.ReadObservations().Count().Should().Be(0);
 
         var obs = new ObservationRecord
@@ -145,6 +150,7 @@ public class SavingRetrievingTest
         DeleteFileIfExists(obsPath);
         DeleteFileIfExists(comPath);
         DeleteFileIfExists(obsIdPath);
+        DeleteFileIfExists(permutationPath);
     }
 
     [Property]
@@ -153,7 +159,8 @@ public class SavingRetrievingTest
         var obsPath = Path.GetTempFileName();
         var comPath = Path.GetTempFileName();
         var obsIdPath = Path.GetTempFileName();
-        CSVDatabase db = new(obsPath, comPath, obsIdPath);
+        var permutationPath = Path.GetTempFileName();
+        CSVDatabase db = new(obsPath, comPath, obsIdPath, permutationPath);
         db.ReadObservations().Count().Should().Be(0);
 
         try
@@ -172,5 +179,10 @@ public class SavingRetrievingTest
         }
 
         db.ReadCommentsForObservation(observationId).Count().Should().Be(0);
+
+        DeleteFileIfExists(obsPath);
+        DeleteFileIfExists(comPath);
+        DeleteFileIfExists(obsIdPath);
+        DeleteFileIfExists(permutationPath);
     }
 }

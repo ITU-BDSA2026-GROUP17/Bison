@@ -6,13 +6,12 @@ using FluentAssertions;
 
 using Microsoft.AspNetCore.Mvc.Testing;
 
-using Xunit.Sdk;
-
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
     private string _obsPath;
     private string _comPath;
     private string _obsIdPath;
+    private string _proposalPath;
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -27,21 +26,20 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             _obsPath = Path.GetTempFileName();
             _comPath = Path.GetTempFileName();
             _obsIdPath = Path.GetTempFileName();
+            _proposalPath = Path.GetTempFileName();
 
             services.AddSingleton<IDatabaseService, CSVDatabase>(container =>
-                new(_obsPath, _comPath, _obsIdPath)
+                new(_obsPath, _comPath, _obsIdPath, _proposalPath)
             );
         });
     }
 
     protected override void Dispose(bool disposing)
     {
-        if (File.Exists(_obsPath))
-            File.Delete(_obsPath);
-        if (File.Exists(_comPath))
-            File.Delete(_comPath);
-        if (File.Exists(_obsIdPath))
-            File.Delete(_obsIdPath);
+        SavingRetrievingTest.DeleteFileIfExists(_obsPath);
+        SavingRetrievingTest.DeleteFileIfExists(_comPath);
+        SavingRetrievingTest.DeleteFileIfExists(_obsIdPath);
+        SavingRetrievingTest.DeleteFileIfExists(_proposalPath);
 
         base.Dispose(disposing);
     }
@@ -60,7 +58,7 @@ public class WebServiceTest : IClassFixture<CustomWebApplicationFactory>
         var postTask = client.PostAsJsonAsync("/observation", new ObservationRecord()
         {
             Author = "Arthur",
-            Observation = "Saw a little duck",
+            Observation = "Saw a little heron",
             Timestamp = 0,
             Location = "At the canal"
         });
@@ -72,12 +70,19 @@ public class WebServiceTest : IClassFixture<CustomWebApplicationFactory>
             Comment = "It's so cute!!",
             Timestamp = 100
         });
+        client.PostAsJsonAsync($"/observation/{_id}/proposal", new ProposalRecord()
+        {
+            Author = "Fredrick",
+            TaxonID = "MSTSNM:Arter:c18811f4-f785-ea11-aa77-501ac539d1ea",
+            Timestamp = 200
+        });
     }
 
     [Theory]
     [InlineData("/observations")]
     [InlineData("/observation/0")]
     [InlineData("/observation/0/comments")]
+    [InlineData("/observation/0/proposals")]
     public async Task Get_EndpointsReturnSuccessAndCorrectContentType(string url)
     {
         var client = _factory.CreateClient();
@@ -91,7 +96,7 @@ public class WebServiceTest : IClassFixture<CustomWebApplicationFactory>
     /*
     currently does not work, as there is an issue with CSV files being used by multiple processes
     -> this test should be enabled once having moved to SQLite
-    
+
     [Fact]
     public async Task Post_EndpointsReturnSuccess()
     {
