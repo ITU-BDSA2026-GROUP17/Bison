@@ -17,6 +17,7 @@ namespace Bison.CLI.Client
             root.Subcommands.Add(ObservationCommand());
             root.Subcommands.Add(CommentCommand());
             root.Subcommands.Add(DiscussionCommand());
+            root.Subcommands.Add(ProposeCommand());
 
             return root;
         }
@@ -96,6 +97,29 @@ namespace Bison.CLI.Client
             });
 
             return discussion;
+        }
+
+        static Command ProposeCommand()
+        {
+            Command propose = new("propose", "propose a taxon to the specified observation in the database");
+            Argument<string> proposeArg = new("taxonID")
+            {
+                Description = "the ID of the taxon to propose"
+            };
+            Argument<int> obsIdArg = new("observation-id")
+            {
+                Description = "the id of the observation you want to comment on"
+            };
+            propose.Arguments.Add(obsIdArg);
+            propose.Arguments.Add(proposeArg);
+            propose.SetAction(async result =>
+                Console.WriteLine(await Program.TryPropose(
+                    result.GetRequiredValue(obsIdArg),
+                    result.GetRequiredValue(proposeArg)
+                ))
+            );
+
+            return propose;
         }
 
         public static void PrintCheeps<T>(IEnumerable<T> cheeps)

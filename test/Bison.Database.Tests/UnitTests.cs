@@ -12,13 +12,14 @@ public class UnitTests
         var obsPath = Path.GetTempFileName();
         var comPath = Path.GetTempFileName();
         var obsIdPath = Path.GetTempFileName();
-        CSVDatabase db = new(obsPath, comPath, obsIdPath);
+        var proposalPath = Path.GetTempFileName();
+        CSVDatabase db = new(obsPath, comPath, obsIdPath, proposalPath);
 
         db.StoreObservation(
             new ObservationRecord
             {
                 Author = "lrec",
-                Observation = "Eurasien jay",
+                Observation = "Eurasian jay",
                 Location = "Assistentens Kirkegård",
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
             }
@@ -136,6 +137,8 @@ public class UnitTests
         );
     }
 
+    private static readonly bool[] BooleanArray = [false, true];
+
     [Fact]
     public static void TestExceptionsOnInvalidFiles()
     {
@@ -159,145 +162,61 @@ public class UnitTests
             e.ParamName.Should().Be("parent");
         }
 
-        try
-        {
-            _ = new CSVDatabase("a", "b", "");
-            throw new Exception("Should have failed by now!");
-        }
-        catch (ArgumentException e)
-        {
-            e.ParamName.Should().Be("observationIDCounter");
-        }
+        var permutations = from b1 in BooleanArray
+                           from b2 in BooleanArray
+                           from b3 in BooleanArray
+                           from b4 in BooleanArray
+                           select new { b1, b2, b3, b4 };
 
-        try
+        foreach (var permutation in permutations)
         {
-            _ = new CSVDatabase("a", "", "c");
-            throw new Exception("Should have failed by now!");
-        }
-        catch (ArgumentException e)
-        {
-            e.ParamName.Should().Be("commentFilePath");
-        }
+            if (!permutation.b1 && !permutation.b2 && !permutation.b3 && !permutation.b4)
+                continue;
 
-        try
-        {
-            _ = new CSVDatabase("", "b", "c");
-            throw new Exception("Should have failed by now!");
-        }
-        catch (ArgumentException e)
-        {
-            e.ParamName.Should().Be("observationFilePath");
-        }
-
-        try
-        {
-            _ = new CSVDatabase("", "", "c");
-            throw new Exception("Should have failed by now!");
-        }
-        catch (ArgumentException e)
-        {
-            e.ParamName.Should().Be("observationFilePath");
-        }
-
-        try
-        {
-            _ = new CSVDatabase("", "b", "");
-            throw new Exception("Should have failed by now!");
-        }
-        catch (ArgumentException e)
-        {
-            e.ParamName.Should().Be("observationFilePath");
-        }
-
-        try
-        {
-            _ = new CSVDatabase("a", "", "");
-            throw new Exception("Should have failed by now!");
-        }
-        catch (ArgumentException e)
-        {
-            e.ParamName.Should().Be("commentFilePath");
-        }
-
-        try
-        {
-            _ = new CSVDatabase("", "", "");
-            throw new Exception("Should have failed by now!");
-        }
-        catch (ArgumentException e)
-        {
-            e.ParamName.Should().Be("observationFilePath");
-        }
-
-        try
-        {
-            _ = new CSVDatabase("/", "data.test", "data.test");
-            throw new Exception("Should have failed by now!");
-        }
-        catch (ArgumentException e)
-        {
-            e.ParamName.Should().Be("parent");
-        }
-
-        try
-        {
-            _ = new CSVDatabase("data.test", "/", "data.test");
-            throw new Exception("Should have failed by now!");
-        }
-        catch (ArgumentException e)
-        {
-            e.ParamName.Should().Be("parent");
-        }
-
-        try
-        {
-            _ = new CSVDatabase("data.test", "data.test", "/");
-            throw new Exception("Should have failed by now!");
-        }
-        catch (ArgumentException e)
-        {
-            e.ParamName.Should().Be("parent");
-        }
+            var should_be = permutation.b1 ?
+                "observationFilePath" :
+                permutation.b2 ?
+                    "commentFilePath" :
+                    permutation.b3 ?
+                        "observationIDCounter" :
+                        "proposalFilePath";
 
 
-        try
-        {
-            _ = new CSVDatabase("data.test", "/", "/");
-            throw new Exception("Should have failed by now!");
-        }
-        catch (ArgumentException e)
-        {
-            e.ParamName.Should().Be("parent");
-        }
-
-        try
-        {
-            _ = new CSVDatabase("/", "data.test", "/");
-            throw new Exception("Should have failed by now!");
-        }
-        catch (ArgumentException e)
-        {
-            e.ParamName.Should().Be("parent");
+            try
+            {
+                _ = new CSVDatabase(
+                    permutation.b1 ? "" : "a",
+                    permutation.b2 ? "" : "b",
+                    permutation.b3 ? "" : "c",
+                    permutation.b4 ? "" : "d"
+                );
+                throw new Exception("Should have failed by now!");
+            }
+            catch (ArgumentException e)
+            {
+                e.ParamName.Should().Be(should_be);
+            }
         }
 
-        try
+        foreach (var permutation in permutations)
         {
-            _ = new CSVDatabase("/", "/", "data.test");
-            throw new Exception("Should have failed by now!");
-        }
-        catch (ArgumentException e)
-        {
-            e.ParamName.Should().Be("parent");
-        }
+            if (!permutation.b1 && !permutation.b2 && !permutation.b3 && !permutation.b4)
+                continue;
 
-        try
-        {
-            _ = new CSVDatabase("/", "/", "/");
-            throw new Exception("Should have failed by now!");
-        }
-        catch (ArgumentException e)
-        {
-            e.ParamName.Should().Be("parent");
+            try
+            {
+                _ = new CSVDatabase(
+                    permutation.b1 ? "/" : "data.test",
+                    permutation.b2 ? "/" : "data.test",
+                    permutation.b3 ? "/" : "data.test",
+                    permutation.b4 ? "/" : "data.test"
+                );
+                throw new Exception("Should have failed by now!");
+            }
+            catch (ArgumentException e)
+            {
+                e.ParamName.Should().Be("parent");
+            }
         }
     }
 

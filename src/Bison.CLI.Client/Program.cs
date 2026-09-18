@@ -110,5 +110,18 @@ namespace Bison.CLI.Client
                 return "Could not find any comments.";
             }
         }
+
+        public async static Task<string> TryPropose(int observationId, string proposal)
+        {
+            var res = await DBClient.PostAsJsonAsync($"/observation/{observationId}/proposal", new ProposalRecord()
+            {
+                Author = Environment.UserName,
+                TaxonID = proposal,
+                Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
+            });
+            return !res.IsSuccessStatusCode
+                ? res.StatusCode != System.Net.HttpStatusCode.BadRequest ? "Could not save proposal." : await res.Content.ReadFromJsonAsync<string>() ?? "Unknown Error"
+                : "Proposal has been saved.";
+        }
     }
 }
