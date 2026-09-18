@@ -17,6 +17,6 @@ public sealed record ObservationRecord
 
     public override string ToString()
     {
-        return string.Format("{0} : {1} @ {2}: {3}", Author, Id, GetAsDateTime().ToString(), Observation);
+        return string.Format("{0} : {1} @ {2} [{3}]: {4}", Author, Id, GetAsDateTime().ToString(), Location, Observation);
     }
 }
