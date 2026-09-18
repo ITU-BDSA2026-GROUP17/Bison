@@ -19,7 +19,7 @@ public class UnitTests
             new ObservationRecord
             {
                 Author = "lrec",
-                Observation = "Eurasien jay",
+                Observation = "Eurasian jay",
                 Location = "Assistentens Kirkegård",
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
             }
