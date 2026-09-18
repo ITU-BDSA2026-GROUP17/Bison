@@ -11,7 +11,7 @@ using Microsoft.Extensions.FileProviders;
 
 public class Taxonomies
 {
-    private readonly List<TaxonRecord> _taxonomies;
+    internal readonly List<TaxonRecord> TaxonomiesList;
 
     public Taxonomies()
     {
@@ -19,13 +19,13 @@ public class Taxonomies
         using var reader = embeddedProvider.GetFileInfo("resources/joined.csv").CreateReadStream();
         using var sr = new StreamReader(reader);
         using var csv = new CsvReader(sr, CultureInfo.InvariantCulture);
-        _taxonomies = [.. csv.GetRecords<TaxonRecord>()];
+        TaxonomiesList = [.. csv.GetRecords<TaxonRecord>()];
     }
 
 #nullable enable
     public TaxonRecord? GetTaxonRecordByID(string id)
     {
-        foreach (var taxon in _taxonomies)
+        foreach (var taxon in TaxonomiesList)
         {
             if (taxon.TaxonID == id)
             {
@@ -37,7 +37,7 @@ public class Taxonomies
 
     public TaxonRecord? GetTaxonRecordByName(string name)
     {
-        foreach (var taxon in _taxonomies)
+        foreach (var taxon in TaxonomiesList)
         {
             if (taxon.VernacularName == name)
             {
@@ -55,7 +55,7 @@ public class Taxonomies
 
     public IEnumerable<TaxonRecord> GetSubTaxons(TaxonRecord parent)
     {
-        foreach (var taxon in _taxonomies)
+        foreach (var taxon in TaxonomiesList)
         {
             if (taxon.ParentNameUsageID == parent.TaxonID)
             {
