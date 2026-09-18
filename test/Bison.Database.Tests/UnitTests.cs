@@ -196,7 +196,6 @@ public class UnitTests
             {
                 e.ParamName.Should().Be(should_be);
             }
-
         }
 
         foreach (var permutation in permutations)

@@ -113,7 +113,6 @@ namespace Bison.CLI.Client
 
         public async static Task<string> TryPropose(int observationId, string proposal)
         {
-
             var res = await DBClient.PostAsJsonAsync($"/observation/{observationId}/proposal", new ProposalRecord()
             {
                 Author = Environment.UserName,
