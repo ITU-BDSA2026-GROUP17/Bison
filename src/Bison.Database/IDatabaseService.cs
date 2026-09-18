@@ -9,4 +9,7 @@ public interface IDatabaseService
 
     public IEnumerable<CommentRecord> ReadCommentsForObservation(int observationID, int? limit = null);
     public void StoreComment(CommentRecord record);
+
+    public IEnumerable<ProposalRecord> ReadProposalsForObservation(int observationID, int? limit = null);
+    public void StoreProposal(ProposalRecord record);
 }

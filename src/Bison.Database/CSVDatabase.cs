@@ -11,18 +11,22 @@ public sealed class CSVDatabase : IDatabaseService
 {
     readonly string _observationFilePath;
     readonly string _commentFilePath;
+    readonly string _proposalFilePath;
 
     readonly SimpleCounter _observationIDCounter;
+    readonly Taxonomies _taxonomies = new();
 
-    public CSVDatabase(string observationFilePath, string commentFilePath, string observationIDCounter)
+    public CSVDatabase(string observationFilePath, string commentFilePath, string observationIDCounter, string proposalFilePath)
     {
         ArgumentException.ThrowIfNullOrEmpty(observationFilePath);
         ArgumentException.ThrowIfNullOrEmpty(commentFilePath);
         ArgumentException.ThrowIfNullOrEmpty(observationIDCounter);
+        ArgumentException.ThrowIfNullOrEmpty(proposalFilePath);
 
         _observationFilePath = observationFilePath;
         _commentFilePath = commentFilePath;
         _observationIDCounter = new(observationIDCounter);
+        _proposalFilePath = proposalFilePath;
     }
 
 #nullable enable
@@ -119,9 +123,61 @@ public sealed class CSVDatabase : IDatabaseService
 
         csv.WriteRecords([record]);
     }
+
+    public IEnumerable<ProposalRecord> ReadProposalsForObservation(int observationId, int? limit = null)
+    {
+        if (!File.Exists(_proposalFilePath) || new FileInfo(_proposalFilePath).Length == 0)
+        {
+            yield break;
+        }
+        using var reader = new StreamReader(_proposalFilePath);
+        using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+        var records = csv.GetRecords<ProposalRecord>();
+
+        foreach (var record in records)
+        {
+            if (record.ObservationId == observationId)
+            {
+                yield return record;
+            }
+        }
+    }
+    public void StoreProposal(ProposalRecord record)
+    {
+        if (GetObservationById(record.ObservationId, ReadObservations()) is null)
+        {
+            throw new ObservationDoesNotExist(record.ObservationId);
+        }
+        if (_taxonomies.GetTaxonRecordByID(record.TaxonID) is null)
+        {
+            throw new TaxonDoesNotExist(record.TaxonID);
+        }
+        var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            // Don't write the header again.
+            HasHeaderRecord = false,
+        };
+        if (!File.Exists(_proposalFilePath) || new FileInfo(_proposalFilePath).Length == 0)
+        {
+            config = new CsvConfiguration(CultureInfo.InvariantCulture);
+            Directory.CreateDirectory(Path.GetDirectoryName(_proposalFilePath));
+        }
+
+        using var stream = File.Open(_proposalFilePath, FileMode.Append);
+        using var writer = new StreamWriter(stream);
+        using var csv = new CsvWriter(writer, config);
+
+        csv.WriteRecords([record]);
+    }
 }
 
 public class ObservationDoesNotExist(int id) : ArgumentException(string.Format("Observation with id {0} does not exist", id))
 {
     public int Id = id;
+}
+
+public class TaxonDoesNotExist(string id) : ArgumentException(string.Format("Taxon with id {0} does not exist", id))
+{
+    public string Id = id;
 }
