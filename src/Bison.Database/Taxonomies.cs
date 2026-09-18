@@ -16,7 +16,7 @@ public class Taxonomies
     public Taxonomies()
     {
         var embeddedProvider = new EmbeddedFileProvider(Assembly.GetExecutingAssembly());
-        using var reader = embeddedProvider.GetFileInfo("./resources/joined.csv").CreateReadStream();
+        using var reader = embeddedProvider.GetFileInfo("resources/joined.csv").CreateReadStream();
         using var sr = new StreamReader(reader);
         using var csv = new CsvReader(sr, CultureInfo.InvariantCulture);
         _taxonomies = [.. csv.GetRecords<TaxonRecord>()];
