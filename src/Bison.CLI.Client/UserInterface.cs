@@ -17,6 +17,7 @@ namespace Bison.CLI.Client
             root.Subcommands.Add(ObservationCommand());
             root.Subcommands.Add(CommentCommand());
             root.Subcommands.Add(DiscussionCommand());
+            root.Subcommands.Add(ProposeCommand());
 
             return root;
         }
@@ -24,9 +25,9 @@ namespace Bison.CLI.Client
         static Command ReadCommand()
         {
             Command read = new("read", "read the saved observations");
-            read.SetAction(result =>
+            read.SetAction(async result =>
             {
-                var res = Program.ReadObservations();
+                var res = await Program.ReadObservations();
                 if (res is not null)
                 {
                     Console.WriteLine(res);
@@ -48,8 +49,8 @@ namespace Bison.CLI.Client
             };
             observe.Arguments.Add(obsArg);
             observe.Arguments.Add(locationArg);
-            observe.SetAction(result => Console.WriteLine(
-                Program.StoreObservation(result.GetRequiredValue(obsArg), result.GetRequiredValue(locationArg))
+            observe.SetAction(async result => Console.WriteLine(
+                await Program.StoreObservation(result.GetRequiredValue(obsArg), result.GetRequiredValue(locationArg))
             ));
 
             return observe;
@@ -68,8 +69,8 @@ namespace Bison.CLI.Client
             };
             comment.Arguments.Add(obsIdArg);
             comment.Arguments.Add(commentArg);
-            comment.SetAction(result =>
-                Console.WriteLine(Program.TryComment(
+            comment.SetAction(async result =>
+                Console.WriteLine(await Program.TryComment(
                     result.GetRequiredValue(obsIdArg),
                     result.GetRequiredValue(commentArg)
                 ))
@@ -86,9 +87,9 @@ namespace Bison.CLI.Client
                 Description = "the id of the observation you want to read comments about"
             };
             discussion.Arguments.Add(obsIdArg);
-            discussion.SetAction(result =>
+            discussion.SetAction(async result =>
             {
-                var res = Program.ReadComments(result.GetRequiredValue(obsIdArg));
+                var res = await Program.ReadComments(result.GetRequiredValue(obsIdArg));
                 if (res is not null)
                 {
                     Console.WriteLine(res);
@@ -96,6 +97,29 @@ namespace Bison.CLI.Client
             });
 
             return discussion;
+        }
+
+        static Command ProposeCommand()
+        {
+            Command propose = new("propose", "propose a taxon to the specified observation in the database");
+            Argument<string> proposeArg = new("taxonID")
+            {
+                Description = "the ID of the taxon to propose"
+            };
+            Argument<int> obsIdArg = new("observation-id")
+            {
+                Description = "the id of the observation you want to comment on"
+            };
+            propose.Arguments.Add(obsIdArg);
+            propose.Arguments.Add(proposeArg);
+            propose.SetAction(async result =>
+                Console.WriteLine(await Program.TryPropose(
+                    result.GetRequiredValue(obsIdArg),
+                    result.GetRequiredValue(proposeArg)
+                ))
+            );
+
+            return propose;
         }
 
         public static void PrintCheeps<T>(IEnumerable<T> cheeps)

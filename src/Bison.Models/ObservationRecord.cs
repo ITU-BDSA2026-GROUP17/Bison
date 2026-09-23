@@ -4,7 +4,7 @@ using Bison.Utilities;
 
 public sealed record ObservationRecord
 {
-    public required int Id { get; set; }
+    public int Id { get; set; }
     public required string Author { get; set; }
     public required string Observation { get; set; }
     public required string Location { get; set; }
@@ -17,6 +17,6 @@ public sealed record ObservationRecord
 
     public override string ToString()
     {
-        return string.Format("{0} : {1} @ {2}: {3}", Author, Id, GetAsDateTime().ToString(), Observation);
+        return string.Format("{0} : {1} @ {2} [{3}]: {4}", Author, Id, GetAsDateTime().ToString(), Location, Observation);
     }
 }

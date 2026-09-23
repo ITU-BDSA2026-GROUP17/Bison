@@ -6,14 +6,18 @@ public sealed class SimpleCounter
 
     public SimpleCounter(string filePath)
     {
+        ArgumentException.ThrowIfNullOrEmpty(filePath);
+
         _filePath = filePath;
 
         if (!File.Exists(_filePath))
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(_filePath));
-            using var writer = File.CreateText(_filePath);
-            writer.Write('-');
-            writer.Write('1');
+            var parent = Path.GetDirectoryName(filePath);
+            ArgumentException.ThrowIfNullOrEmpty(parent);
+            Directory.CreateDirectory(parent);
+            File.Create(_filePath).Close();
+            // creates the file; it's empty so NextNumber's int.Parse
+            // will throw -> gets caught and returns 0
         }
         else
         {
@@ -24,9 +28,9 @@ public sealed class SimpleCounter
             }
             catch
             {
-                using var writer = File.CreateText(_filePath);
-                writer.Write('-');
-                writer.Write('1');
+                File.Create(_filePath).Close();
+                // overrides the file; it's empty so NextNumber's int.Parse
+                // will throw -> gets caught and returns 0
             }
         }
     }

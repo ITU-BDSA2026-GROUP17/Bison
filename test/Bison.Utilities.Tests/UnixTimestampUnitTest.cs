@@ -4,27 +4,31 @@ using Bison.Utilities;
 
 using FluentAssertions;
 
+using FsCheck;
+using FsCheck.Fluent;
 using FsCheck.Xunit;
 
 public class UnixTimestampUnitTest
 {
-    static DateTime GetDateTimeWithoutSubseconds()
+    public static Arbitrary<DateTime> DateGenerator()
     {
-        var current = DateTime.Now;
-        var ticks = current.Ticks / TimeSpan.TicksPerSecond;
+        DateTime minDate = new(1970, 1, 1, 0, 0, 0);
+        DateTime maxDate = new(2038, 1, 19, 3, 14, 7);
+        int totalSecRange = (int)(maxDate - minDate).TotalSeconds;
 
-        DateTime without = new(ticks * TimeSpan.TicksPerSecond);
-        without.Nanosecond.Should().Be(0);
-        return without;
+        // Gen.Choose picks a random integer, which we map back to a DateTime
+        Gen<DateTime> dateGenerator = Gen.Choose(0, totalSecRange)
+            .Select(secs => minDate.AddSeconds(secs));
+
+        return dateGenerator.ToArbitrary();
     }
 
-    [Fact]
-    public void UnixTimestampTranslationWorks()
+    [Property(Arbitrary = new[] { typeof(UnixTimestampUnitTest) })]
+    public void UnixTimestampTranslationWorks(DateTime dateTime)
     {
-        var current = GetDateTimeWithoutSubseconds();
-        var unix = DateTimeUtilities.DateTimeToUnixTimeStamp(current);
+        var unix = DateTimeUtilities.DateTimeToUnixTimeStamp(dateTime);
         var restored = DateTimeUtilities.UnixTimeStampToDateTime(unix);
 
-        restored.Should().Be(current);
+        restored.Should().Be(dateTime);
     }
 }

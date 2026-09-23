@@ -1,16 +1,19 @@
 version: 2
 updates:
     - package-ecosystem: dotnet-sdk
+      target-branch: dev
       directory: /
       schedule:
           interval: weekly
 
     - package-ecosystem: nuget
+      target-branch: dev
       directory: /
       schedule:
           interval: weekly
 
-    - package-ecosystem: "github-actions"
-      directory: "/"
+    - package-ecosystem: github-actions
+      target-branch: dev
+      directory: /
       schedule:
-          interval: "weekly"
+          interval: weekly

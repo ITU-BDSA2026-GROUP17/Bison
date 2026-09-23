@@ -1,0 +1,38 @@
+name: .NET Stryker
+
+on: workflow_dispatch
+
+env:
+    DOTNET_VERSION: "8.0.x"
+
+jobs:
+    stryker:
+        name: stryker
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v7
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v6
+              with:
+                  dotnet-version: ${{ env.DOTNET_VERSION }}
+
+            - name: Restore Local Tools
+              run: dotnet tool restore
+
+            - name: Install Dependencies
+              run: dotnet restore
+
+            - name: Build
+              run: dotnet build --no-restore
+
+            - name: Test
+              run: dotnet tool run stryker
+
+            - name: Save Stryker Result
+              uses: actions/upload-artifact@v7
+              with:
+                  name: "stryker-report"
+                  path: StrykerOutput/*/reports/*.html
+                  retention-days: 7
+                  

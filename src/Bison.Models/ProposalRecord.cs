@@ -2,11 +2,11 @@ namespace Bison.Models;
 
 using Bison.Utilities;
 
-public sealed record CommentRecord
+public sealed record ProposalRecord
 {
     public int ObservationId { get; set; }
     public required string Author { get; set; }
-    public required string Comment { get; set; }
+    public required string TaxonID { get; set; }
     public required int Timestamp { get; set; }
 
     public DateTime GetAsDateTime()
@@ -16,6 +16,6 @@ public sealed record CommentRecord
 
     public override string ToString()
     {
-        return string.Format("{0} @ {1}: {2}", Author, GetAsDateTime().ToString(), Comment);
+        return string.Format("{0} @ {1}: {2}", Author, GetAsDateTime().ToString(), TaxonID);
     }
 }
