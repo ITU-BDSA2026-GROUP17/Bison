@@ -10,12 +10,11 @@
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="33.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.20" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SQLite" Version="8.0.20" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.31" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Bison.Models\Bison.Models.csproj" />
-    <ProjectReference Include="..\Bison.Utilities\Bison.Utilities.csproj" />
   </ItemGroup>
 
   <ItemGroup>
