@@ -8,7 +8,7 @@ public class E2E
 {
     public static Process StartDatabase()
     {
-        using var process = Process.Start(new ProcessStartInfo()
+        var process = Process.Start(new ProcessStartInfo()
         {
             UseShellExecute = false,
             CreateNoWindow = true,
@@ -34,7 +34,7 @@ public class E2E
     [Fact]
     public async Task CommentOnNonExistentObservationTest()
     {
-        var db = StartDatabase();
+        using var db = StartDatabase();
         using var process = Process.Start(new ProcessStartInfo()
         {
             UseShellExecute = false,
@@ -51,13 +51,12 @@ public class E2E
         await process.WaitForExitAsync();
 
         output.Trim().Should().Be("Observation id 2147483647 does not exist");
-        db.Close();
     }
 
     [Fact]
     public async Task TestObservationWorks()
     {
-        var db = StartDatabase();
+        using var db = StartDatabase();
         using var process = Process.Start(new ProcessStartInfo()
         {
             UseShellExecute = false,
@@ -74,13 +73,12 @@ public class E2E
         await process.WaitForExitAsync();
 
         output.Trim().Should().Be("Observation has been saved.");
-        db.Close();
     }
 
     [Fact]
     public async Task CommentOnExistentObservationWorks()
     {
-        var db = StartDatabase();
+        using var db = StartDatabase();
         using var process = Process.Start(new ProcessStartInfo()
         {
             UseShellExecute = false,
@@ -97,13 +95,12 @@ public class E2E
         await process.WaitForExitAsync();
 
         output.Trim().Should().Be("Comment has been saved.");
-        db.Close();
     }
 
     [Fact]
     public async Task ProposalOnExistentObservationWorks()
     {
-        var db = StartDatabase();
+        using var db = StartDatabase();
         using var process = Process.Start(new ProcessStartInfo()
         {
             UseShellExecute = false,
@@ -120,13 +117,12 @@ public class E2E
         await process.WaitForExitAsync();
 
         output.Trim().Should().Be("Proposal has been saved.");
-        db.Close();
     }
 
     [Fact]
     public async Task ProposalOnNonExistentObservationTest()
     {
-        var db = StartDatabase();
+        using var db = StartDatabase();
         using var process = Process.Start(new ProcessStartInfo()
         {
             UseShellExecute = false,
@@ -143,13 +139,12 @@ public class E2E
         await process.WaitForExitAsync();
 
         output.Trim().Should().Be("Observation with id 2147483647 does not exist");
-        db.Close();
     }
 
     [Fact]
     public async Task ProposalOfNonExistentTaxonTest()
     {
-        var db = StartDatabase();
+        using var db = StartDatabase();
         using var process = Process.Start(new ProcessStartInfo()
         {
             UseShellExecute = false,
@@ -166,6 +161,5 @@ public class E2E
         await process.WaitForExitAsync();
 
         output.Trim().Should().Be("Taxon with id boo does not exist");
-        db.Close();
     }
 }

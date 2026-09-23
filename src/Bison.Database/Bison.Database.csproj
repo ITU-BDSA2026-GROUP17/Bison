@@ -19,4 +19,8 @@
     <EmbeddedResource Include="resources/**/*"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Bison.Database.Tests"/>
+  </ItemGroup>
+
 </Project>

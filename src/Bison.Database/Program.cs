@@ -27,8 +27,8 @@ app.MapPost("/observation", (ObservationRecord obs, IDatabaseService dbService) 
 {
     try
     {
-        dbService.StoreObservation(obs);
-        return Results.Created();
+        var id = dbService.StoreObservation(obs);
+        return Results.Created($"/observation/{id}", new { Id = id });
     }
     catch (Exception e)
     {
