@@ -40,8 +40,8 @@ jobs:
                         }
                     }
                   ' | jq '.data.organization.projectsV2.nodes[0]')
-                  echo "iter=$(echo $RESULT | jq -r '.field.configuration.iterations[0].id')" >> $GITHUB_OUTPUT
-                  echo "project=$(echo $RESULT | jq -r '.title')" >> $GITHUB_OUTPUT
+                  echo "iter=\"$(echo $RESULT | jq -r '.field.configuration.iterations[0].id')\"" >> $GITHUB_OUTPUT
+                  echo "project=\"$(echo $RESULT | jq -r '.title')\"" >> $GITHUB_OUTPUT
 
             - name: "Add weekly label & project"
               run: gh issue edit $NUMBER -t Task --add-project "$PROJECT" --add-label "weekly"
