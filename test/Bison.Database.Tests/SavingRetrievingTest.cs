@@ -37,10 +37,10 @@ public class SavingRetrievingTest
         var permutationPath = Path.GetTempFileName();
         CSVDatabase db = new(obsPath, comPath, obsIdPath, permutationPath);
 
-        var observation = new ObservationRecord
+        var observation = new Observation
         {
             Author = "Test Person 1",
-            Observation = "WOAH WOAH",
+            Text = "WOAH WOAH",
             Location = "Nowhere",
             Timestamp = 0 // January 1st, 1970 at 00:00:00 UTC
         };
@@ -67,10 +67,10 @@ public class SavingRetrievingTest
         CSVDatabase db = new(obsPath, comPath, obsIdPath, permutationPath);
         db.ReadObservations().Count().Should().Be(0);
 
-        var observation = new ObservationRecord
+        var observation = new Observation
         {
             Author = "Test Person 1",
-            Observation = "WOAH WOAH",
+            Text = "WOAH WOAH",
             Location = "Nowhere",
             Timestamp = 0 // January 1st, 1970 at 00:00:00 UTC
         };
@@ -96,17 +96,17 @@ public class SavingRetrievingTest
         CSVDatabase db = new(obsPath, comPath, obsIdPath, permutationPath);
         db.ReadObservations().Count().Should().Be(0);
 
-        var obs1 = new ObservationRecord
+        var obs1 = new Observation
         {
             Author = "Test Person 1",
-            Observation = "WOAH WOAH",
+            Text = "WOAH WOAH",
             Location = "Nowhere",
             Timestamp = 0 // January 1st, 1970 at 00:00:00 UTC
         };
-        var obs2 = new ObservationRecord
+        var obs2 = new Observation
         {
             Author = "Test Person 2",
-            Observation = "A heron!!",
+            Text = "A heron!!",
             Location = "By DR Byen",
             Timestamp = 1788264000 // September 1st, 2026 at 12:00:00 UTC
         };
@@ -134,10 +134,10 @@ public class SavingRetrievingTest
         CSVDatabase db = new(obsPath, comPath, obsIdPath, permutationPath);
         db.ReadObservations().Count().Should().Be(0);
 
-        var obs = new ObservationRecord
+        var obs = new Observation
         {
             Author = author.ToString(),
-            Observation = observation.ToString(),
+            Text = observation.ToString(),
             Location = location.ToString(),
             Timestamp = 0 // January 1st, 1970 at 00:00:00 UTC
         };
@@ -165,12 +165,12 @@ public class SavingRetrievingTest
 
         try
         {
-            db.StoreComment(new CommentRecord()
+            db.StoreComment(new Comment()
             {
                 Author = "Test Person",
-                Comment = "Test Comment",
-                ObservationId = observationId,
-                Timestamp = 0
+                Text = "Test Comment",
+                Id = observationId,
+                CreatedAt = 0
             });
         }
         catch (ObservationDoesNotExist e)

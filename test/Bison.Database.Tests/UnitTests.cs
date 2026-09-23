@@ -16,115 +16,115 @@ public class UnitTests
         CSVDatabase db = new(obsPath, comPath, obsIdPath, proposalPath);
 
         db.StoreObservation(
-            new ObservationRecord
+            new Observation
             {
                 Author = "lrec",
-                Observation = "Eurasian jay",
+                Text = "Eurasian jay",
                 Location = "Assistentens Kirkegård",
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
             }
         );
         db.StoreComment(
-            new CommentRecord
+            new Comment
             {
-                ObservationId = 0,
+                Id = 0,
                 Author = "mawb",
-                Comment = "I do think it's a jay of somekind",
-                Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now)
+                Text = "I do think it's a jay of somekind",
+                CreatedAt = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now)
             }
         );
         db.StoreComment(
-            new CommentRecord
+            new Comment
             {
-                ObservationId = 0,
+                Id = 0,
                 Author = "lrec",
-                Comment = "I think it might be a bird",
-                Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now)
+                Text = "I think it might be a bird",
+                CreatedAt = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now)
             }
         );
 
         db.StoreObservation(
-            new ObservationRecord
+            new Observation
             {
                 Author = "mawb",
-                Observation = "Ghost",
+                Text = "Ghost",
                 Location = "Here",
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
             }
         );
         db.StoreComment(
-            new CommentRecord
+            new Comment
             {
-                ObservationId = 1,
+                Id = 1,
                 Author = "pask",
-                Comment = "You should be medicated",
-                Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now)
+                Text = "You should be medicated",
+                CreatedAt = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now)
             }
         );
         db.StoreComment(
-            new CommentRecord
+            new Comment
             {
-                ObservationId = 1,
+                Id = 1,
                 Author = "mawb",
-                Comment = "Well yes, but for a different reason",
-                Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now)
+                Text = "Well yes, but for a different reason",
+                CreatedAt = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now)
             }
         );
 
         db.StoreObservation(
-            new ObservationRecord
+            new Observation
             {
                 Author = "toov",
-                Observation = "Magnus",
+                Text = "Magnus",
                 Location = "ITU",
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
             }
         );
         db.StoreComment(
-            new CommentRecord
+            new Comment
             {
-                ObservationId = 2,
+                Id = 2,
                 Author = "mawb",
-                Comment = "Please don't observe me like this.",
-                Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now)
+                Text = "Please don't observe me like this.",
+                CreatedAt = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now)
             }
         );
         db.StoreComment(
-            new CommentRecord
+            new Comment
             {
-                ObservationId = 2,
+                Id = 2,
                 Author = "toov",
-                Comment = "ok ig",
-                Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now)
+                Text = "ok ig",
+                CreatedAt = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now)
             }
         );
 
         db.StoreObservation(
-            new ObservationRecord
+            new Observation
             {
                 Author = "pask",
-                Observation = "Saw a group of crows",
+                Text = "Saw a group of crows",
                 Location = "Tivoli",
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
             }
         );
 
         db.StoreObservation(
-            new ObservationRecord
+            new Observation
             {
                 Author = "lrec",
-                Observation = "Peanut Butter Baby",
+                Text = "Peanut Butter Baby",
                 Location = "The Table",
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now),
             }
         );
         db.StoreComment(
-            new CommentRecord
+            new Comment
             {
-                ObservationId = 4,
+                Id = 4,
                 Author = "toov",
-                Comment = "Ahh",
-                Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now)
+                Text = "Ahh",
+                CreatedAt = DateTimeUtilities.DateTimeToUnixTimeStamp(DateTime.Now)
             }
         );
 

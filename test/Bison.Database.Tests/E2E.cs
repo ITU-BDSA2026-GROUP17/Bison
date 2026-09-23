@@ -126,10 +126,10 @@ public class E2E
             from obs in string_gen
             from location in string_gen
             from timestamp in date_gen
-            select new ObservationRecord()
+            select new Observation()
             {
                 Author = author.ToString(),
-                Observation = obs.ToString(),
+                Text = obs.ToString(),
                 Location = location.ToString(),
                 Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(timestamp),
             }
@@ -150,12 +150,12 @@ public class E2E
             from author in string_gen
             from comment in string_gen
             from timestamp in date_gen
-            select new CommentRecord()
+            select new Comment()
             {
-                ObservationId = obs.Id,
+                Id = obs.Id,
                 Author = author.ToString(),
-                Comment = comment.ToString(),
-                Timestamp = DateTimeUtilities.DateTimeToUnixTimeStamp(timestamp)
+                Text = comment.ToString(),
+                CreatedAt = DateTimeUtilities.DateTimeToUnixTimeStamp(timestamp)
             }
         ).Sample(50);
         // save them
@@ -171,7 +171,7 @@ public class E2E
             from author in string_gen
             from taxonId in TaxonIdGenerator().Generator
             from timestamp in date_gen
-            select new ProposalRecord()
+            select new Proposal()
             {
                 ObservationId = obs.Id,
                 Author = author.ToString(),
@@ -189,7 +189,7 @@ public class E2E
         // check if every generated observation exists
         foreach (var observation in observations)
         {
-            var res = await DBClient.GetFromJsonAsync<ObservationRecord>($"/observation/{observation.Id}");
+            var res = await DBClient.GetFromJsonAsync<Observation>($"/observation/{observation.Id}");
             res.Should().NotBeNull();
             res.Should().Be(observation);
         }
@@ -198,7 +198,7 @@ public class E2E
         var commentsForObservation = comments.GroupBy(v => v.ObservationId).ToDictionary(v => v.Key, k => k.ToList());
         foreach (var entry in commentsForObservation)
         {
-            var coms = await DBClient.GetFromJsonAsync<List<CommentRecord>>($"/observation/{entry.Key}/comments");
+            var coms = await DBClient.GetFromJsonAsync<List<Comment>>($"/observation/{entry.Key}/comments");
             ScrambledEquals(entry.Value, coms).Should().BeTrue();
         }
 
@@ -206,7 +206,7 @@ public class E2E
         var proposalsForObservation = proposals.GroupBy(v => v.ObservationId).ToDictionary(v => v.Key, k => k.ToList());
         foreach (var entry in proposalsForObservation)
         {
-            var coms = await DBClient.GetFromJsonAsync<List<ProposalRecord>>($"/observation/{entry.Key}/proposals");
+            var coms = await DBClient.GetFromJsonAsync<List<Proposal>>($"/observation/{entry.Key}/proposals");
             ScrambledEquals(entry.Value, coms).Should().BeTrue();
         }
     }

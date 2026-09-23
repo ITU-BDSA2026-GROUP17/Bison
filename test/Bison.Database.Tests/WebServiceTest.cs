@@ -55,22 +55,22 @@ public class WebServiceTest : IClassFixture<CustomWebApplicationFactory>
         _factory = factory;
 
         var client = factory.CreateClient();
-        var postTask = client.PostAsJsonAsync("/observation", new ObservationRecord()
+        var postTask = client.PostAsJsonAsync("/observation", new Observation()
         {
             Author = "Arthur",
-            Observation = "Saw a little heron",
+            Text = "Saw a little heron",
             Timestamp = 0,
             Location = "At the canal"
         });
         postTask.Wait();
         _id = postTask.Result.Content.As<int>();
-        client.PostAsJsonAsync($"/observation/{_id}/comment", new CommentRecord()
+        client.PostAsJsonAsync($"/observation/{_id}/comment", new Comment()
         {
             Author = "Fredrick",
-            Comment = "It's so cute!!",
-            Timestamp = 100
+            Text = "It's so cute!!",
+            CreatedAt = 100
         });
-        client.PostAsJsonAsync($"/observation/{_id}/proposal", new ProposalRecord()
+        client.PostAsJsonAsync($"/observation/{_id}/proposal", new Proposal()
         {
             Author = "Fredrick",
             TaxonID = "MSTSNM:Arter:c18811f4-f785-ea11-aa77-501ac539d1ea",
