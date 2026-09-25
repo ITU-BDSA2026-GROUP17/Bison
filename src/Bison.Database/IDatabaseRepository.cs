@@ -5,7 +5,8 @@ namespace Bison.Database;
 public interface IDatabaseRepository
 {
     public Task<User> CreateUser(string name);
-    public Task<List<User>> GetAllUsers();
+    public Task<User?> GetUserById(int userId);
+    public Task<User?> GetUserByName(string name);
 
     public Task<Observation?> GetObservation(int id);
     public Task<List<Observation>> GetObservations(int? limit = null, int? skip = null);

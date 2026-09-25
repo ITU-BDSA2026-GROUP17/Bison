@@ -14,21 +14,18 @@ public class DatabaseRepository(BisonDBContext dbContext) : IDatabaseRepository
         await _dbContext.SaveChangesAsync();
         return res.Entity;
     }
-    public async Task<List<User>> GetAllUsers()
+    public async Task<User?> GetUserById(int userId)
     {
-        var query = from user in _dbContext.Users
-                    select user;
-        return await query.ToListAsync();
+        return await _dbContext.Users.FindAsync(userId);
+    }
+    public async Task<User?> GetUserByName(string name)
+    {
+        return await _dbContext.Users.FirstOrDefaultAsync(u => u.Name == name);
     }
 
     public async Task<Observation?> GetObservation(int id)
     {
-        var query = from obs in _dbContext.Observations
-                    where obs.Id == id
-                    select obs;
-        var res = await query.ToListAsync();
-
-        return res.Count == 0 ? null : res[0];
+        return await _dbContext.Observations.FindAsync(id);
     }
     public async Task<List<Observation>> GetObservations(int? limit = null, int? skip = null)
     {
