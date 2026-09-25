@@ -22,7 +22,6 @@ public class Taxonomies
         TaxonomiesList = [.. csv.GetRecords<TaxonRecord>()];
     }
 
-#nullable enable
     public TaxonRecord? GetTaxonRecordByID(string id)
     {
         foreach (var taxon in TaxonomiesList)
@@ -51,7 +50,6 @@ public class Taxonomies
     {
         return GetTaxonRecordByID(child.ParentNameUsageID);
     }
-#nullable restore
 
     public IEnumerable<TaxonRecord> GetSubTaxons(TaxonRecord parent)
     {

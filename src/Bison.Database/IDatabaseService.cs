@@ -4,12 +4,12 @@ using Bison.Models;
 
 public interface IDatabaseService
 {
-    public IEnumerable<ObservationRecord> ReadObservations(int? limit = null);
-    public int StoreObservation(ObservationRecord record);
+    public IEnumerable<Observation> ReadObservations(int? limit = null);
+    public int StoreObservation(Observation record);
 
-    public IEnumerable<CommentRecord> ReadCommentsForObservation(int observationID, int? limit = null);
-    public void StoreComment(CommentRecord record);
+    public IEnumerable<Comment> ReadCommentsForObservation(int observationID, int? limit = null);
+    public void StoreComment(Comment record);
 
-    public IEnumerable<ProposalRecord> ReadProposalsForObservation(int observationID, int? limit = null);
-    public void StoreProposal(ProposalRecord record);
+    public IEnumerable<Proposal> ReadProposalsForObservation(int observationID, int? limit = null);
+    public void StoreProposal(Proposal record);
 }
