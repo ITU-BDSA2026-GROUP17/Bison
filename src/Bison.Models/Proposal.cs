@@ -7,7 +7,7 @@ public sealed class Proposal
 {
     public int Id { get; set; }
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public required DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 
     public required User Author { get; set; }
     public Observation Observation { get; set; }

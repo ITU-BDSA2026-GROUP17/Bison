@@ -7,7 +7,7 @@ public sealed class Observation
 {
     public int Id { get; set; }
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public required DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 
     public required User Author { get; set; }
     [MaxLength(512)]

@@ -6,7 +6,7 @@ namespace Bison.Database;
 
 public class BisonDBContext : DbContext
 {
-    public DbSet<Observation> Obserations { get; set; }
+    public DbSet<Observation> Observations { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Proposal> Proposals { get; set; }
     public DbSet<User> Users { get; set; }
