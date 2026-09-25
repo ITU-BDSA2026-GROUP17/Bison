@@ -4,7 +4,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddSingleton<IObservationService, ObservationService>();
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

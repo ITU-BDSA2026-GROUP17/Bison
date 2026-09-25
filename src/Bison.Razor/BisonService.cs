@@ -33,5 +33,4 @@ public class ObservationService : IObservationService
         dateTime = dateTime.AddSeconds(unixTimeStamp);
         return dateTime.ToString("MM/dd/yy H:mm:ss");
     }
-
 }
