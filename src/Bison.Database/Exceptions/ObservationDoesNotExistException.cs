@@ -1,4 +1,4 @@
-namespace Bison.Database;
+namespace Bison.Database.Exceptions;
 
 public class ObservationDoesNotExistException(int observationId) : Exception($"Observation with ID {observationId} does not exist")
 {
