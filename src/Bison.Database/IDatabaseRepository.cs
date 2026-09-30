@@ -15,7 +15,7 @@ public interface IDatabaseRepository
 
     public Task<List<Comment>> GetCommentsForObservation(int observationId, int? limit = null, int? skip = null);
     public Task<Comment> CreateComment(int authorId, int observationId, string comment);
-    
+
     public Task<List<Proposal>> GetProposalsForObservation(int observationId, int? limit = null, int? skip = null);
     public Task<Proposal> CreateProposal(int authorId, int observationId, string taxonId);
 }
