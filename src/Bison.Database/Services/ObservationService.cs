@@ -10,7 +10,7 @@ public class ObservationService(IDatabaseRepository databaseRepository) : IObser
     {
         return _repository.GetObservation(id);
     }
-    public Task<List<Observation>> GetObservationsByUser(int userId, int? limit = null, int? skip = null)
+    public Task<List<Observation>> GetObservationsByUserAsync(int userId, int? limit = null, int? skip = null)
     {
         return _repository.GetObservationsByUser(userId, limit, skip);
     }
