@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bison.Database;
 
-public class DatabaseRepository(BisonDBContext dbContext) : IDatabaseRepository
+public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
 {
-    private readonly BisonDBContext _dbContext = dbContext;
+    private readonly BisonDbContext _dbContext = dbContext;
 
     public async Task<User> CreateUser(string name)
     {

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bison.Database;
 
-public class BisonDBContext : DbContext
+public class BisonDbContext(DbContextOptions<BisonDbContext> options) : DbContext(options)
 {
     public DbSet<Observation> Observations { get; set; }
     public DbSet<Comment> Comments { get; set; }

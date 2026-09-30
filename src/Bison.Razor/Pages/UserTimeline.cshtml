@@ -9,7 +9,7 @@
 <div>
     <h2> @routeName's Observations </h2>
 
-    @if (Model.Observations.Any())
+    @if (Model.Observations is not null && Model.Observations.Any())
     {
         <ul id="messagelist" class="observations">
             @foreach (var ob in Model.Observations)
@@ -17,10 +17,10 @@
                 <li>
                     <p>
                         <strong>
-                            <a href="/@ob.Author">@ob.Author</a>
+                            <a href="/@ob.Author.Name">@ob.Author.Name</a>
                         </strong>
-                        @ob.Message
-                        <small>&mdash; @ob.Timestamp</small>
+                        @ob.Text
+                        <small>&mdash; @ob.CreatedAt.ToString("dd/MM/yy H:mm:ss")</small>
                     </p>
                 </li>
             }

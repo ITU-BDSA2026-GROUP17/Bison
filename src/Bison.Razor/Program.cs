@@ -1,8 +1,28 @@
+using Bison.Database;
+using Bison.Database.Services;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
-builder.Services.AddSingleton<IObservationService, ObservationService>();
+
+builder.Services.AddDbContext<BisonDbContext>(options =>
+{
+    if (Environment.GetEnvironmentVariable("BISONDBPATH") is string dbPath)
+    {
+        options.UseSqlite($"Data Source={dbPath}");
+    } else
+    {
+        var tempPath = Path.Join(Path.GetTempPath(), "bison.db");
+        options.UseSqlite($"Data Source={tempPath}");
+    }
+});
+builder.Services.AddScoped<IDatabaseRepository, DatabaseRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IObservationService, ObservationService>();
+builder.Services.AddScoped<IProposalService, ProposalService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
 
 var app = builder.Build();
 
