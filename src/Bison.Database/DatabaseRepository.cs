@@ -1,3 +1,4 @@
+using Bison.Database.Exceptions;
 using Bison.Models;
 
 using Microsoft.EntityFrameworkCore;
