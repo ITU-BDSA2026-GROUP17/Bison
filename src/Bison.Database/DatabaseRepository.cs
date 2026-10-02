@@ -11,7 +11,13 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
 
     public async Task<User> CreateUser(string name)
     {
-        var res = _dbContext.Users.Add(new User() { Name = name });
+        var res = _dbContext.Users.Add(new User()
+        {
+            Name = name,
+            Comments = [],
+            Observations = [],
+            Proposals = [],
+        });
         await _dbContext.SaveChangesAsync();
         return res.Entity;
     }
@@ -63,7 +69,9 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
             {
                 Author = authorNotNull,
                 Text = observation,
-                Location = location
+                Location = location,
+                Comments = [],
+                Proposals = [],
             });
             await _dbContext.SaveChangesAsync();
             return res.Entity;
