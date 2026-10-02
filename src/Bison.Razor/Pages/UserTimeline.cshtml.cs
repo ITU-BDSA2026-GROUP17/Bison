@@ -17,8 +17,28 @@ public class UserTimelineModel(IObservationService service, IUserService uServic
         var user = await _userService.GetUserByNameAsync(author);
         if (user is not null)
         {
-            Observations = await _obsService.GetObservationsByUserAsync(user.Id);
+            Observations = await _obsService.GetObservationsByUserAsync(user.Id, PublicModel.PAGE_SIZE);
         }
         return Page();
+    }
+    public async Task<ActionResult> OnGet(string author, [FromQuery] int page)
+    {
+        if (page < 2)
+        {
+            return await OnGet(author);
+        }
+        else
+        {
+            var user = await _userService.GetUserByNameAsync(author);
+            if (user is not null)
+            {
+                Observations = await _obsService.GetObservationsByUserAsync(
+                    user.Id,
+                    PublicModel.PAGE_SIZE,
+                    PublicModel.PAGE_SIZE * (page - 1)
+                );
+            }
+            return Page();
+        }
     }
 }
