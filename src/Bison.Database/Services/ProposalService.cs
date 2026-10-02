@@ -1,11 +1,11 @@
-using Bison.Models;
 using Bison.Database.Exceptions;
+using Bison.Models;
 
 namespace Bison.Database.Services;
 
 public class ProposalService(IDatabaseRepository databaseRepository) : IProposalService
 {
-    private readonly static Taxonomies Taxonomies = new ();
+    private readonly static Taxonomies Taxonomies = new();
 
     private readonly IDatabaseRepository _repository = databaseRepository;
 
