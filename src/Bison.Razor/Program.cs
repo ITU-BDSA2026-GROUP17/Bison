@@ -26,6 +26,13 @@ builder.Services.AddScoped<ICommentService, CommentService>();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    using var context = scope.ServiceProvider.GetService<BisonDbContext>()!;
+
+    context.Database.Migrate();
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
