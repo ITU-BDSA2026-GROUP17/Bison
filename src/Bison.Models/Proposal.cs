@@ -10,7 +10,7 @@ public sealed class Proposal
     public DateTime CreatedAt { get; set; }
 
     public required User Author { get; set; }
-    public Observation Observation { get; set; }
+    public required Observation Observation { get; set; }
     [MaxLength(128)]
     public required string TaxonId { get; set; }
 }

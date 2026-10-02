@@ -14,4 +14,7 @@ public sealed class Observation
     public required string Text { get; set; }
     [MaxLength(512)]
     public required string Location { get; set; }
+
+    public required List<Comment> Comments { get; set; }
+    public required List<Proposal> Proposals { get; set; }
 }

@@ -1,5 +1,6 @@
 using Bison.Database;
 using Bison.Database.Services;
+
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,7 +13,8 @@ builder.Services.AddDbContext<BisonDbContext>(options =>
     if (Environment.GetEnvironmentVariable("BISONDBPATH") is string dbPath)
     {
         options.UseSqlite($"Data Source={dbPath}");
-    } else
+    }
+    else
     {
         var tempPath = Path.Join(Path.GetTempPath(), "bison.db");
         options.UseSqlite($"Data Source={tempPath}");
@@ -25,6 +27,13 @@ builder.Services.AddScoped<IProposalService, ProposalService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    using var context = scope.ServiceProvider.GetService<BisonDbContext>()!;
+
+    context.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
