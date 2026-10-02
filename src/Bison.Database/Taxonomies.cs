@@ -38,7 +38,7 @@ public class Taxonomies
     {
         foreach (var taxon in TaxonomiesList)
         {
-            if (taxon.VernacularName == name)
+            if (taxon.VernacularName != "" && taxon.VernacularName == name)
             {
                 return taxon;
             }
