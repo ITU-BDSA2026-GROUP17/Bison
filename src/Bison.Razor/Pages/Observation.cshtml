@@ -1,0 +1,58 @@
+﻿@page "/ob/{id}"
+@model Bison.Razor.Pages.ObservationModel
+@{
+    ViewData["Title"] = "Bison";
+    Layout = "Shared/_Layout";
+}
+
+<div>
+    
+
+    @if (Model.Observation is not null)
+    {
+        <h2> Public Timeline </h2>
+        <ul id="messagelist" class="observations">
+            <li>
+                <p>
+                    <strong>
+                        <a href="/@Model.Observation.Author.Name">@Model.Observation.Author.Name</a>
+                    </strong>
+                    @Model.Observation.Text
+                    <small>&mdash; @Model.Observation.CreatedAt.ToString("dd/MM/yy H:mm:ss")</small>
+                </p>
+            </li>
+        </ul>
+        <ul id="messagelist" class="observations">
+            @foreach (var comment in Model.Observation.Comments)
+            {
+                <li>
+                    <p>
+                        <strong>
+                            <a href="/@comment.Author.Name">@comment.Author.Name</a>
+                        </strong>
+                        @comment.Text
+                        <small>&mdash; @comment.CreatedAt.ToString("dd/MM/yy H:mm:ss")</small>
+                    </p>
+                </li>
+            }
+        </ul>
+        <ul id="messagelist" class="observations">
+            @foreach (var proposal in Model.Observation.Proposals)
+            {
+                <li>
+                    <p>
+                        <strong>
+                            <a href="/@proposal.Author.Name">@proposal.Author.Name</a>
+                        </strong>
+                        @proposal.TaxonId
+                        <small>&mdash; @proposal.CreatedAt.ToString("dd/MM/yy H:mm:ss")</small>
+                    </p>
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <h2>404 - Observation id does not exist</h2>
+    }
+</div>
