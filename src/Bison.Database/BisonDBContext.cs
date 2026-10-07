@@ -24,7 +24,7 @@ public class BisonDbContext(DbContextOptions<BisonDbContext> options) : DbContex
     }
 }
 
-public class BisonContextFactory : IDesignTimeDbContextFactory<BisonDbContext>
+internal class BisonContextFactory : IDesignTimeDbContextFactory<BisonDbContext>
 {
     public BisonDbContext CreateDbContext(string[] args)
     {
