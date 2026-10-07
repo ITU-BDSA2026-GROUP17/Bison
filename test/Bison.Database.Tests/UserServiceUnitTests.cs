@@ -1,3 +1,5 @@
+using Bison.Database.Services;
+
 namespace Bison.Database.Tests;
 
 public class UserServiceUnitTests
@@ -7,10 +9,10 @@ public class UserServiceUnitTests
     {
         // Arrange
         using var dbOptions = new DbOptions();
-        var db = new DatabaseRepository(dbOptions.BisonDbContext);
+        var db = new UserService(new DatabaseRepository(dbOptions.BisonDbContext));
 
         // Act
-        var user = await db.GetUserById(userId);
+        var user = await db.GetUserByIdAsync(userId);
 
         // Assert
         user.Should().BeNull();
@@ -21,10 +23,10 @@ public class UserServiceUnitTests
     {
         // Arrange
         using var dbOptions = new DbOptions();
-        var db = new DatabaseRepository(dbOptions.BisonDbContext);
+        var db = new UserService(new DatabaseRepository(dbOptions.BisonDbContext));
 
         // Act
-        var user = await db.GetUserByName(name);
+        var user = await db.GetUserByNameAsync(name);
 
         // Assert
         user.Should().BeNull();
@@ -35,12 +37,12 @@ public class UserServiceUnitTests
     {
         // Arrange
         using var dbOptions = new DbOptions();
-        var db = new DatabaseRepository(dbOptions.BisonDbContext);
+        var db = new UserService(new DatabaseRepository(dbOptions.BisonDbContext));
 
         // Act
-        var user = await db.CreateUser(name);
-        var nameUser = await db.GetUserByName(name);
-        var idUser = await db.GetUserById(user.Id);
+        var user = await db.CreateUserAsync(name);
+        var nameUser = await db.GetUserByNameAsync(name);
+        var idUser = await db.GetUserByIdAsync(user.Id);
 
 
         // Assert
