@@ -12,11 +12,14 @@ public class DbOptions : IDisposable
         var dbContextOptionsBuilder = new DbContextOptionsBuilder<BisonDbContext>();
         dbContextOptionsBuilder.UseSqlite("Data Source=:memory:");
         BisonDbContext = new(dbContextOptionsBuilder.Options);
+        BisonDbContext.Database.OpenConnection();
+        BisonDbContext.Database.Migrate();
     }
 
     public void Dispose()
     {
         GC.SuppressFinalize(this);
+        BisonDbContext.Database.CloseConnection();
         BisonDbContext.Dispose();
     }
 }

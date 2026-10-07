@@ -6,7 +6,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 public sealed class Comment
 {
     public int Id { get; set; }
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public DateTime CreatedAt { get; set; }
 
     public required User Author { get; set; }

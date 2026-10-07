@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bison.Database.Migrations
 {
     [DbContext(typeof(BisonDbContext))]
-    [Migration("20261002093754_InitialDbSchema")]
+    [Migration("20261007145705_InitialDbSchema")]
     partial class InitialDbSchema
     {
         /// <inheritdoc />
@@ -31,7 +31,8 @@ namespace Bison.Database.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<int>("ObservationId")
                         .HasColumnType("INTEGER");
@@ -61,7 +62,8 @@ namespace Bison.Database.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Location")
                         .IsRequired()
@@ -91,7 +93,8 @@ namespace Bison.Database.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<int>("ObservationId")
                         .HasColumnType("INTEGER");
