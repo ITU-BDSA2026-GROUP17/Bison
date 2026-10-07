@@ -1,4 +1,4 @@
-using Bison.Database;
+namespace Bison.Database.Tests;
 
 public class TaxonomiesUnitTest
 {
