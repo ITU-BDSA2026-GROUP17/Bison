@@ -84,7 +84,7 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
 
     public async Task<List<Comment>> GetCommentsForObservation(int observationId, int? limit = null, int? skip = null)
     {
-        IQueryable<Comment> query = _dbContext.Comments.Where(cmt => cmt.Observation.Id == observationId);
+        IQueryable<Comment> query = _dbContext.Comments.Where(cmt => cmt.Observation.Id == observationId).OrderByDescending(cmt => cmt.Id);
         if (skip is int skipAmount)
         {
             query = query.Skip(skipAmount);
@@ -125,7 +125,7 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
 
     public async Task<List<Proposal>> GetProposalsForObservation(int observationId, int? limit = null, int? skip = null)
     {
-        IQueryable<Proposal> query = _dbContext.Proposals.Where(ppl => ppl.Observation.Id == observationId);
+        IQueryable<Proposal> query = _dbContext.Proposals.Where(ppl => ppl.Observation.Id == observationId).OrderByDescending(ppl => ppl.Id);
         if (skip is int skipAmount)
         {
             query = query.Skip(skipAmount);
