@@ -12,16 +12,12 @@ public class PublicModel(IObservationService service) : PageModel
     private readonly IObservationService _service = service;
     public List<Observation>? Observations { get; set; }
 
-    public async Task<ActionResult> OnGet()
-    {
-        Observations = await _service.GetObservationsAsync(PAGE_SIZE);
-        return Page();
-    }
     public async Task<ActionResult> OnGet([FromQuery] int page)
     {
         if (page < 2)
         {
-            return await OnGet();
+            Observations = await _service.GetObservationsAsync(PAGE_SIZE);
+            return Page();
         }
         else
         {
