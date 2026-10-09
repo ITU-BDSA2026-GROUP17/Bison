@@ -95,11 +95,12 @@ public class ObservationServiceUnitTests
 
         //Act
         var page1 = await db.GetObservationsAsync(4);
-        var page2 = await db.GetObservationsAsync(4, 4);
+        var page2 = await db.GetObservationsAsync(2, 4);
 
         //Assert
         page1.Count.Should().Be(4);
         page2.Count.Should().Be(1);
+        page1.Select(obs => obs.Id).Should().BeInDescendingOrder();
     }
     [Fact]
     public static async Task PaginationWorksForGetByUserTest()
@@ -119,10 +120,11 @@ public class ObservationServiceUnitTests
 
         //Act
         var page1 = await db.GetObservationsByUserAsync(user.Id, 4);
-        var page2 = await db.GetObservationsByUserAsync(user.Id, 4, 4);
+        var page2 = await db.GetObservationsByUserAsync(user.Id, 2, 4);
 
         //Assert
         page1.Count.Should().Be(4);
         page2.Count.Should().Be(1);
+        page1.Select(obs => obs.Id).Should().BeInDescendingOrder();
     }
 }

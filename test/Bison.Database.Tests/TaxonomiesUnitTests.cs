@@ -86,9 +86,10 @@ public class TaxonomiesUnitTest
             taxon.ParentNameUsageID.Should().Be(item.Item2);
 
             // Act
-            var parent = Taxonomies.GetTaxonRecordByID(item.Item2);
+            var parent = Taxonomies.GetSuperTaxon(taxon);
             // Assert
             parent.Should().NotBeNull();
+            parent.TaxonID.Should().Be(item.Item2);
         }
 
         // Act
