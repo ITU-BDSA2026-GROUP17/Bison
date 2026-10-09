@@ -498,4 +498,5 @@ devenv.local.yaml
 .pre-commit-config.yaml
 
 # our files
+dist/
 Bison.db

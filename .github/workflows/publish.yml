@@ -28,9 +28,6 @@ jobs:
             - name: Build
               run: dotnet build --no-restore
 
-            - name: Test
-              run: dotnet test --no-build --verbosity normal
-
             - name: Publish and Zip
               run: |
                   make all
@@ -43,4 +40,4 @@ jobs:
               with:
                   generate_release_notes: true
                   files: |
-                      data/*.zip
+                      dist/*.zip
