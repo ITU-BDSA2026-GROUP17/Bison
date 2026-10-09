@@ -12,6 +12,7 @@ in {
     packages = [
         my-dotnet-bundle
         pkgs.roslyn-ls
+        pkgs.z3
     ];
     env.DOTNET_ROOT = "${my-dotnet-bundle}";
     

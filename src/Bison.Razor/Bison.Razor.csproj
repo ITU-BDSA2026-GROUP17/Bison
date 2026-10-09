@@ -5,6 +5,10 @@
     <TargetFramework>net8</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+
+    <PublishSingleFile>true</PublishSingleFile> <!-- Compiles all files into one executable -->
+    <SelfContained>false</SelfContained> <!-- But require the .NET runtime (assumed everyone has it) -->
+    <PublishReadyToRun>false</PublishReadyToRun> <!-- Maybe update to true later if needed -->
   </PropertyGroup>
 
   <ItemGroup>
