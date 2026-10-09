@@ -22,7 +22,6 @@ public class Taxonomies
         TaxonomiesList = [.. csv.GetRecords<TaxonRecord>()];
     }
 
-#nullable enable
     public TaxonRecord? GetTaxonRecordByID(string id)
     {
         foreach (var taxon in TaxonomiesList)
@@ -39,7 +38,7 @@ public class Taxonomies
     {
         foreach (var taxon in TaxonomiesList)
         {
-            if (taxon.VernacularName == name)
+            if (taxon.VernacularName != "" && taxon.VernacularName == name)
             {
                 return taxon;
             }
@@ -51,7 +50,6 @@ public class Taxonomies
     {
         return GetTaxonRecordByID(child.ParentNameUsageID);
     }
-#nullable restore
 
     public IEnumerable<TaxonRecord> GetSubTaxons(TaxonRecord parent)
     {
