@@ -8,8 +8,7 @@ public class ProposalServiceUnitTests
 {
     private static readonly Taxonomies Taxonomies = new();
     public static Arbitrary<string> TaxonIdGenerator() =>
-        (from i in Gen.Choose(0, Taxonomies.TaxonomiesList.Count - 1)
-         select Taxonomies.TaxonomiesList[i].TaxonID).ToArbitrary();
+        Gen.Elements(Taxonomies.TaxonomiesList.Select(t => t.TaxonID)).ToArbitrary();
 
     [Property]
     public static async Task EmptyDbGetProposalsByObsIdTest(int obsId)

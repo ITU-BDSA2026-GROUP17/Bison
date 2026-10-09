@@ -5,7 +5,9 @@
         "language-version": "latest",
         "additional-timeout": 5000,
         "mutate": [
-            "**/*"
+            "**/*",
+            "!**/Migrations/**/*.cs",
+            "!**/Bison.Models/**/*.cs"
         ],
         "solution": "./Bison.sln",
         "configuration": null,

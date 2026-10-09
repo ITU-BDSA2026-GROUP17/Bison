@@ -40,6 +40,7 @@
     <CoverletOutput>./coverage/</CoverletOutput>
     <Threshold>80</Threshold>
     <ThresholdType>branch</ThresholdType>
+    <ExcludeByFile>**/Migrations/**/*.cs,**/Bison.Models/**/*.cs</ExcludeByFile>
   </PropertyGroup>
 
 </Project>
