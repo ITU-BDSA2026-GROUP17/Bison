@@ -1,7 +1,6 @@
 namespace Bison.Database.Tests;
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
 
 public class DbOptions : IDisposable
 {
@@ -22,10 +21,4 @@ public class DbOptions : IDisposable
         BisonDbContext.Database.CloseConnection();
         BisonDbContext.Dispose();
     }
-}
-
-public class UnitTests(DbOptions dbOptions) : IClassFixture<DbOptions>
-{
-    private readonly DbOptions _dbOptions = dbOptions;
-    private readonly DatabaseRepository _databaseRepository = new(dbOptions.BisonDbContext);
 }
