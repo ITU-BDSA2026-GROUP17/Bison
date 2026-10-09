@@ -4,7 +4,11 @@
         "mutation-level": "Standard",
         "language-version": "latest",
         "additional-timeout": 5000,
-        "mutate": ["**/*"],
+        "mutate": [
+            "**/*",
+            "!**/Migrations/**/*.cs",
+            "!**/Bison.Models/**/*.cs"
+        ],
         "solution": "./Bison.sln",
         "configuration": null,
         "target-framework": null,
@@ -18,7 +22,10 @@
             "break": 0
         },
         "verbosity": "debug",
-        "reporters": ["Progress", "Html"],
+        "reporters": [
+            "Progress",
+            "Html"
+        ],
         "since": {
             "enabled": false,
             "ignore-changes-in": [],
@@ -35,9 +42,7 @@
         },
         "dashboard-url": "https://dashboard.stryker-mutator.io",
         "test-projects": [
-            "./test/Bison.CLI.Client.Tests/Bison.CLI.Client.Tests.csproj",
-            "./test/Bison.Database.Tests/Bison.Database.Tests.csproj",
-            "./test/Bison.Utilities.Tests/Bison.Utilities.Tests.csproj"
+            "./test/Bison.Database.Tests/Bison.Database.Tests.csproj"
         ],
         "test-case-filter": "",
         "test-runner": null,

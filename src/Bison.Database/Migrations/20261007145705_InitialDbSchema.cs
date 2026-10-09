@@ -31,7 +31,7 @@ namespace Bison.Database.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     AuthorId = table.Column<int>(type: "INTEGER", nullable: false),
                     Text = table.Column<string>(type: "TEXT", maxLength: 512, nullable: false),
                     Location = table.Column<string>(type: "TEXT", maxLength: 512, nullable: false)
@@ -53,7 +53,7 @@ namespace Bison.Database.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     AuthorId = table.Column<int>(type: "INTEGER", nullable: false),
                     ObservationId = table.Column<int>(type: "INTEGER", nullable: false),
                     Text = table.Column<string>(type: "TEXT", maxLength: 512, nullable: false)
@@ -81,7 +81,7 @@ namespace Bison.Database.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     AuthorId = table.Column<int>(type: "INTEGER", nullable: false),
                     ObservationId = table.Column<int>(type: "INTEGER", nullable: false),
                     TaxonId = table.Column<string>(type: "TEXT", maxLength: 128, nullable: false)

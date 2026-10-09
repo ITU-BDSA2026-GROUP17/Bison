@@ -21,10 +21,22 @@ public class BisonDbContext(DbContextOptions<BisonDbContext> options) : DbContex
         modelBuilder.Entity<User>()
             .HasIndex(c => c.Name)
             .IsUnique();
+
+        modelBuilder.Entity<Observation>()
+            .Property(obs => obs.CreatedAt)
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        modelBuilder.Entity<Comment>()
+            .Property(com => com.CreatedAt)
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        modelBuilder.Entity<Proposal>()
+            .Property(pro => pro.CreatedAt)
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
     }
 }
 
-public class BisonContextFactory : IDesignTimeDbContextFactory<BisonDbContext>
+internal class BisonContextFactory : IDesignTimeDbContextFactory<BisonDbContext>
 {
     public BisonDbContext CreateDbContext(string[] args)
     {

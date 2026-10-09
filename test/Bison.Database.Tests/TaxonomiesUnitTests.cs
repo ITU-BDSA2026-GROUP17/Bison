@@ -1,4 +1,4 @@
-using Bison.Database;
+namespace Bison.Database.Tests;
 
 public class TaxonomiesUnitTest
 {
@@ -7,6 +7,7 @@ public class TaxonomiesUnitTest
     [Fact]
     public static void CorrectNameAndTaxonIdAssociationTest()
     {
+        // Arrange
         var idList = new (string, string)[]
         {
             ("MSTSNM:Arter:c18811f4-f785-ea11-aa77-501ac539d1ea", "Sølvhejre"),
@@ -18,12 +19,16 @@ public class TaxonomiesUnitTest
 
         foreach (var item in idList)
         {
+            // Act
             Console.WriteLine(item.ToString());
             var taxon = Taxonomies.GetTaxonRecordByID(item.Item1);
+            // Assert
             taxon.Should().NotBeNull();
             taxon.VernacularName.Should().Be(item.Item2);
 
+            // Act
             var taxon2 = Taxonomies.GetTaxonRecordByName(item.Item2);
+            // Assert
             taxon2.Should().NotBeNull();
             taxon2.TaxonID.Should().Be(item.Item1);
         }
@@ -32,6 +37,7 @@ public class TaxonomiesUnitTest
     [Fact]
     public static void NotCorrectNameOrIdTest()
     {
+        // Arrange
         var list = new string[]
         {
             "thisisnotreal",
@@ -45,11 +51,15 @@ public class TaxonomiesUnitTest
 
         foreach (var str in list)
         {
+            // Act
             Console.WriteLine(str);
             var taxon = Taxonomies.GetTaxonRecordByID(str);
+            // Assert
             taxon.Should().BeNull();
 
+            // Act
             var taxon2 = Taxonomies.GetTaxonRecordByName(str);
+            // Assert
             taxon2.Should().BeNull();
         }
     }
@@ -57,6 +67,7 @@ public class TaxonomiesUnitTest
     [Fact]
     public static void GetSuperTaxonTest()
     {
+        // Arrange
         var idList = new (string, string)[]
         {
             ("MSTSNM:Arter:c18811f4-f785-ea11-aa77-501ac539d1ea", "MSTSNM:Arter:7f9ef9f3-f785-ea11-aa77-501ac539d1ea"),
@@ -67,25 +78,35 @@ public class TaxonomiesUnitTest
 
         foreach (var item in idList)
         {
+            // Act
             Console.WriteLine(item.ToString());
             var taxon = Taxonomies.GetTaxonRecordByID(item.Item1);
+            // Assert
             taxon.Should().NotBeNull();
             taxon.ParentNameUsageID.Should().Be(item.Item2);
 
-            var parent = Taxonomies.GetTaxonRecordByID(item.Item2);
+            // Act
+            var parent = Taxonomies.GetSuperTaxon(taxon);
+            // Assert
             parent.Should().NotBeNull();
+            parent.TaxonID.Should().Be(item.Item2);
         }
 
+        // Act
         var aarefodede = Taxonomies.GetTaxonRecordByID("MSTSNM:Arter:3e4e67e4-f785-ea11-aa77-501ac539d1ea");
+        // Assert
         aarefodede.Should().NotBeNull();
 
+        // Act
         var aarefodedeParent = Taxonomies.GetTaxonRecordByID(aarefodede.ParentNameUsageID);
+        // Assert
         aarefodedeParent.Should().BeNull();
     }
 
     [Fact]
     public static void GetSubTaxonTest()
     {
+        // Arrange
         var list = new (string, int)[]
         {
             ("MSTSNM:Arter:3e4e67e4-f785-ea11-aa77-501ac539d1ea", 6),
@@ -96,10 +117,14 @@ public class TaxonomiesUnitTest
 
         foreach (var parent in list)
         {
+            // Act
             var taxon = Taxonomies.GetTaxonRecordByID(parent.Item1);
+            // Assert
             taxon.Should().NotBeNull();
 
+            // Act
             var subs = Taxonomies.GetSubTaxons(taxon).ToList();
+            // Assert
             subs.Count.Should().Be(parent.Item2);
         }
     }
