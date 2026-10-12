@@ -14,8 +14,12 @@ public class UserService(IDatabaseRepository databaseRepository) : IUserService
     {
         return _repository.GetUserByName(name);
     }
-    public Task<User> CreateUserAsync(string name)
+    public Task<User> CreateUserAsync(string name, string email)
     {
-        return _repository.CreateUser(name);
+        ArgumentException.ThrowIfNullOrWhiteSpace(name);
+        ArgumentException.ThrowIfNullOrWhiteSpace(email);
+        return !IUserService.IsValidEmail(email)
+            ? throw new ArgumentException("email is invalid", nameof(email))
+            : _repository.CreateUser(name, email);
     }
 }

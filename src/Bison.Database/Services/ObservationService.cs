@@ -18,8 +18,9 @@ public class ObservationService(IDatabaseRepository databaseRepository) : IObser
     {
         return _repository.GetObservations(limit, skip);
     }
-    public Task<Observation> CreateObservationAsync(int userId, string description, string location)
+    public Task<Observation> CreateObservationAsync(int userId, string taxonId, string description)
     {
-        return _repository.CreateObservation(userId, description, location);
+        ArgumentException.ThrowIfNullOrWhiteSpace(description);
+        return _repository.CreateObservation(userId, taxonId, description);
     }
 }

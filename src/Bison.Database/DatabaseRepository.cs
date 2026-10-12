@@ -9,14 +9,12 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
 {
     private readonly BisonDbContext _dbContext = dbContext;
 
-    public async Task<User> CreateUser(string name)
+    public async Task<User> CreateUser(string name, string email)
     {
         var res = _dbContext.Users.Add(new User()
         {
             Name = name,
-            Comments = [],
-            Observations = [],
-            Proposals = [],
+            Email = email
         });
         await _dbContext.SaveChangesAsync();
         return res.Entity;
@@ -32,11 +30,14 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
 
     public async Task<Observation?> GetObservation(int id)
     {
-        return await _dbContext.Observations.FindAsync(id);
+        return await _dbContext.Posts.FindAsync(id) is Observation obs ? obs : null;
     }
     public async Task<List<Observation>> GetObservations(int? limit = null, int? skip = null)
     {
-        IQueryable<Observation> query = _dbContext.Observations.OrderByDescending(obs => obs.Id);
+        IQueryable<Observation> query = _dbContext.Posts
+            .Where(p => p is Observation)
+            .Select(p => (Observation)p)
+            .OrderByDescending(obs => obs.Id);
         if (skip is int skipAmount)
         {
             query = query.Skip(skipAmount);
@@ -49,7 +50,11 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
     }
     public async Task<List<Observation>> GetObservationsByUser(int userId, int? limit = null, int? skip = null)
     {
-        IQueryable<Observation> query = _dbContext.Observations.Where(obs => obs.Author.Id == userId).OrderByDescending(obs => obs.Id);
+        IQueryable<Observation> query = _dbContext.Posts
+            .Where(p => p is Observation)
+            .Select(p => (Observation)p)
+            .Where(obs => obs.Author.Id == userId)
+            .OrderByDescending(obs => obs.Id);
         if (skip is int skipAmount)
         {
             query = query.Skip(skipAmount);
@@ -60,31 +65,30 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
         }
         return await query.ToListAsync();
     }
-    public async Task<Observation> CreateObservation(int userId, string observation, string location)
+    public async Task<Observation> CreateObservation(int userId, string taxonId, string observation)
     {
-        var author = await _dbContext.Users.FindAsync(userId);
-        if (author is User authorNotNull)
+        var author = await _dbContext.Users.FindAsync(userId)
+            ?? throw new UserDoesNotExistException(userId);
+        var taxon = await _dbContext.Taxons.Where(t => t.DWC_TaxonId == taxonId).FirstAsync()
+            ?? throw new TaxonIdDoesNotExistException(taxonId);
+
+        var res = _dbContext.Posts.Add(new Observation()
         {
-            var res = _dbContext.Observations.Add(new Observation()
-            {
-                Author = authorNotNull,
-                Text = observation,
-                Location = location,
-                Comments = [],
-                Proposals = [],
-            });
-            await _dbContext.SaveChangesAsync();
-            return res.Entity;
-        }
-        else
-        {
-            throw new UserDoesNotExistException(userId);
-        }
+            Author = author,
+            Text = observation,
+            Taxon = taxon
+        });
+        await _dbContext.SaveChangesAsync();
+        return (Observation)res.Entity;
     }
 
     public async Task<List<Comment>> GetCommentsForObservation(int observationId, int? limit = null, int? skip = null)
     {
-        IQueryable<Comment> query = _dbContext.Comments.Where(cmt => cmt.Observation.Id == observationId).OrderByDescending(cmt => cmt.Id);
+        IQueryable<Comment> query = _dbContext.Posts
+            .Where(p => p is Comment)
+            .Select(p => (Comment)p)
+            .Where(cmt => cmt.Observation.Id == observationId)
+            .OrderByDescending(cmt => cmt.Id);
         if (skip is int skipAmount)
         {
             query = query.Skip(skipAmount);
@@ -97,35 +101,31 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
     }
     public async Task<Comment> CreateComment(int authorId, int observationId, string comment)
     {
-        var author = await _dbContext.Users.FindAsync(authorId);
-        if (author is User authorNotNull)
+        var author = await _dbContext.Users.FindAsync(authorId)
+            ?? throw new UserDoesNotExistException(authorId);
+        var observation = await _dbContext.Posts
+            .Where(p => p is Observation && p.Id == observationId)
+            .Select(p => (Observation)p)
+            .FirstAsync()
+            ?? throw new ObservationDoesNotExistException(observationId);
+
+        var res = _dbContext.Posts.Add(new Comment()
         {
-            var observation = await _dbContext.Observations.FindAsync(observationId);
-            if (observation is Observation observationNotNull)
-            {
-                var res = _dbContext.Comments.Add(new Comment()
-                {
-                    Author = authorNotNull,
-                    Observation = observationNotNull,
-                    Text = comment
-                });
-                await _dbContext.SaveChangesAsync();
-                return res.Entity;
-            }
-            else
-            {
-                throw new ObservationDoesNotExistException(observationId);
-            }
-        }
-        else
-        {
-            throw new UserDoesNotExistException(authorId);
-        }
+            Author = author,
+            Observation = observation,
+            Text = comment
+        });
+        await _dbContext.SaveChangesAsync();
+        return (Comment)res.Entity;
     }
 
     public async Task<List<Proposal>> GetProposalsForObservation(int observationId, int? limit = null, int? skip = null)
     {
-        IQueryable<Proposal> query = _dbContext.Proposals.Where(ppl => ppl.Observation.Id == observationId).OrderByDescending(ppl => ppl.Id);
+        IQueryable<Proposal> query = _dbContext.Posts
+            .Where(p => p is Proposal)
+            .Select(p => (Proposal)p)
+            .Where(ppl => ppl.Observation.Id == observationId)
+            .OrderByDescending(ppl => ppl.Id);
         if (skip is int skipAmount)
         {
             query = query.Skip(skipAmount);
@@ -136,31 +136,26 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
         }
         return await query.ToListAsync();
     }
-    public async Task<Proposal> CreateProposal(int authorId, int observationId, string taxonId)
+    public async Task<Proposal> CreateProposal(int authorId, int observationId, string taxonId, string text)
     {
-        var author = await _dbContext.Users.FindAsync(authorId);
-        if (author is User authorNotNull)
+        var author = await _dbContext.Users.FindAsync(authorId)
+            ?? throw new UserDoesNotExistException(authorId);
+        var observation = await _dbContext.Posts
+            .Where(p => p is Observation && p.Id == observationId)
+            .Select(p => (Observation)p)
+            .FirstAsync()
+            ?? throw new ObservationDoesNotExistException(observationId);
+        var taxon = await _dbContext.Taxons.Where(t => t.DWC_TaxonId == taxonId).FirstAsync()
+            ?? throw new TaxonIdDoesNotExistException(taxonId);
+
+        var res = _dbContext.Posts.Add(new Proposal()
         {
-            var observation = await _dbContext.Observations.FindAsync(observationId);
-            if (observation is Observation observationNotNull)
-            {
-                var res = _dbContext.Proposals.Add(new Proposal()
-                {
-                    Author = authorNotNull,
-                    Observation = observationNotNull,
-                    TaxonId = taxonId
-                });
-                await _dbContext.SaveChangesAsync();
-                return res.Entity;
-            }
-            else
-            {
-                throw new ObservationDoesNotExistException(observationId);
-            }
-        }
-        else
-        {
-            throw new UserDoesNotExistException(authorId);
-        }
+            Author = author,
+            Observation = observation,
+            Taxon = taxon,
+            Text = text,
+        });
+        await _dbContext.SaveChangesAsync();
+        return (Proposal)res.Entity;
     }
 }

@@ -12,6 +12,7 @@ public class CommentService(IDatabaseRepository databaseRepository) : ICommentSe
     }
     public Task<Comment> CreateCommentAsync(int authorId, int observationId, string comment)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(comment);
         return _repository.CreateComment(authorId, observationId, comment);
     }
 }
