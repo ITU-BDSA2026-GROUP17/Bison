@@ -1,5 +1,3 @@
-using System.Net.NetworkInformation;
-
 using Bison.Database.Exceptions;
 using Bison.Database.Services;
 using Bison.Models;
@@ -34,8 +32,8 @@ public class ObservationServiceUnitTests
         //Assert
         obs.Count.Should().Be(0);
     }
-    [Property]
-    public static async Task EmptyDbCreateObsTest(int userId, string description, string location)
+    [Property(Arbitrary = new[] { typeof(ProposalServiceUnitTests) })]
+    public static async Task EmptyDbCreateObsTest(int userId, Taxon taxon, NonWhiteSpaceString description)
     {
         //Arrange
         using var dbOptions = new DbOptions();
@@ -44,7 +42,7 @@ public class ObservationServiceUnitTests
         //Act
         try
         {
-            await db.CreateObservationAsync(userId, description, location);
+            await db.CreateObservationAsync(userId, taxon.DWC_TaxonId, description.Item);
             Assert.Fail("User does not exist, this should throw an error");
         }
         //Assert
@@ -54,43 +52,44 @@ public class ObservationServiceUnitTests
             e.UserId.Should().Be(userId);
         }
     }
-    [Property]
-    public static async Task CreateObsTest(string description, string location)
+    [Property(Arbitrary = new[] { typeof(ProposalServiceUnitTests) })]
+    public static async Task CreateObsTest(Taxon taxon, NonWhiteSpaceString description)
     {
         //Arrange
         using var dbOptions = new DbOptions();
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var db = new ObservationService(repo);
-        var user = await repo.CreateUser("testUser");
+        var user = await repo.CreateUser("testUser", "test@example.com");
 
         //Act
-        var obs = await db.CreateObservationAsync(user.Id, description, location);
+        var obs = await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, description.Item);
         var idObs = await db.GetObservationByIdAsync(obs.Id);
 
         //Assert
         obs.Author.Id.Should().Be(user.Id);
-        obs.Text.Should().Be(description);
-        obs.Location.Should().Be(location);
+        obs.Text.Should().Be(description.Item);
+        obs.Taxon.Id.Should().Be(taxon.Id);
 
         idObs.Id.Should().Be(obs.Id);
         idObs.Author.Id.Should().Be(user.Id);
-        idObs.Text.Should().Be(description);
-        idObs.Location.Should().Be(location);
+        idObs.Text.Should().Be(description.Item);
+        idObs.Taxon.Id.Should().Be(taxon.Id);
     }
     [Fact]
     public static async Task PaginationWorksTest()
     {
         //Arrange
         using var dbOptions = new DbOptions();
+        var taxon = (await ProposalServiceUnitTests.TaxonIdGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var db = new ObservationService(repo);
-        var user = await repo.CreateUser("testUser");
+        var user = await repo.CreateUser("testUser", "test@example.com");
         List<Observation> list = [
-            await db.CreateObservationAsync(user.Id, "test1", "bird Location1"),
-            await db.CreateObservationAsync(user.Id, "test2", "bird Location2"),
-            await db.CreateObservationAsync(user.Id, "test3", "bird Location3"),
-            await db.CreateObservationAsync(user.Id, "test4", "bird Location4"),
-            await db.CreateObservationAsync(user.Id, "test5", "bird Location5"),
+            await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, "test1"),
+            await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, "test2"),
+            await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, "test3"),
+            await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, "test4"),
+            await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, "test5"),
         ];
 
         //Act
@@ -107,15 +106,16 @@ public class ObservationServiceUnitTests
     {
         //Arrange
         using var dbOptions = new DbOptions();
+        var taxon = (await ProposalServiceUnitTests.TaxonIdGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var db = new ObservationService(repo);
-        var user = await repo.CreateUser("testUser");
+        var user = await repo.CreateUser("testUser", "test@example.com");
         List<Observation> list = [
-            await db.CreateObservationAsync(user.Id, "test1", "bird Location1"),
-            await db.CreateObservationAsync(user.Id, "test2", "bird Location2"),
-            await db.CreateObservationAsync(user.Id, "test3", "bird Location3"),
-            await db.CreateObservationAsync(user.Id, "test4", "bird Location4"),
-            await db.CreateObservationAsync(user.Id, "test5", "bird Location5"),
+            await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, "test1"),
+            await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, "test2"),
+            await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, "test3"),
+            await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, "test4"),
+            await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, "test5"),
         ];
 
         //Act

@@ -21,7 +21,7 @@ public class CommentServiceUnitTests
         com.Count.Should().Be(0);
     }
     [Property]
-    public static async Task EmptyDbCreateCommentTest(int userId, int obsId, string comment)
+    public static async Task EmptyDbCreateCommentTest(int userId, int obsId, NonWhiteSpaceString comment)
     {
         //Arrange
         using var dbOptions = new DbOptions();
@@ -30,7 +30,7 @@ public class CommentServiceUnitTests
         //Act
         try
         {
-            await db.CreateCommentAsync(userId, obsId, comment);
+            await db.CreateCommentAsync(userId, obsId, comment.Item);
             Assert.Fail("No user, should throw an exception");
         }
         //Assert
@@ -41,18 +41,18 @@ public class CommentServiceUnitTests
         }
     }
     [Property]
-    public static async Task DbWithUserCreateCommentTest(int obsId, string comment)
+    public static async Task DbWithUserCreateCommentTest(int obsId, NonWhiteSpaceString comment)
     {
         //Arrange
         using var dbOptions = new DbOptions();
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
-        var user = await repo.CreateUser("testName");
+        var user = await repo.CreateUser("testName", "test@example.com");
         var db = new CommentService(repo);
 
         //Act
         try
         {
-            await db.CreateCommentAsync(user.Id, obsId, comment);
+            await db.CreateCommentAsync(user.Id, obsId, comment.Item);
             Assert.Fail("No Observation, should throw an exception");
         }
         //Assert
@@ -67,9 +67,10 @@ public class CommentServiceUnitTests
     {
         //Arrange
         using var dbOptions = new DbOptions();
+        var taxon = (await ProposalServiceUnitTests.TaxonIdGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
-        var user = await repo.CreateUser("testName");
-        var obs = await repo.CreateObservation(user.Id, "TestObs", "TestLocation");
+        var user = await repo.CreateUser("testName", "test@example.com");
+        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation");
         var db = new CommentService(repo);
 
         //Act
@@ -95,9 +96,10 @@ public class CommentServiceUnitTests
     {
         //Arrange
         using var dbOptions = new DbOptions();
+        var taxon = (await ProposalServiceUnitTests.TaxonIdGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
-        var user = await repo.CreateUser("testName");
-        var obs = await repo.CreateObservation(user.Id, "TestObs", "TestLocation");
+        var user = await repo.CreateUser("testName", "test@example.com");
+        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation");
         var db = new CommentService(repo);
         List<Comment> list = [
             await db.CreateCommentAsync(user.Id, obs.Id, "com1"),
