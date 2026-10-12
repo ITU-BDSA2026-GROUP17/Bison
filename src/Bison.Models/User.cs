@@ -6,16 +6,15 @@ public sealed class User : IEquatable<User>
 {
     public int Id { get; set; }
     public required string Name { get; set; }
+    public required string Email { get; set; }
 
-    public required List<Comment> Comments { get; set; }
-    public required List<Observation> Observations { get; set; }
-    public required List<Proposal> Proposals { get; set; }
+    public List<Post> Posts { get; set; } = [];
 
     public bool Equals(User? other)
     {
         return other is null ?
             this is null :
-            this is not null && Id == other.Id && Name == other.Name;
+            this is not null && Id == other.Id && Name == other.Name && Email == other.Email;
     }
 
     public override bool Equals(object? obj)
