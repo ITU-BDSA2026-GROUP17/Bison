@@ -6,7 +6,7 @@
 }
 
 <div>
-    
+
 
     @if (Model.Observation is not null)
     {
@@ -15,37 +15,37 @@
             <li>
                 <p>
                     <strong>
-                        <a href="/@Model.Observation.Author.Name">@Model.Observation.Author.Name</a>
+                        <a href="/@Model.Observation.AuthorName">@Model.Observation.AuthorName</a>
                     </strong>
-                    @Model.Observation.Text
-                    <small>&mdash; @Model.Observation.CreatedAt.ToString("dd/MM/yy H:mm:ss")</small>
+                    @Model.Observation.Description
+                    <small>&mdash; @Model.Observation.CreatedAt</small>
                 </p>
             </li>
         </ul>
         <ul id="messagelist" class="observations">
-            @foreach (var comment in Model.Observation.Comments)
+            @foreach (var comment in Model.Comments)
             {
                 <li>
                     <p>
                         <strong>
-                            <a href="/@comment.Author.Name">@comment.Author.Name</a>
+                            <a href="/@comment.AuthorName">@comment.AuthorName</a>
                         </strong>
-                        @comment.Text
-                        <small>&mdash; @comment.CreatedAt.ToString("dd/MM/yy H:mm:ss")</small>
+                        @comment.Comment
+                        <small>&mdash; @comment.CreatedAt</small>
                     </p>
                 </li>
             }
         </ul>
         <ul id="messagelist" class="observations">
-            @foreach (var proposal in Model.Observation.Proposals)
+            @foreach (var proposal in Model.Proposals)
             {
                 <li>
                     <p>
                         <strong>
-                            <a href="/@proposal.Author.Name">@proposal.Author.Name</a>
+                            <a href="/@proposal.AuthorName">@proposal.AuthorName</a>
                         </strong>
-                        @proposal.TaxonId
-                        <small>&mdash; @proposal.CreatedAt.ToString("dd/MM/yy H:mm:ss")</small>
+                        @proposal.TaxonName
+                        <small>&mdash; @proposal.CreatedAt</small>
                     </p>
                 </li>
             }

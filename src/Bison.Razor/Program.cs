@@ -33,6 +33,7 @@ using (var scope = app.Services.CreateScope())
     using var context = scope.ServiceProvider.GetService<BisonDbContext>()!;
 
     context.Database.Migrate();
+    DbSeeder.SeedDatabase(context);
 }
 
 // Configure the HTTP request pipeline.

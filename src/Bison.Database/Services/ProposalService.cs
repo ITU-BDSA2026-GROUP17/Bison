@@ -7,13 +7,31 @@ public class ProposalService(IDatabaseRepository databaseRepository) : IProposal
 {
     private readonly IDatabaseRepository _repository = databaseRepository;
 
-    public Task<List<Proposal>> GetProposalsByObservationIdAsync(int observationId, int? limit = null, int? skip = null)
+    public async Task<List<ProposalDTO>> GetProposalsByObservationIdAsync(int observationId, int? limit = null, int? skip = null)
     {
-        return _repository.GetProposalsForObservation(observationId, limit, skip);
+        return [..
+            (await _repository.GetProposalsForObservation(observationId, limit, skip))
+            .Select(ppl => new ProposalDTO(
+                ppl.Id,
+                ppl.CreatedAt.ToString(ObservationService.DATE_FORMAT_STRING),
+                ppl.Observation.Id,
+                ppl.Author.Name,
+                ppl.Taxon.VernacularName,
+                ppl.Text
+            ))
+        ];
     }
-    public Task<Proposal> CreateProposalAsync(int authorId, int observationId, string taxonId, string text)
+    public async Task<ProposalDTO> CreateProposalAsync(int authorId, int observationId, string taxonId, string text)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(text);
-        return _repository.CreateProposal(authorId, observationId, taxonId, text);
+        var ppl = await _repository.CreateProposal(authorId, observationId, taxonId, text);
+        return new ProposalDTO(
+            ppl.Id,
+            ppl.CreatedAt.ToString(ObservationService.DATE_FORMAT_STRING),
+            ppl.Observation.Id,
+            ppl.Author.Name,
+            ppl.Taxon.VernacularName,
+            ppl.Text
+        );
     }
 }

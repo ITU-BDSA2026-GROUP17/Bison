@@ -2,13 +2,11 @@
 
 using System.Net.Mail;
 
-using Bison.Models;
-
 public interface IUserService
 {
-    public Task<User?> GetUserByIdAsync(int userId);
-    public Task<User?> GetUserByNameAsync(string name);
-    public Task<User> CreateUserAsync(string name, string email);
+    public Task<UserDTO?> GetUserByIdAsync(int userId);
+    public Task<UserDTO?> GetUserByNameAsync(string name);
+    public Task<UserDTO> CreateUserAsync(string name, string email);
 
     public static bool IsValidEmail(string? email) {
         if (email is null) return false;
@@ -21,3 +19,5 @@ public interface IUserService
         }
     }
 }
+
+public record UserDTO(int Id, string Name, string Email);

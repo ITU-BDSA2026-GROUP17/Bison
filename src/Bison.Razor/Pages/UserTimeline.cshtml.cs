@@ -10,7 +10,7 @@ public class UserTimelineModel(IObservationService service, IUserService uServic
 {
     private readonly IObservationService _obsService = service;
     private readonly IUserService _userService = uService;
-    public List<Observation>? Observations { get; set; }
+    public List<ObservationDTO>? Observations { get; set; }
 
     public async Task<ActionResult> OnGet(string author, [FromQuery] int page)
     {

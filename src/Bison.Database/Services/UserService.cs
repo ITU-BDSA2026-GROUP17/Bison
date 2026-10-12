@@ -1,25 +1,27 @@
-using Bison.Models;
-
 namespace Bison.Database.Services;
 
 public class UserService(IDatabaseRepository databaseRepository) : IUserService
 {
     private readonly IDatabaseRepository _repository = databaseRepository;
 
-    public Task<User?> GetUserByIdAsync(int userId)
+    public async Task<UserDTO?> GetUserByIdAsync(int userId)
     {
-        return _repository.GetUserById(userId);
+        var user = await _repository.GetUserById(userId);
+        return user is null ? null : new UserDTO(user.Id, user.Name, user.Email);
     }
-    public Task<User?> GetUserByNameAsync(string name)
+    public async Task<UserDTO?> GetUserByNameAsync(string name)
     {
-        return _repository.GetUserByName(name);
+        var user = await _repository.GetUserByName(name);
+        return user is null ? null : new UserDTO(user.Id, user.Name, user.Email);
     }
-    public Task<User> CreateUserAsync(string name, string email)
+    public async Task<UserDTO> CreateUserAsync(string name, string email)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
         ArgumentException.ThrowIfNullOrWhiteSpace(email);
-        return !IUserService.IsValidEmail(email)
-            ? throw new ArgumentException("email is invalid", nameof(email))
-            : _repository.CreateUser(name, email);
+        if (!IUserService.IsValidEmail(email))
+            throw new ArgumentException("email is invalid", nameof(email));
+
+        var user = await _repository.CreateUser(name, email);
+        return new UserDTO(user.Id, user.Name, user.Email);
     }
 }

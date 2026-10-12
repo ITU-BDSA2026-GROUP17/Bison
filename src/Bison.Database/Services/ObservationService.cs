@@ -6,21 +6,51 @@ public class ObservationService(IDatabaseRepository databaseRepository) : IObser
 {
     private readonly IDatabaseRepository _repository = databaseRepository;
 
-    public Task<Observation?> GetObservationByIdAsync(int id)
+    internal static readonly string DATE_FORMAT_STRING = "dd/MM/yy H:mm:ss";
+
+    public async Task<ObservationDTO?> GetObservationByIdAsync(int id)
     {
-        return _repository.GetObservation(id);
+        var obs = await _repository.GetObservation(id);
+        return obs is null ? null :
+            new ObservationDTO(
+                obs.Id,
+                obs.CreatedAt.ToString(DATE_FORMAT_STRING),
+                obs.Author.Name,
+                obs.Text
+            );
     }
-    public Task<List<Observation>> GetObservationsByUserAsync(int userId, int? limit = null, int? skip = null)
+    public async Task<List<ObservationDTO>> GetObservationsByUserAsync(int userId, int? limit = null, int? skip = null)
     {
-        return _repository.GetObservationsByUser(userId, limit, skip);
+        return [.. (await _repository.GetObservationsByUser(userId, limit, skip)).Select(obs =>
+            new ObservationDTO(
+                obs.Id,
+                obs.CreatedAt.ToString(DATE_FORMAT_STRING),
+                obs.Author.Name,
+                obs.Text
+            )
+        )];
     }
-    public Task<List<Observation>> GetObservationsAsync(int? limit = null, int? skip = null)
+    public async Task<List<ObservationDTO>> GetObservationsAsync(int? limit = null, int? skip = null)
     {
-        return _repository.GetObservations(limit, skip);
+        var obs = await _repository.GetObservations(limit, skip);
+        return [.. obs.Select(obs =>
+            new ObservationDTO(
+                obs.Id,
+                obs.CreatedAt.ToString(DATE_FORMAT_STRING),
+                obs.Author.Name,
+                obs.Text
+            )
+        )];
     }
-    public Task<Observation> CreateObservationAsync(int userId, string taxonId, string description)
+    public async Task<ObservationDTO> CreateObservationAsync(int userId, string taxonId, string description)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(description);
-        return _repository.CreateObservation(userId, taxonId, description);
+        var obs = await _repository.CreateObservation(userId, taxonId, description);
+        return new ObservationDTO(
+            obs.Id,
+            obs.CreatedAt.ToString(DATE_FORMAT_STRING),
+            obs.Author.Name,
+            obs.Text
+        );
     }
 }
