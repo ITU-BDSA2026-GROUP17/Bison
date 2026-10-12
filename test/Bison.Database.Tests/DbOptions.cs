@@ -13,7 +13,7 @@ public class DbOptions : IDisposable
         BisonDbContext = new(dbContextOptionsBuilder.Options);
         BisonDbContext.Database.OpenConnection();
         BisonDbContext.Database.Migrate();
-        DbInitializer.SeedDatabase(BisonDbContext);
+        DbSeeder.SeedDatabase(BisonDbContext);
     }
 
     public void Dispose()

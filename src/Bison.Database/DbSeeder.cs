@@ -2,7 +2,7 @@ namespace Bison.Database;
 
 using Bison.Models;
 
-public static class DbInitializer
+public static class DbSeeder
 {
     public static void SeedDatabase(BisonDbContext bisonContext)
     {
