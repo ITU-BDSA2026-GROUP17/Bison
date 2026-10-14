@@ -102,22 +102,47 @@ public class UserServiceUnitTests
         idUserDTO.Name.Should().Be(userDTO.Name);
     }
 
-    [Property]
-    public async Task MapUserDTOToUserTest(int userId)
+    [Fact]
+    public async Task MapUserDTOToUserTest()
     {
         //Arrange
         using var dbOptions = new DbOptions();
         dbOptions.SeedDatabase();
         var db = new UserService(new DatabaseRepository(dbOptions.BisonDbContext));
 
+        var userId = (await UserGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0].Id;
+
         //Act
         var userDTO = await db.GetUserByIdAsync(userId);
         var user = await db.ToUser(userDTO);
 
         //Assert
+        userDTO.Should().NotBeNull();
+        user.Should().NotBeNull();
         userDTO.Name.Should().Be(user.Name);
         userDTO.Email.Should().Be(user.Email);
         userDTO.Id.Should().Be(user.Id);
+    }
+
+    [Fact]
+    public async Task MapUserToUserDTOTest()
+    {
+        //Arrange
+        using var dbOptions = new DbOptions();
+        dbOptions.SeedDatabase();
+        var db = new UserService(new DatabaseRepository(dbOptions.BisonDbContext));
+
+        var user = (await UserGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
+
+        //Act
+        var userDTO = await db.ToUserDTO(user);
+
+        //Assert
+        userDTO.Should().NotBeNull();
+        user.Should().NotBeNull();
+        user.Name.Should().Be(userDTO.Name);
+        user.Email.Should().Be(userDTO.Email);
+        user.Id.Should().Be(userDTO.Id);
     }
 
     [Property]
