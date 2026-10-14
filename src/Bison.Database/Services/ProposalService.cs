@@ -34,4 +34,27 @@ public class ProposalService(IDatabaseRepository databaseRepository) : IProposal
             ppl.Text
         );
     }
+
+    public async Task<ProposalDTO> ToProposalDTO(Proposal proposal) {
+        int id = proposal.Id;
+        string createdAt = proposal.CreatedAt;
+        int observationId = proposal.Id;
+        string authorName = proposal.Author.Name;
+        string? taxonName = proposal.Taxon.VernacularName;
+        string text = proposal.Text;
+       
+        return new ProposalDTO(id, createdAt, observationId, authorName, taxonName, text);
+    }
+
+    public async Task<Proposal?> ToProposal(ProposalDTO proposalDTO) { 
+        var proposals = await _repository.GetProposalsForObservation(proposalDTO.ObservationId);
+        foreach (var proposal in proposals)
+        {
+            if (proposal.Id == proposalDTO.Id)
+            {
+                return proposal;
+            }
+        }
+        return null;
+    }
 }

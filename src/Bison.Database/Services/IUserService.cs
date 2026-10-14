@@ -20,7 +20,7 @@ public interface IUserService
             return false;
         }
     }
-    public Task<UserDTO> ToDto(User user);
+    public Task<UserDTO> ToUserDTO(User user);
 
     public Task<User?> ToUser(UserDTO userDTO);
 }
