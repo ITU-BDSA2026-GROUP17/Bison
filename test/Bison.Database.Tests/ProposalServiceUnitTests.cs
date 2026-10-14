@@ -31,6 +31,7 @@ public class ProposalServiceUnitTests
         //Arrange
         using var dbOptions = new DbOptions();
         var db = new ProposalService(new DatabaseRepository(dbOptions.BisonDbContext));
+
         if (await dbOptions.BisonDbContext.Taxons.Where(t => t.DWC_TaxonId == invalidTaxonId).FirstAsync() is not null)
             return;
 
@@ -47,13 +48,14 @@ public class ProposalServiceUnitTests
             e.TaxonId.Should().Be(invalidTaxonId);
         }
     }
-    [Property(Arbitrary = new[] { typeof(ProposalServiceUnitTests) })]
-    public static async Task EmptyDbCreateProposalWithValidTaxonIdTest(int userId, int obsId, Taxon taxon)
+    [Property]
+    public static async Task EmptyDbCreateProposalWithValidTaxonIdTest(int userId, int obsId)
     {
         //Arrange
         using var dbOptions = new DbOptions();
         var db = new ProposalService(new DatabaseRepository(dbOptions.BisonDbContext));
 
+        var taxon = (await TaxonIdGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
         //Act
         try
         {
@@ -68,14 +70,17 @@ public class ProposalServiceUnitTests
         }
     }
 
-    [Property(Arbitrary = new[] { typeof(ProposalServiceUnitTests) })]
-    public static async Task DbWithUserCreateProposalTest(int obsId, Taxon taxon)
+    [Property]
+    public static async Task DbWithUserCreateProposalTest(int obsId)
     {
         //Arrange
         using var dbOptions = new DbOptions();
+        dbOptions.SeedDatabase();
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var user = await repo.CreateUser("testName", "test@example.com");
         var db = new ProposalService(repo);
+
+        var taxon = (await TaxonIdGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
 
         //Act
         try
@@ -90,8 +95,8 @@ public class ProposalServiceUnitTests
             e.ObservationId.Should().Be(obsId);
         }
     }
-    [Property(Arbitrary = new[] { typeof(ProposalServiceUnitTests) })]
-    public static async Task CreateProposalTest(Taxon taxon, NonWhiteSpaceString text)
+    [Property]
+    public static async Task CreateProposalTest(NonWhiteSpaceString text)
     {
         //Arrange
         using var dbOptions = new DbOptions();
@@ -99,28 +104,37 @@ public class ProposalServiceUnitTests
         var user = await repo.CreateUser("testName", "test@example.com");
         var obs = await repo.CreateObservation(user.Id, "TestObs", "TestLocation");
         var db = new ProposalService(repo);
+        var userDB = new UserService(repo);
+        var obsDB = new ObservationService(repo);
+
+        var taxon = (await TaxonIdGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
 
         //Act
-        var ppl = await db.CreateProposalAsync(user.Id, obs.Id, taxon.DWC_TaxonId, text.Item);
-        var gottenPpl = await db.GetProposalsByObservationIdAsync(obs.Id);
+        var pplDTO = await db.CreateProposalAsync(user.Id, obs.Id, taxon.DWC_TaxonId, text.Item);
+        var ppl = await db.ToProposal(pplDTO);
+        var gottenPpls = await db.GetProposalsByObservationIdAsync(obs.Id);
+        var gottenPpl = await db.ToProposal(gottenPpls[0]);
 
 
         //Assert
-        ppl.Should().NotBeNull();
+        pplDTO.Should().NotBeNull();
+        
         ppl.Author.Id.Should().Be(user.Id);
+        ppl.Observation.Id.Should().Be(obs.Id);
         ppl.Observation.Id.Should().Be(obs.Id);
         ppl.Taxon.Id.Should().Be(taxon.Id);
         ppl.Text.Should().Be(text.Item);
 
+        gottenPpls.Should().NotBeNull();
+        gottenPpls.Count.Should().Be(1);
         gottenPpl.Should().NotBeNull();
-        gottenPpl.Count.Should().Be(1);
-        gottenPpl[0].Should().NotBeNull();
-        gottenPpl[0].Id.Should().Be(ppl.Id);
-        gottenPpl[0].Author.Id.Should().Be(user.Id);
-        gottenPpl[0].Observation.Id.Should().Be(obs.Id);
-        gottenPpl[0].Taxon.Id.Should().Be(taxon.Id);
-        gottenPpl[0].Text.Should().Be(text.Item);
+        gottenPpl.Id.Should().Be(pplDTO.Id);
+        gottenPpl.Author.Id.Should().Be(user.Id);
+        gottenPpl.Observation.Id.Should().Be(obs.Id);
+        gottenPpl.Taxon.Id.Should().Be(taxon.Id);
+        gottenPpl.Text.Should().Be(text.Item);
     }
+    [Fact]
     public static async Task PaginationWorksTest()
     {
         //Arrange
@@ -130,7 +144,7 @@ public class ProposalServiceUnitTests
         var user = await repo.CreateUser("testName", "test@example.com");
         var obs = await repo.CreateObservation(user.Id, taxonIds[0].DWC_TaxonId, "TestLocation");
         var db = new ProposalService(repo);
-        List<Proposal> list = [
+        List<ProposalDTO> list = [
             await db.CreateProposalAsync(user.Id, obs.Id, taxonIds[0].DWC_TaxonId, "prop1"),
             await db.CreateProposalAsync(user.Id, obs.Id, taxonIds[1].DWC_TaxonId, "prop2"),
             await db.CreateProposalAsync(user.Id, obs.Id, taxonIds[2].DWC_TaxonId, "prop3"),
