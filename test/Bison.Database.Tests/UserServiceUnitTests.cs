@@ -35,27 +35,43 @@ public class UserServiceUnitTests
     }
 
     [Property]
-    public static async Task CreateUserTest(NonWhiteSpaceString name, MailAddress email)
+    public static async Task CreateUserDTOTest(NonWhiteSpaceString name, MailAddress email)
     {
         // Arrange
         using var dbOptions = new DbOptions();
         var db = new UserService(new DatabaseRepository(dbOptions.BisonDbContext));
 
         // Act
-        var user = await db.CreateUserAsync(name.Item, email.Address);
-        var nameUser = await db.GetUserByNameAsync(name.Item);
-        var idUser = await db.GetUserByIdAsync(user.Id);
-
+        var userDTO = await db.CreateUserAsync(name.Item, email.Address);
+        var nameUserDTO = await db.GetUserByNameAsync(name.Item);
+        var idUserDTO = await db.GetUserByIdAsync(userDTO.Id);
 
         // Assert
-        user.Should().NotBeNull();
-        user.Name.Should().Be(name.Item);
-        user.Posts.Count.Should().Be(0);
+        userDTO.Should().NotBeNull();
+        userDTO.Name.Should().Be(name.Item);
 
-        nameUser.Id.Should().Be(user.Id);
-        nameUser.Name.Should().Be(user.Name);
+        nameUserDTO.Id.Should().Be(userDTO.Id);
+        nameUserDTO.Name.Should().Be(userDTO.Name);
 
-        idUser.Id.Should().Be(user.Id);
-        idUser.Name.Should().Be(user.Name);
+        idUserDTO.Id.Should().Be(userDTO.Id);
+        idUserDTO.Name.Should().Be(userDTO.Name);
+    }
+
+    [Property]
+    public async Task MapUserDTOToUserTest(int userId)
+    {
+        //Arrange
+        using var dbOptions = new DbOptions();
+        dbOptions.SeedDatabase();
+        var db = new UserService(new DatabaseRepository(dbOptions.BisonDbContext));
+
+        //Act
+        var userDTO = await db.GetUserByIdAsync(userId);
+        var user = await db.ToUser(userDTO);
+
+        //Assert
+        userDTO.Name.Should().Be(user.Name);
+        userDTO.Email.Should().Be(user.Email);
+        userDTO.Id.Should().Be(user.Id);
     }
 }
