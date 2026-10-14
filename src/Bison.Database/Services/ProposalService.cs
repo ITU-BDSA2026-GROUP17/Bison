@@ -13,7 +13,7 @@ public class ProposalService(IDatabaseRepository databaseRepository) : IProposal
             (await _repository.GetProposalsForObservation(observationId, limit, skip))
             .Select(ppl => new ProposalDTO(
                 ppl.Id,
-                ppl.CreatedAt.ToString(ObservationService.DATE_FORMAT_STRING),
+                ppl.CreatedAt.ToString(ObservationService.DATE_FORMAT),
                 ppl.Observation.Id,
                 ppl.Author.Name,
                 ppl.Taxon.VernacularName,
@@ -27,7 +27,7 @@ public class ProposalService(IDatabaseRepository databaseRepository) : IProposal
         var ppl = await _repository.CreateProposal(authorId, observationId, taxonId, text);
         return new ProposalDTO(
             ppl.Id,
-            ppl.CreatedAt.ToString(ObservationService.DATE_FORMAT_STRING),
+            ppl.CreatedAt.ToString(ObservationService.DATE_FORMAT),
             ppl.Observation.Id,
             ppl.Author.Name,
             ppl.Taxon.VernacularName,
