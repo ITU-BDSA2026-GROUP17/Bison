@@ -1,3 +1,5 @@
+using Bison.Models;
+
 namespace Bison.Database.Services;
 
 public class UserService(IDatabaseRepository databaseRepository) : IUserService
@@ -23,5 +25,17 @@ public class UserService(IDatabaseRepository databaseRepository) : IUserService
 
         var user = await _repository.CreateUser(name, email);
         return new UserDTO(user.Id, user.Name, user.Email);
+    }
+
+    public static async Task<UserDTO> ToDto(User user) {
+        int id = user.Id;
+        string name = user.Name;
+        string email = user.Email;
+       
+        return new UserDTO(id, name, email);
+    }
+
+    public async Task<User?> ToUser(UserDTO userDTO) { 
+        return await _repository.GetUserByName(userDTO.Name);
     }
 }
