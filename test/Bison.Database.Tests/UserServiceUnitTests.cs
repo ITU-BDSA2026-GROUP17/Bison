@@ -1,37 +1,82 @@
 using System.Net.Mail;
 
 using Bison.Database.Services;
+using Bison.Models;
+
+using Microsoft.EntityFrameworkCore;
 
 namespace Bison.Database.Tests;
 
 public class UserServiceUnitTests
 {
+    public static async Task<Arbitrary<User>> UserGenerator(BisonDbContext dbContext) =>
+        Gen.Elements((IEnumerable<User>)await dbContext.Users.ToListAsync()).ToArbitrary();
+
+    [Fact]
+    public static async Task DbGetUserDTOByIdTest()
+    {
+        // Arrange
+        using var dbOptions = new DbOptions();
+        dbOptions.SeedDatabase();
+        var db = new UserService(new DatabaseRepository(dbOptions.BisonDbContext));
+
+        var user = (await UserGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
+
+        // Act
+        var userDTO = await db.GetUserByIdAsync(user.Id);
+
+        // Assert
+        userDTO.Should().NotBeNull();
+        userDTO.Id.Should().Be(user.Id);
+        userDTO.Name.Should().Be(user.Name);
+        userDTO.Email.Should().Be(user.Email);
+    }
+
+    [Fact]
+    public static async Task DbGetUserDTOByNameTest()
+    {
+        // Arrange
+        using var dbOptions = new DbOptions();
+        dbOptions.SeedDatabase();
+        var db = new UserService(new DatabaseRepository(dbOptions.BisonDbContext));
+
+        var user = (await UserGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
+
+        // Act
+        var userDTO = await db.GetUserByNameAsync(user.Name);
+
+        // Assert
+        userDTO.Should().NotBeNull();
+        userDTO.Id.Should().Be(user.Id);
+        userDTO.Name.Should().Be(user.Name);
+        userDTO.Email.Should().Be(user.Email);
+    }
     [Property]
-    public static async Task EmptyDbGetUserByIdReturnTest(int userId)
+    public static async Task EmptyDbGetUserDTOByIdReturnTest(int userId)
     {
         // Arrange
         using var dbOptions = new DbOptions();
         var db = new UserService(new DatabaseRepository(dbOptions.BisonDbContext));
 
         // Act
-        var user = await db.GetUserByIdAsync(userId);
+        var userDTO = await db.GetUserByIdAsync(userId);
 
         // Assert
-        user.Should().BeNull();
+        userDTO.Should().BeNull();
     }
 
     [Property]
-    public static async Task EmptyDbGetUserByNameReturnTest(NonWhiteSpaceString name)
+    public static async Task EmptyDbGetUserDTOByNameReturnTest(NonWhiteSpaceString name)
     {
         // Arrange
         using var dbOptions = new DbOptions();
         var db = new UserService(new DatabaseRepository(dbOptions.BisonDbContext));
 
         // Act
-        var user = await db.GetUserByNameAsync(name.Item);
+        var userDTO = await db.GetUserByNameAsync(name.Item);
 
         // Assert
-        user.Should().BeNull();
+        userDTO.Should().BeNull();
     }
 
     [Property]
@@ -73,5 +118,31 @@ public class UserServiceUnitTests
         userDTO.Name.Should().Be(user.Name);
         userDTO.Email.Should().Be(user.Email);
         userDTO.Id.Should().Be(user.Id);
+    }
+
+    [Property]
+    public static async Task GeneratorTest()
+    {
+         // Arrange
+        using var dbOptions = new DbOptions();
+        dbOptions.SeedDatabase();
+        var db = new UserService(new DatabaseRepository(dbOptions.BisonDbContext));
+
+        // Act
+        var user = (await UserGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
+
+        // Assert
+        User foundUser = null;
+        foreach (User u in dbOptions.BisonDbContext.Users)
+        {
+            if (u.Equals(user))
+            {
+                foundUser = u;
+            }
+            continue;
+        }
+
+        foundUser.Should().NotBeNull();
+        foundUser.Should().Be(user);
     }
 }
