@@ -2,6 +2,8 @@
 
 using System.Net.Mail;
 
+using Bison.Models;
+
 public interface IUserService
 {
     public Task<UserDTO?> GetUserByIdAsync(int userId);
@@ -18,6 +20,9 @@ public interface IUserService
             return false;
         }
     }
+    public Task<UserDTO> ToDto(User user);
+
+    public Task<User?> ToUser(UserDTO userDTO);
 }
 
 public record UserDTO(int Id, string Name, string Email);

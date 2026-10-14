@@ -27,7 +27,7 @@ public class UserService(IDatabaseRepository databaseRepository) : IUserService
         return new UserDTO(user.Id, user.Name, user.Email);
     }
 
-    public static async Task<UserDTO> ToDto(User user) {
+    public async Task<UserDTO> ToDto(User user) {
         int id = user.Id;
         string name = user.Name;
         string email = user.Email;
