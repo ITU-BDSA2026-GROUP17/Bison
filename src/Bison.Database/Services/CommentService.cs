@@ -10,7 +10,7 @@ public class CommentService(IDatabaseRepository databaseRepository) : ICommentSe
             (await _repository.GetCommentsForObservation(observationId, limit, skip))
             .Select(cmt => new CommentDTO(
                 cmt.Id,
-                cmt.CreatedAt.ToString(ObservationService.DATE_FORMAT_STRING),
+                cmt.CreatedAt.ToString(ObservationService.DATE_FORMAT),
                 cmt.Observation.Id,
                 cmt.Author.Name,
                 cmt.Text
@@ -23,7 +23,7 @@ public class CommentService(IDatabaseRepository databaseRepository) : ICommentSe
         var cmt = await _repository.CreateComment(authorId, observationId, comment);
         return new CommentDTO(
             cmt.Id,
-            cmt.CreatedAt.ToString(ObservationService.DATE_FORMAT_STRING),
+            cmt.CreatedAt.ToString(ObservationService.DATE_FORMAT),
             cmt.Observation.Id,
             cmt.Author.Name,
             cmt.Text
