@@ -1,7 +1,5 @@
 namespace Bison.Models;
 
-using System.ComponentModel.DataAnnotations;
-
 #pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
 public sealed class Proposal : Post, IEquatable<Proposal>
 #pragma warning restore CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()

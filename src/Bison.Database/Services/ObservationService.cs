@@ -1,5 +1,3 @@
-using System.Globalization;
-
 using Bison.Models;
 
 namespace Bison.Database.Services;

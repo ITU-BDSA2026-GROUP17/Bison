@@ -1,4 +1,3 @@
-using Bison.Database.Exceptions;
 using Bison.Models;
 
 namespace Bison.Database.Services;
