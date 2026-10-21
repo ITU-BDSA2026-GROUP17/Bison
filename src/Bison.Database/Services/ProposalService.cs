@@ -1,22 +1,35 @@
-using Bison.Database.Exceptions;
 using Bison.Models;
 
 namespace Bison.Database.Services;
 
 public class ProposalService(IDatabaseRepository databaseRepository) : IProposalService
 {
-    private readonly static Taxonomies Taxonomies = new();
-
     private readonly IDatabaseRepository _repository = databaseRepository;
 
-    public Task<List<Proposal>> GetProposalsByObservationIdAsync(int observationId, int? limit = null, int? skip = null)
+    public async Task<List<ProposalDTO>> GetProposalsByObservationIdAsync(int observationId, int? limit = null, int? skip = null)
     {
-        return _repository.GetProposalsForObservation(observationId, limit, skip);
+        return [..
+            (await _repository.GetProposalsForObservation(observationId, limit, skip))
+            .Select(IProposalService.ToProposalDTO)
+        ];
     }
-    public Task<Proposal> CreateProposalAsync(int authorId, int observationId, string taxonId)
+    public async Task<ProposalDTO> CreateProposalAsync(int authorId, int observationId, string taxonId, string text)
     {
-        return Taxonomies.GetTaxonRecordByID(taxonId) is not null
-            ? _repository.CreateProposal(authorId, observationId, taxonId)
-            : throw new TaxonIdDoesNotExistException(taxonId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(text);
+        var ppl = await _repository.CreateProposal(authorId, observationId, taxonId, text);
+        return IProposalService.ToProposalDTO(ppl);
+    }
+
+    public async Task<Proposal?> ToProposalAsync(ProposalDTO proposalDTO)
+    {
+        var proposals = await _repository.GetProposalsForObservation(proposalDTO.ObservationId);
+        foreach (var proposal in proposals)
+        {
+            if (proposal.Id == proposalDTO.Id)
+            {
+                return proposal;
+            }
+        }
+        return null;
     }
 }

@@ -1,16 +1,12 @@
+using System.Net.Mail;
+
 using Bison.Database.Services;
-using Bison.Models;
-
-using CsvHelper.Configuration.Attributes;
-
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.EntityFrameworkCore.ValueGeneration;
 
 namespace Bison.Database.Tests;
 
 public class IntegrationTests
 {
-    private static readonly Gen<NonEmptyString> StringGenerator = ArbMap.Default.GeneratorFor<NonEmptyString>();
+    private static readonly Gen<NonWhiteSpaceString> StringGenerator = ArbMap.Default.GeneratorFor<NonWhiteSpaceString>();
 
 
     [Fact]
@@ -18,34 +14,38 @@ public class IntegrationTests
     {
         // Arrange
         using var dbOptions = new DbOptions();
+        dbOptions.SeedTaxonsOnly();
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var userService = new UserService(repo);
         var observationService = new ObservationService(repo);
         var commentService = new CommentService(repo);
         var proposalService = new ProposalService(repo);
+        var taxonGenerator = (await ProposalServiceIntegrationTests.TaxonGenerator(dbOptions.BisonDbContext)).Generator;
 
         var users = await Task.WhenAll((
             from name in StringGenerator
-            select userService.CreateUserAsync(name.ToString())
+            from email in ArbMap.Default.GeneratorFor<MailAddress>()
+            select userService.CreateUserAsync(name.Item, email.Address)
         ).Sample(5));
         var observations = await Task.WhenAll((
             from author in Gen.Elements(users)
+            from taxon in taxonGenerator
             from text in StringGenerator
-            from location in StringGenerator
-            select observationService.CreateObservationAsync(author.Id, text.ToString(), location.ToString())
+            select observationService.CreateObservationAsync(author.Id, taxon.DWC_TaxonId, text.Item)
         ).Sample(25));
         var comments = (await Task.WhenAll((
             from author in Gen.Elements(users)
             from obs in Gen.Elements(observations)
             from text in StringGenerator
-            select commentService.CreateCommentAsync(author.Id, obs.Id, text.ToString())
-        ).Sample(50))).GroupBy(c => c.Observation.Id).ToDictionary(k => k.Key, v => v.ToList());
+            select commentService.CreateCommentAsync(author.Id, obs.Id, text.Item)
+        ).Sample(50))).GroupBy(c => c.ObservationId).ToDictionary(k => k.Key, v => v.ToList());
         var proposals = (await Task.WhenAll((
             from author in Gen.Elements(users)
             from obs in Gen.Elements(observations)
-            from taxon in ProposalServiceUnitTests.TaxonIdGenerator().Generator
-            select proposalService.CreateProposalAsync(author.Id, obs.Id, taxon)
-        ).Sample(35))).GroupBy(p => p.Observation.Id).ToDictionary(k => k.Key, v => v.ToList());
+            from taxon in taxonGenerator
+            from text in StringGenerator
+            select proposalService.CreateProposalAsync(author.Id, obs.Id, taxon.DWC_TaxonId, text.Item)
+        ).Sample(35))).GroupBy(p => p.ObservationId).ToDictionary(k => k.Key, v => v.ToList());
 
         // Act
         var gottenUsers = await Task.WhenAll(
@@ -56,10 +56,10 @@ public class IntegrationTests
         );
         var gottenComments = (await Task.WhenAll(
             comments.Select(k => commentService.GetCommentsByObservationIdAsync(k.Key))
-        )).ToDictionary(k => k[0].Observation.Id, v => v);
+        )).ToDictionary(k => k[0].ObservationId, v => v);
         var gottenProposals = (await Task.WhenAll(
             proposals.Select(k => proposalService.GetProposalsByObservationIdAsync(k.Key))
-        )).ToDictionary(k => k[0].Observation.Id, v => v);
+        )).ToDictionary(k => k[0].ObservationId, v => v);
 
         // Assert
         gottenUsers.ScrambledEquals(users).Should().BeTrue();

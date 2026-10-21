@@ -1,5 +1,4 @@
 ﻿using Bison.Database.Services;
-using Bison.Models;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,7 +9,7 @@ public class PublicModel(IObservationService service) : PageModel
 {
     internal static readonly int PAGE_SIZE = 32;
     private readonly IObservationService _service = service;
-    public List<Observation>? Observations { get; set; }
+    public List<ObservationDTO>? Observations { get; set; }
 
     public async Task<ActionResult> OnGet([FromQuery] int page)
     {
