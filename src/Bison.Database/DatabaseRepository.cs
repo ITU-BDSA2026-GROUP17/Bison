@@ -30,11 +30,15 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
 
     public async Task<Observation?> GetObservation(int id)
     {
-        return await _dbContext.Posts.FindAsync(id) is Observation obs ? obs : null;
+        return await _dbContext.Posts
+            .Include("Taxon")
+            .Where(p => p.Id == id)
+            .FirstOrDefaultAsync() is Observation obs ? obs : null;
     }
     public async Task<List<Observation>> GetObservations(int? limit = null, int? skip = null)
     {
         IQueryable<Observation> query = _dbContext.Posts
+            .Include("Taxon")
             .Where(p => p is Observation)
             .Select(p => (Observation)p)
             .OrderByDescending(obs => obs.Id);
@@ -51,6 +55,7 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
     public async Task<List<Observation>> GetObservationsByUser(int userId, int? limit = null, int? skip = null)
     {
         IQueryable<Observation> query = _dbContext.Posts
+            .Include("Taxon")
             .Where(p => p is Observation)
             .Select(p => (Observation)p)
             .Where(obs => obs.Author.Id == userId)
@@ -69,7 +74,7 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
     {
         var author = await _dbContext.Users.FindAsync(userId)
             ?? throw new UserDoesNotExistException(userId);
-        var taxon = await _dbContext.Taxons.Where(t => t.DWC_TaxonId == taxonId).FirstAsync()
+        var taxon = await _dbContext.Taxons.Where(t => t.DWC_TaxonId == taxonId).FirstOrDefaultAsync()
             ?? throw new TaxonIdDoesNotExistException(taxonId);
 
         var res = _dbContext.Posts.Add(new Observation()
@@ -85,6 +90,7 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
     public async Task<List<Comment>> GetCommentsForObservation(int observationId, int? limit = null, int? skip = null)
     {
         IQueryable<Comment> query = _dbContext.Posts
+            .Include("Observation")
             .Where(p => p is Comment)
             .Select(p => (Comment)p)
             .Where(cmt => cmt.Observation.Id == observationId)
@@ -106,7 +112,7 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
         var observation = await _dbContext.Posts
             .Where(p => p is Observation && p.Id == observationId)
             .Select(p => (Observation)p)
-            .FirstAsync()
+            .FirstOrDefaultAsync()
             ?? throw new ObservationDoesNotExistException(observationId);
 
         var res = _dbContext.Posts.Add(new Comment()
@@ -122,6 +128,8 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
     public async Task<List<Proposal>> GetProposalsForObservation(int observationId, int? limit = null, int? skip = null)
     {
         IQueryable<Proposal> query = _dbContext.Posts
+            .Include("Taxon")
+            .Include("Observation")
             .Where(p => p is Proposal)
             .Select(p => (Proposal)p)
             .Where(ppl => ppl.Observation.Id == observationId)
@@ -143,9 +151,9 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
         var observation = await _dbContext.Posts
             .Where(p => p is Observation && p.Id == observationId)
             .Select(p => (Observation)p)
-            .FirstAsync()
+            .FirstOrDefaultAsync()
             ?? throw new ObservationDoesNotExistException(observationId);
-        var taxon = await _dbContext.Taxons.Where(t => t.DWC_TaxonId == taxonId).FirstAsync()
+        var taxon = await _dbContext.Taxons.Where(t => t.DWC_TaxonId == taxonId).FirstOrDefaultAsync()
             ?? throw new TaxonIdDoesNotExistException(taxonId);
 
         var res = _dbContext.Posts.Add(new Proposal()

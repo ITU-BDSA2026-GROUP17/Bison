@@ -10,19 +10,26 @@ public interface IUserService
     public Task<UserDTO?> GetUserByNameAsync(string name);
     public Task<UserDTO> CreateUserAsync(string name, string email);
 
-    public static bool IsValidEmail(string? email) {
+    public static bool IsValidEmail(string? email)
+    {
         if (email is null) return false;
         var trimmed = email.Trim();
-        try {
+        try
+        {
             var addr = new MailAddress(email);
             return addr.Address == trimmed;
-        } catch {
+        }
+        catch
+        {
             return false;
         }
     }
-    public Task<UserDTO> ToUserDTO(User user);
+    public static UserDTO ToUserDTO(User user)
+    {
+        return new UserDTO(user.Id, user.Name, user.Email);
+    }
 
-    public Task<User?> ToUser(UserDTO userDTO);
+    public Task<User?> ToUserAsync(UserDTO userDTO);
 }
 
 public record UserDTO(int Id, string Name, string Email);

@@ -1,9 +1,14 @@
+using System.Globalization;
+
 using Bison.Models;
 
 namespace Bison.Database;
 
 public interface IDatabaseRepository
 {
+    //internal static readonly string DATE_FORMAT_STRING = "dd/MM/yy H:mm:ss";
+    internal static readonly CultureInfo DATE_FORMAT = new("fr-FR");
+
     public Task<User> CreateUser(string name, string email);
     public Task<User?> GetUserById(int userId);
     public Task<User?> GetUserByName(string name);

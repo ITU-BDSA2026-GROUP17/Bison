@@ -9,12 +9,12 @@ public class UserService(IDatabaseRepository databaseRepository) : IUserService
     public async Task<UserDTO?> GetUserByIdAsync(int userId)
     {
         var user = await _repository.GetUserById(userId);
-        return user is null ? null : new UserDTO(user.Id, user.Name, user.Email);
+        return user is null ? null : IUserService.ToUserDTO(user);
     }
     public async Task<UserDTO?> GetUserByNameAsync(string name)
     {
         var user = await _repository.GetUserByName(name);
-        return user is null ? null : new UserDTO(user.Id, user.Name, user.Email);
+        return user is null ? null : IUserService.ToUserDTO(user);
     }
     public async Task<UserDTO> CreateUserAsync(string name, string email)
     {
@@ -24,18 +24,11 @@ public class UserService(IDatabaseRepository databaseRepository) : IUserService
             throw new ArgumentException("email is invalid", nameof(email));
 
         var user = await _repository.CreateUser(name, email);
-        return new UserDTO(user.Id, user.Name, user.Email);
+        return IUserService.ToUserDTO(user);
     }
 
-    public async Task<UserDTO> ToUserDTO(User user) {
-        int id = user.Id;
-        string name = user.Name;
-        string email = user.Email;
-       
-        return new UserDTO(id, name, email);
-    }
-
-    public async Task<User?> ToUser(UserDTO userDTO) { 
+    public async Task<User?> ToUserAsync(UserDTO userDTO)
+    {
         return await _repository.GetUserByName(userDTO.Name);
     }
 }

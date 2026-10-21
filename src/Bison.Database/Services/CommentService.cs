@@ -1,3 +1,5 @@
+using Bison.Models;
+
 namespace Bison.Database.Services;
 
 public class CommentService(IDatabaseRepository databaseRepository) : ICommentService
@@ -8,25 +10,25 @@ public class CommentService(IDatabaseRepository databaseRepository) : ICommentSe
     {
         return [..
             (await _repository.GetCommentsForObservation(observationId, limit, skip))
-            .Select(cmt => new CommentDTO(
-                cmt.Id,
-                cmt.CreatedAt.ToString(ObservationService.DATE_FORMAT),
-                cmt.Observation.Id,
-                cmt.Author.Name,
-                cmt.Text
-            ))
+            .Select(ICommentService.ToCommentDTO)
         ];
     }
     public async Task<CommentDTO> CreateCommentAsync(int authorId, int observationId, string comment)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(comment);
         var cmt = await _repository.CreateComment(authorId, observationId, comment);
-        return new CommentDTO(
-            cmt.Id,
-            cmt.CreatedAt.ToString(ObservationService.DATE_FORMAT),
-            cmt.Observation.Id,
-            cmt.Author.Name,
-            cmt.Text
-        );
+        return ICommentService.ToCommentDTO(cmt);
+    }
+    public async Task<Comment?> ToCommentAsync(CommentDTO commentDTO)
+    {
+        var comments = await _repository.GetCommentsForObservation(commentDTO.ObservationId);
+        foreach (var comment in comments)
+        {
+            if (comment.Id == commentDTO.Id)
+            {
+                return comment;
+            }
+        }
+        return null;
     }
 }

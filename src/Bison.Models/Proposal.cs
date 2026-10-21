@@ -7,7 +7,6 @@ public sealed class Proposal : Post, IEquatable<Proposal>
 #pragma warning restore CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
 {
     public required Observation Observation { get; set; }
-    [MaxLength(128)]
     public required Taxon Taxon { get; set; }
 
     public bool Equals(Proposal? other)
