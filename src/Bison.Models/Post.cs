@@ -11,7 +11,7 @@ public class Post : IEquatable<Post>
 
     public required User Author { get; set; }
     [MaxLength(512)]
-    public required string Text { get; set; } 
+    public required string Text { get; set; }
     public bool Equals(Post? other)
     {
         return other is null ?
