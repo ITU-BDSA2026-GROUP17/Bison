@@ -20,6 +20,16 @@ public class DbOptions : IDisposable
         DbSeeder.SeedDatabase(BisonDbContext);
     }
 
+    public void SeedTaxonsOnly()
+    {
+        SeedDatabase();
+        var posts = BisonDbContext.Posts.ToList();
+        BisonDbContext.Posts.RemoveRange(posts);
+        var users = BisonDbContext.Users.ToList();
+        BisonDbContext.Users.RemoveRange(users);
+        BisonDbContext.SaveChanges();
+    }
+
     public void Dispose()
     {
         GC.SuppressFinalize(this);

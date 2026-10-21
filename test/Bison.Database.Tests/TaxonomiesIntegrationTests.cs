@@ -2,13 +2,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bison.Database.Tests;
 
-public class TaxonomiesUnitTest
+public class TaxonomiesIntegrationTest
 {
     [Fact]
     public static async Task CorrectNameAndTaxonIdAssociationTest()
     {
         // Arrange
         using var dbOptions = new DbOptions();
+        dbOptions.SeedTaxonsOnly();
         var db = dbOptions.BisonDbContext;
         var idList = new (string, string)[]
         {
@@ -41,6 +42,7 @@ public class TaxonomiesUnitTest
     {
         // Arrange
         using var dbOptions = new DbOptions();
+        dbOptions.SeedTaxonsOnly();
         var db = dbOptions.BisonDbContext;
         var list = new string[]
         {
@@ -57,7 +59,7 @@ public class TaxonomiesUnitTest
         {
             // Act
             Console.WriteLine(str);
-            var taxon = await db.Taxons.Where(t => t.DWC_TaxonId == str).FirstAsync();
+            var taxon = await db.Taxons.Where(t => t.DWC_TaxonId == str).FirstOrDefaultAsync();
             // Assert
             taxon.Should().BeNull();
         }
@@ -68,6 +70,7 @@ public class TaxonomiesUnitTest
     {
         // Arrange
         using var dbOptions = new DbOptions();
+        dbOptions.SeedTaxonsOnly();
         var db = dbOptions.BisonDbContext;
         var idList = new (string, string)[]
         {
@@ -100,6 +103,7 @@ public class TaxonomiesUnitTest
     {
         // Arrange
         using var dbOptions = new DbOptions();
+        dbOptions.SeedTaxonsOnly();
         var db = dbOptions.BisonDbContext;
         var list = new (string, int)[]
         {

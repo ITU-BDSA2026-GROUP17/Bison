@@ -1,16 +1,16 @@
 using Bison.Database.Exceptions;
 using Bison.Database.Services;
-using Bison.Models;
 
 namespace Bison.Database.Tests;
 
-public class CommentServiceUnitTests
+public class CommentServiceIntegrationTests
 {
     [Property]
     public static async Task EmptyDbGetCommentsByObsIdTest(int obsId)
     {
         //Arrange
         using var dbOptions = new DbOptions();
+        dbOptions.SeedTaxonsOnly();
         var db = new CommentService(new DatabaseRepository(dbOptions.BisonDbContext));
 
         //Act
@@ -25,6 +25,7 @@ public class CommentServiceUnitTests
     {
         //Arrange
         using var dbOptions = new DbOptions();
+        dbOptions.SeedTaxonsOnly();
         var db = new CommentService(new DatabaseRepository(dbOptions.BisonDbContext));
 
         //Act
@@ -45,6 +46,7 @@ public class CommentServiceUnitTests
     {
         //Arrange
         using var dbOptions = new DbOptions();
+        dbOptions.SeedTaxonsOnly();
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var user = await repo.CreateUser("testName", "test@example.com");
         var db = new CommentService(repo);
@@ -63,45 +65,47 @@ public class CommentServiceUnitTests
         }
     }
     [Property]
-    public static async Task CreateCommentTest(string comment)
+    public static async Task CreateCommentTest(NonWhiteSpaceString comment)
     {
         //Arrange
         using var dbOptions = new DbOptions();
-        var taxon = (await ProposalServiceUnitTests.TaxonIdGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
+        dbOptions.SeedTaxonsOnly();
+        var taxon = (await ProposalServiceIntegrationTests.TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var user = await repo.CreateUser("testName", "test@example.com");
         var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation");
         var db = new CommentService(repo);
 
         //Act
-        var com = await db.CreateCommentAsync(user.Id, obs.Id, comment);
+        var com = await db.CreateCommentAsync(user.Id, obs.Id, comment.Item);
         var gottenCom = await db.GetCommentsByObservationIdAsync(obs.Id);
 
 
         //Assert
         com.Should().NotBeNull();
         com.Author.Id.Should().Be(user.Id);
-        com.Observation.Id.Should().Be(obs.Id);
-        com.Text.Should().Be(comment);
+        com.ObservationId.Should().Be(obs.Id);
+        com.Comment.Should().Be(comment.Item);
 
         gottenCom.Should().NotBeNull();
         gottenCom.Count.Should().Be(1);
         gottenCom[0].Should().NotBeNull();
         gottenCom[0].Id.Should().Be(com.Id);
         gottenCom[0].Author.Id.Should().Be(user.Id);
-        gottenCom[0].Observation.Id.Should().Be(obs.Id);
-        gottenCom[0].Text.Should().Be(comment);
+        gottenCom[0].ObservationId.Should().Be(obs.Id);
+        gottenCom[0].Comment.Should().Be(comment.Item);
     }
     public static async Task PaginationWorksTest()
     {
         //Arrange
         using var dbOptions = new DbOptions();
-        var taxon = (await ProposalServiceUnitTests.TaxonIdGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
+        dbOptions.SeedTaxonsOnly();
+        var taxon = (await ProposalServiceIntegrationTests.TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var user = await repo.CreateUser("testName", "test@example.com");
         var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation");
         var db = new CommentService(repo);
-        List<Comment> list = [
+        List<CommentDTO> list = [
             await db.CreateCommentAsync(user.Id, obs.Id, "com1"),
             await db.CreateCommentAsync(user.Id, obs.Id, "com2"),
             await db.CreateCommentAsync(user.Id, obs.Id, "com3"),

@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bison.Database.Tests;
 
-public class ProposalServiceUnitTests
+public class ProposalServiceIntegrationTests
 {
-    public static async Task<Arbitrary<Taxon>> TaxonIdGenerator(BisonDbContext dbContext) =>
+    public static async Task<Arbitrary<Taxon>> TaxonGenerator(BisonDbContext dbContext) =>
         Gen.Elements((IEnumerable<Taxon>)await dbContext.Taxons.ToListAsync()).ToArbitrary();
 
     [Property]
@@ -16,6 +16,7 @@ public class ProposalServiceUnitTests
     {
         //Arrange
         using var dbOptions = new DbOptions();
+        dbOptions.SeedTaxonsOnly();
         var db = new ProposalService(new DatabaseRepository(dbOptions.BisonDbContext));
 
         //Act
@@ -30,22 +31,23 @@ public class ProposalServiceUnitTests
     {
         //Arrange
         using var dbOptions = new DbOptions();
+        dbOptions.SeedTaxonsOnly();
         var db = new ProposalService(new DatabaseRepository(dbOptions.BisonDbContext));
 
-        if (await dbOptions.BisonDbContext.Taxons.Where(t => t.DWC_TaxonId == invalidTaxonId).FirstAsync() is not null)
+        if (await dbOptions.BisonDbContext.Taxons.Where(t => t.DWC_TaxonId == invalidTaxonId).FirstOrDefaultAsync() is not null)
             return;
 
         //Act
         try
         {
             await db.CreateProposalAsync(userId, obsId, invalidTaxonId, "prop1");
-            Assert.Fail("Invalid taxon Id, should throw an exception");
+            Assert.Fail("No user, should throw an exception");
         }
         //Assert
-        catch (TaxonIdDoesNotExistException e)
+        catch (UserDoesNotExistException e)
         {
-            e.Message.Should().Be($"Taxon with ID {invalidTaxonId} does not exist");
-            e.TaxonId.Should().Be(invalidTaxonId);
+            e.Message.Should().Be($"User with ID {userId} does not exist");
+            e.UserId.Should().Be(userId);
         }
     }
     [Property]
@@ -53,9 +55,10 @@ public class ProposalServiceUnitTests
     {
         //Arrange
         using var dbOptions = new DbOptions();
+        dbOptions.SeedTaxonsOnly();
         var db = new ProposalService(new DatabaseRepository(dbOptions.BisonDbContext));
 
-        var taxon = (await TaxonIdGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
+        var taxon = (await TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
         //Act
         try
         {
@@ -69,18 +72,17 @@ public class ProposalServiceUnitTests
             e.UserId.Should().Be(userId);
         }
     }
-
     [Property]
     public static async Task DbWithUserCreateProposalTest(int obsId)
     {
         //Arrange
         using var dbOptions = new DbOptions();
-        dbOptions.SeedDatabase();
+        dbOptions.SeedTaxonsOnly();
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var user = await repo.CreateUser("testName", "test@example.com");
         var db = new ProposalService(repo);
 
-        var taxon = (await TaxonIdGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
+        var taxon = (await TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
 
         //Act
         try
@@ -96,29 +98,58 @@ public class ProposalServiceUnitTests
         }
     }
     [Property]
+    public static async Task DbCreateProposalWithInvalidTaxonIdTest(string invalidTaxonId)
+    {
+        //Arrange
+        using var dbOptions = new DbOptions();
+        dbOptions.SeedTaxonsOnly();
+        var taxon = (await TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
+
+        var repo = new DatabaseRepository(dbOptions.BisonDbContext);
+        var user = await repo.CreateUser("testName", "test@example.com");
+        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation");
+        var db = new ProposalService(repo);
+
+        if (await dbOptions.BisonDbContext.Taxons.Where(t => t.DWC_TaxonId == invalidTaxonId).FirstOrDefaultAsync() is not null)
+            return;
+
+        //Act
+        try
+        {
+            await db.CreateProposalAsync(user.Id, obs.Id, invalidTaxonId, "prop1");
+            Assert.Fail("Invalid taxon Id, should throw an exception");
+        }
+        //Assert
+        catch (TaxonIdDoesNotExistException e)
+        {
+            e.Message.Should().Be($"Taxon with ID {invalidTaxonId} does not exist");
+            e.TaxonId.Should().Be(invalidTaxonId);
+        }
+    }
+    [Property]
     public static async Task CreateProposalTest(NonWhiteSpaceString text)
     {
         //Arrange
         using var dbOptions = new DbOptions();
+        dbOptions.SeedDatabase();
+        var taxon = (await TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
+
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var user = await repo.CreateUser("testName", "test@example.com");
-        var obs = await repo.CreateObservation(user.Id, "TestObs", "TestLocation");
+        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation");
         var db = new ProposalService(repo);
         var userDB = new UserService(repo);
         var obsDB = new ObservationService(repo);
 
-        var taxon = (await TaxonIdGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
-
         //Act
         var pplDTO = await db.CreateProposalAsync(user.Id, obs.Id, taxon.DWC_TaxonId, text.Item);
-        var ppl = await db.ToProposal(pplDTO);
+        var ppl = await db.ToProposalAsync(pplDTO);
         var gottenPpls = await db.GetProposalsByObservationIdAsync(obs.Id);
-        var gottenPpl = await db.ToProposal(gottenPpls[0]);
-
+        var gottenPpl = await db.ToProposalAsync(gottenPpls[0]);
 
         //Assert
         pplDTO.Should().NotBeNull();
-        
+
         ppl.Author.Id.Should().Be(user.Id);
         ppl.Observation.Id.Should().Be(obs.Id);
         ppl.Observation.Id.Should().Be(obs.Id);
@@ -139,7 +170,8 @@ public class ProposalServiceUnitTests
     {
         //Arrange
         using var dbOptions = new DbOptions();
-        var taxonIds = (await TaxonIdGenerator(dbOptions.BisonDbContext)).Generator.Sample(5);
+        dbOptions.SeedTaxonsOnly();
+        var taxonIds = (await TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(5);
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var user = await repo.CreateUser("testName", "test@example.com");
         var obs = await repo.CreateObservation(user.Id, taxonIds[0].DWC_TaxonId, "TestLocation");

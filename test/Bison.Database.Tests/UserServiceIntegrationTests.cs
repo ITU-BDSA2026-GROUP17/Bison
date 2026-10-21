@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bison.Database.Tests;
 
-public class UserServiceUnitTests
+public class UserServiceIntegrationTests
 {
     public static async Task<Arbitrary<User>> UserGenerator(BisonDbContext dbContext) =>
         Gen.Elements((IEnumerable<User>)await dbContext.Users.ToListAsync()).ToArbitrary();
@@ -114,7 +114,7 @@ public class UserServiceUnitTests
 
         //Act
         var userDTO = await db.GetUserByIdAsync(userId);
-        var user = await db.ToUser(userDTO);
+        var user = await db.ToUserAsync(userDTO);
 
         //Assert
         userDTO.Should().NotBeNull();
@@ -135,7 +135,7 @@ public class UserServiceUnitTests
         var user = (await UserGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
 
         //Act
-        var userDTO = await db.ToUserDTO(user);
+        var userDTO = IUserService.ToUserDTO(user);
 
         //Assert
         userDTO.Should().NotBeNull();
@@ -148,7 +148,7 @@ public class UserServiceUnitTests
     [Property]
     public static async Task GeneratorTest()
     {
-         // Arrange
+        // Arrange
         using var dbOptions = new DbOptions();
         dbOptions.SeedDatabase();
         var db = new UserService(new DatabaseRepository(dbOptions.BisonDbContext));
