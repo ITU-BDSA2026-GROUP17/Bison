@@ -15,7 +15,7 @@
             <li>
                 <p>
                     <strong>
-                        <a href="/@Model.Observation.AuthorName">@Model.Observation.AuthorName</a>
+                        <a href="/@Model.Observation.Author.Name">@Model.Observation.Author.Name</a>
                     </strong>
                     @Model.Observation.Description
                     <small>&mdash; @Model.Observation.CreatedAt</small>
@@ -28,7 +28,7 @@
                 <li>
                     <p>
                         <strong>
-                            <a href="/@comment.AuthorName">@comment.AuthorName</a>
+                            <a href="/@comment.Author.Name">@comment.Author.Name</a>
                         </strong>
                         @comment.Comment
                         <small>&mdash; @comment.CreatedAt</small>
@@ -42,7 +42,7 @@
                 <li>
                     <p>
                         <strong>
-                            <a href="/@proposal.AuthorName">@proposal.AuthorName</a>
+                            <a href="/@proposal.Author.Name">@proposal.Author.Name</a>
                         </strong>
                         @proposal.TaxonName
                         <small>&mdash; @proposal.CreatedAt</small>
