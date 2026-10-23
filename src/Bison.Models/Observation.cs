@@ -18,4 +18,9 @@ public sealed class Observation : Post, IEquatable<Observation>
     {
         return obj is Observation other && Equals(other);
     }
+
+    public Taxon GetTaxon()
+    {
+        return Taxon;
+    }
 }

@@ -9,6 +9,31 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
 {
     private readonly BisonDbContext _dbContext = dbContext;
 
+    public async Task<List<Taxon>> GetTaxons(int? limit = null, int? skip = null)
+    {
+        IQueryable<Taxon> query = _dbContext.Taxons
+            .OrderByDescending(obs => obs.Id);
+        if (skip is int skipAmount)
+        {
+            query = query.Skip(skipAmount);
+        }
+        if (limit is int limitAmount)
+        {
+            query = query.Take(limitAmount);
+        }
+        return await query.ToListAsync();
+    }
+    public async Task<Taxon?> GetTaxonByDWCId(string taxonId)
+    {
+        return await _dbContext.Taxons
+            .Where(t => t.DWC_TaxonId == taxonId)
+            .FirstOrDefaultAsync();
+    }
+    public async Task<Taxon?> GetTaxonByNumericId(int taxonId)
+    {
+        return await _dbContext.Taxons.FindAsync(taxonId);
+    }
+
     public async Task<User> CreateUser(string name, string email)
     {
         var res = _dbContext.Users.Add(new User()
@@ -74,8 +99,7 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
     {
         var author = await _dbContext.Users.FindAsync(userId)
             ?? throw new UserDoesNotExistException(userId);
-        var taxon = await _dbContext.Taxons.Where(t => t.DWC_TaxonId == taxonId).FirstOrDefaultAsync()
-            ?? throw new TaxonIdDoesNotExistException(taxonId);
+        var taxon = await GetTaxonByDWCId(taxonId) ?? throw new TaxonIdDoesNotExistException(taxonId);
 
         var res = _dbContext.Posts.Add(new Observation()
         {
@@ -153,8 +177,7 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
             .Select(p => (Observation)p)
             .FirstOrDefaultAsync()
             ?? throw new ObservationDoesNotExistException(observationId);
-        var taxon = await _dbContext.Taxons.Where(t => t.DWC_TaxonId == taxonId).FirstOrDefaultAsync()
-            ?? throw new TaxonIdDoesNotExistException(taxonId);
+        var taxon = await GetTaxonByDWCId(taxonId) ?? throw new TaxonIdDoesNotExistException(taxonId);
 
         var res = _dbContext.Posts.Add(new Proposal()
         {

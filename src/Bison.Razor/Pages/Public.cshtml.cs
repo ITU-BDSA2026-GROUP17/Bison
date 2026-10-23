@@ -11,17 +11,19 @@ public class PublicModel(IObservationService service) : PageModel
     private readonly IObservationService _service = service;
     public List<ObservationDTO>? Observations { get; set; }
 
-    public async Task<ActionResult> OnGet([FromQuery] int page)
+    public async Task<ActionResult> OnGet([FromQuery] int page, [FromQuery] string taxonId)
     {
-        if (page < 2)
+        try
         {
-            Observations = await _service.GetObservationsAsync(PAGE_SIZE);
-            return Page();
+            page = page < 2 ? 0 : page;
+            Observations = await _service.GetObservationsByTaxonAsync(taxonId, PAGE_SIZE, PAGE_SIZE * (page - 1));
         }
-        else
+        catch
         {
-            Observations = await _service.GetObservationsAsync(PAGE_SIZE, PAGE_SIZE * (page - 1));
-            return Page();
+            Observations = page < 2
+                ? await _service.GetObservationsAsync(PAGE_SIZE)
+                : await _service.GetObservationsAsync(PAGE_SIZE, PAGE_SIZE * (page - 1));
         }
+        return Page();
     }
 }
