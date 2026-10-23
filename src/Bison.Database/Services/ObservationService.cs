@@ -1,4 +1,6 @@
+using Bison.Database.Exceptions;
 using Bison.Models;
+using Bison.Verified.Services;
 
 namespace Bison.Database.Services;
 
@@ -16,6 +18,16 @@ public class ObservationService(IDatabaseRepository databaseRepository) : IObser
         return [.. (await _repository.GetObservationsByUser(userId, limit, skip))
             .Select(IObservationService.ToObservationDTO)
         ];
+    }
+    public async Task<List<ObservationDTO>> GetObservationsByTaxonAsync(string taxonId, int? limit = null, int? skip = null)
+    {
+        await _repository.GetTaxons(); // load all taxons in memory (else ef core might show bad ones)
+        var taxon = await _repository.GetTaxonByDWCId(taxonId) ?? throw new TaxonIdDoesNotExistException(taxonId);
+        var filtered = FilterByService.FilterByTaxon(
+            taxon,
+            await _repository.GetObservations(limit, skip)
+        );
+        return [.. filtered.Select(IObservationService.ToObservationDTO)];
     }
     public async Task<List<ObservationDTO>> GetObservationsAsync(int? limit = null, int? skip = null)
     {

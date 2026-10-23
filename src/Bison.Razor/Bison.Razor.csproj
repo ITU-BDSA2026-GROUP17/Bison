@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Bison.Database\Bison.Database.csproj" />
+    <ProjectReference Include="..\Bison.Verified\Bison.Verified.csproj" />
   </ItemGroup>
 
 </Project>
