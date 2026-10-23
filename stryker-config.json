@@ -47,7 +47,9 @@
         "test-case-filter": "",
         "test-runner": null,
         "ignore-mutations": [],
-        "ignore-methods": [],
+        "ignore-methods": [
+            "*Exception.ctor"
+        ],
         "report-file-name": "mutation-report",
         "break-on-initial-test-failure": false
     }

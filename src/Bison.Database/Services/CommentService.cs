@@ -6,12 +6,29 @@ public class CommentService(IDatabaseRepository databaseRepository) : ICommentSe
 {
     private readonly IDatabaseRepository _repository = databaseRepository;
 
-    public Task<List<Comment>> GetCommentsByObservationIdAsync(int observationId, int? limit = null, int? skip = null)
+    public async Task<List<CommentDTO>> GetCommentsByObservationIdAsync(int observationId, int? limit = null, int? skip = null)
     {
-        return _repository.GetCommentsForObservation(observationId, limit, skip);
+        return [..
+            (await _repository.GetCommentsForObservation(observationId, limit, skip))
+            .Select(ICommentService.ToCommentDTO)
+        ];
     }
-    public Task<Comment> CreateCommentAsync(int authorId, int observationId, string comment)
+    public async Task<CommentDTO> CreateCommentAsync(int authorId, int observationId, string comment)
     {
-        return _repository.CreateComment(authorId, observationId, comment);
+        ArgumentException.ThrowIfNullOrWhiteSpace(comment);
+        var cmt = await _repository.CreateComment(authorId, observationId, comment);
+        return ICommentService.ToCommentDTO(cmt);
+    }
+    public async Task<Comment?> ToCommentAsync(CommentDTO commentDTO)
+    {
+        var comments = await _repository.GetCommentsForObservation(commentDTO.ObservationId);
+        foreach (var comment in comments)
+        {
+            if (comment.Id == commentDTO.Id)
+            {
+                return comment;
+            }
+        }
+        return null;
     }
 }

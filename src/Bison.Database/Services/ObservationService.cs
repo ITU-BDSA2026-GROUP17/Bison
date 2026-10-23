@@ -6,20 +6,30 @@ public class ObservationService(IDatabaseRepository databaseRepository) : IObser
 {
     private readonly IDatabaseRepository _repository = databaseRepository;
 
-    public Task<Observation?> GetObservationByIdAsync(int id)
+    public async Task<ObservationDTO?> GetObservationByIdAsync(int id)
     {
-        return _repository.GetObservation(id);
+        var obs = await _repository.GetObservation(id);
+        return obs is null ? null : IObservationService.ToObservationDTO(obs);
     }
-    public Task<List<Observation>> GetObservationsByUserAsync(int userId, int? limit = null, int? skip = null)
+    public async Task<List<ObservationDTO>> GetObservationsByUserAsync(int userId, int? limit = null, int? skip = null)
     {
-        return _repository.GetObservationsByUser(userId, limit, skip);
+        return [.. (await _repository.GetObservationsByUser(userId, limit, skip))
+            .Select(IObservationService.ToObservationDTO)
+        ];
     }
-    public Task<List<Observation>> GetObservationsAsync(int? limit = null, int? skip = null)
+    public async Task<List<ObservationDTO>> GetObservationsAsync(int? limit = null, int? skip = null)
     {
-        return _repository.GetObservations(limit, skip);
+        var obs = await _repository.GetObservations(limit, skip);
+        return [.. obs.Select(IObservationService.ToObservationDTO)];
     }
-    public Task<Observation> CreateObservationAsync(int userId, string description, string location)
+    public async Task<ObservationDTO> CreateObservationAsync(int userId, string taxonId, string description)
     {
-        return _repository.CreateObservation(userId, description, location);
+        ArgumentException.ThrowIfNullOrWhiteSpace(description);
+        var obs = await _repository.CreateObservation(userId, taxonId, description);
+        return IObservationService.ToObservationDTO(obs);
+    }
+    public async Task<Observation?> ToObservationAsync(ObservationDTO observationDTO)
+    {
+        return await _repository.GetObservation(observationDTO.Id);
     }
 }

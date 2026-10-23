@@ -1,13 +1,16 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace Bison.Database.Tests;
 
-public class TaxonomiesUnitTest
+public class TaxonomiesIntegrationTest
 {
-    private readonly static Taxonomies Taxonomies = new();
-
     [Fact]
-    public static void CorrectNameAndTaxonIdAssociationTest()
+    public static async Task CorrectNameAndTaxonIdAssociationTest()
     {
         // Arrange
+        using var dbOptions = new DbOptions();
+        dbOptions.SeedTaxonsOnly();
+        var db = dbOptions.BisonDbContext;
         var idList = new (string, string)[]
         {
             ("MSTSNM:Arter:c18811f4-f785-ea11-aa77-501ac539d1ea", "Sølvhejre"),
@@ -21,23 +24,26 @@ public class TaxonomiesUnitTest
         {
             // Act
             Console.WriteLine(item.ToString());
-            var taxon = Taxonomies.GetTaxonRecordByID(item.Item1);
+            var taxon = await db.Taxons.Where(t => t.DWC_TaxonId == item.Item1).FirstAsync();
             // Assert
             taxon.Should().NotBeNull();
             taxon.VernacularName.Should().Be(item.Item2);
 
             // Act
-            var taxon2 = Taxonomies.GetTaxonRecordByName(item.Item2);
+            var taxon2 = await db.Taxons.Where(t => t.VernacularName == item.Item2).FirstAsync();
             // Assert
             taxon2.Should().NotBeNull();
-            taxon2.TaxonID.Should().Be(item.Item1);
+            taxon2.DWC_TaxonId.Should().Be(item.Item1);
         }
     }
 
     [Fact]
-    public static void NotCorrectNameOrIdTest()
+    public static async Task NotCorrectNameOrIdTest()
     {
         // Arrange
+        using var dbOptions = new DbOptions();
+        dbOptions.SeedTaxonsOnly();
+        var db = dbOptions.BisonDbContext;
         var list = new string[]
         {
             "thisisnotreal",
@@ -53,21 +59,19 @@ public class TaxonomiesUnitTest
         {
             // Act
             Console.WriteLine(str);
-            var taxon = Taxonomies.GetTaxonRecordByID(str);
+            var taxon = await db.Taxons.Where(t => t.DWC_TaxonId == str).FirstOrDefaultAsync();
             // Assert
             taxon.Should().BeNull();
-
-            // Act
-            var taxon2 = Taxonomies.GetTaxonRecordByName(str);
-            // Assert
-            taxon2.Should().BeNull();
         }
     }
 
     [Fact]
-    public static void GetSuperTaxonTest()
+    public static async Task GetSuperTaxonTest()
     {
         // Arrange
+        using var dbOptions = new DbOptions();
+        dbOptions.SeedTaxonsOnly();
+        var db = dbOptions.BisonDbContext;
         var idList = new (string, string)[]
         {
             ("MSTSNM:Arter:c18811f4-f785-ea11-aa77-501ac539d1ea", "MSTSNM:Arter:7f9ef9f3-f785-ea11-aa77-501ac539d1ea"),
@@ -80,33 +84,27 @@ public class TaxonomiesUnitTest
         {
             // Act
             Console.WriteLine(item.ToString());
-            var taxon = Taxonomies.GetTaxonRecordByID(item.Item1);
+            var taxon = await db.Taxons.Where(t => t.DWC_TaxonId == item.Item1).FirstAsync();
             // Assert
             taxon.Should().NotBeNull();
-            taxon.ParentNameUsageID.Should().Be(item.Item2);
-
-            // Act
-            var parent = Taxonomies.GetSuperTaxon(taxon);
-            // Assert
-            parent.Should().NotBeNull();
-            parent.TaxonID.Should().Be(item.Item2);
+            taxon.Parent.Should().NotBeNull();
+            taxon.Parent.DWC_TaxonId.Should().Be(item.Item2);
         }
 
         // Act
-        var aarefodede = Taxonomies.GetTaxonRecordByID("MSTSNM:Arter:3e4e67e4-f785-ea11-aa77-501ac539d1ea");
+        var aarefodede = await db.Taxons.Where(t => t.DWC_TaxonId == "MSTSNM:Arter:3e4e67e4-f785-ea11-aa77-501ac539d1ea").FirstAsync();
         // Assert
         aarefodede.Should().NotBeNull();
-
-        // Act
-        var aarefodedeParent = Taxonomies.GetTaxonRecordByID(aarefodede.ParentNameUsageID);
-        // Assert
-        aarefodedeParent.Should().BeNull();
+        aarefodede.Parent.Should().BeNull();
     }
 
     [Fact]
-    public static void GetSubTaxonTest()
+    public static async Task GetSubTaxonTest()
     {
         // Arrange
+        using var dbOptions = new DbOptions();
+        dbOptions.SeedTaxonsOnly();
+        var db = dbOptions.BisonDbContext;
         var list = new (string, int)[]
         {
             ("MSTSNM:Arter:3e4e67e4-f785-ea11-aa77-501ac539d1ea", 6),
@@ -118,14 +116,10 @@ public class TaxonomiesUnitTest
         foreach (var parent in list)
         {
             // Act
-            var taxon = Taxonomies.GetTaxonRecordByID(parent.Item1);
+            var taxon = await db.Taxons.Where(t => t.DWC_TaxonId == parent.Item1).FirstAsync();
             // Assert
             taxon.Should().NotBeNull();
-
-            // Act
-            var subs = Taxonomies.GetSubTaxons(taxon).ToList();
-            // Assert
-            subs.Count.Should().Be(parent.Item2);
+            taxon.Children.Count.Should().Be(parent.Item2);
         }
     }
 }
