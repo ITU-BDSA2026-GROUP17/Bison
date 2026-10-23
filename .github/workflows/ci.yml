@@ -47,11 +47,11 @@ jobs:
             - name: Install Dependencies
               run: dotnet restore
 
-            - name: Build
-              run: dotnet build --no-restore
-
             - name: Build Dafny
               run: make dafny
+
+            - name: Build
+              run: dotnet build --no-restore
 
             - name: Test
               run: dotnet test --no-build --verbosity normal
