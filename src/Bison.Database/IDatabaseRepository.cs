@@ -6,7 +6,7 @@ namespace Bison.Database;
 
 public interface IDatabaseRepository
 {
-    //internal static readonly string DATE_FORMAT_STRING = "dd/MM/yy H:mm:ss";
+    //internal static readonly string DATE_FORMAT_STRING = "dd/MM/yyyy HH:mm:ss";
     internal static readonly CultureInfo DATE_FORMAT = new("fr-FR");
 
     public Task<Taxon?> GetTaxonByDWCId(string taxonId);
