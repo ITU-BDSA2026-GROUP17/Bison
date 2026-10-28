@@ -44,6 +44,12 @@ jobs:
               with:
                   dotnet-version: ${{ env.DOTNET_VERSION }}
 
+            - name: Setup Z3
+              id: z3
+              uses: cda-tum/setup-z3@v1.7.3
+              with:
+                  add_to_library_path: true
+
             - name: Install Dependencies
               run: dotnet restore
 
