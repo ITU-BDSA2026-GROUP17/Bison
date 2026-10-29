@@ -80,7 +80,6 @@ public class CommentServiceIntegrationTests
         var com = await db.CreateCommentAsync(user.Id, obs.Id, comment.Item);
         var gottenCom = await db.GetCommentsByObservationIdAsync(obs.Id);
 
-
         //Assert
         com.Should().NotBeNull();
         com.Author.Id.Should().Be(user.Id);
@@ -94,6 +93,32 @@ public class CommentServiceIntegrationTests
         gottenCom[0].Author.Id.Should().Be(user.Id);
         gottenCom[0].ObservationId.Should().Be(obs.Id);
         gottenCom[0].Comment.Should().Be(comment.Item);
+    }
+    [Property]
+    public static async Task CreateCommentOnCommentTest(NonWhiteSpaceString comment)
+    {
+        //Arrange
+        using var dbOptions = new DbOptions();
+        dbOptions.SeedTaxonsOnly();
+        var taxon = (await ProposalServiceIntegrationTests.TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
+        var repo = new DatabaseRepository(dbOptions.BisonDbContext);
+        var user = await repo.CreateUser("testName", "test@example.com");
+        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation");
+        var cmt = await repo.CreateComment(user.Id, obs.Id, comment.Item);
+        var db = new CommentService(repo);
+
+        //Act
+        try
+        {
+            var com = await db.CreateCommentAsync(user.Id, cmt.Id, comment.Item);
+            Assert.Fail("Invalid observation Id, should throw an exception");
+        }
+        //Assert
+        catch (ObservationDoesNotExistException e)
+        {
+            e.Message.Should().Be($"Observation with ID {cmt.Id} does not exist");
+            e.ObservationId.Should().Be(cmt.Id);
+        }
     }
     public static async Task PaginationWorksTest()
     {
