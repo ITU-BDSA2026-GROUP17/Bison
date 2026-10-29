@@ -142,7 +142,7 @@ public class DTOTests
         var db = new ProposalService(new DatabaseRepository(dbOptions.BisonDbContext));
 
         var pplDTOList = await db.GetProposalsByObservationIdAsync(3);
-        var pplDTO = pplDTOList[0];
+        var pplDTO = pplDTOList[1]; // Using index 1 to improve branch coverage. 
 
         //Act
         var ppl = await db.ToProposalAsync(pplDTO);
@@ -211,7 +211,7 @@ public class DTOTests
         var db = new CommentService(new DatabaseRepository(dbOptions.BisonDbContext));
 
         var cmtDTOList = await db.GetCommentsByObservationIdAsync(3);
-        var cmtDTO = cmtDTOList[0];
+        var cmtDTO = cmtDTOList[1]; // Using index 1 to improve branch coverage. 
 
         //Act
         var cmt = await db.ToCommentAsync(cmtDTO);
