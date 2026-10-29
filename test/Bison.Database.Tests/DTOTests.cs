@@ -66,9 +66,9 @@ public class DTOTests
         user.Email.Should().Be(userDTO.Email);
         user.Id.Should().Be(userDTO.Id);
     }
-    
+
     // Observations
-     [Fact]
+    [Fact]
     public async Task ObservationDTOToObservationAsyncSuccessfulTest()
     {
         //Arrange
@@ -133,7 +133,7 @@ public class DTOTests
     }
 
     // Proposals
-     [Fact]
+    [Fact]
     public async Task ProposalDTOToProposalAsyncSuccessfulTest()
     {
         //Arrange
@@ -202,7 +202,7 @@ public class DTOTests
     }
 
     // Comments
-     [Fact]
+    [Fact]
     public async Task CommentDTOToCommentAsyncSuccessfulTest()
     {
         //Arrange

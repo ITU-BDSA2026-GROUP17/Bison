@@ -1,8 +1,8 @@
 namespace Bison.Database.Tests;
 
-using Bison.Database.Services;
-
 using System.Net.Mail;
+
+using Bison.Database.Services;
 
 public class CorrectEmailFormatUniTest
 {
@@ -15,7 +15,7 @@ public class CorrectEmailFormatUniTest
         // Assert
         isValid.Should().BeFalse();
     }
-    
+
     [Fact]
     public void AssertInvalidMailIsInvalid()
     {
@@ -25,7 +25,7 @@ public class CorrectEmailFormatUniTest
         // Assert
         isValid.Should().BeFalse();
     }
-    
+
     [Property]
     public void AssertCorrectFormat(MailAddress mail)
     {
