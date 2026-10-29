@@ -120,6 +120,7 @@ public class CommentServiceIntegrationTests
             e.ObservationId.Should().Be(cmt.Id);
         }
     }
+    [Fact]
     public static async Task PaginationWorksTest()
     {
         //Arrange
