@@ -15,7 +15,7 @@ public class UserTimelineModel(IObservationService service, IUserService uServic
     {
         if (page < 2)
         {
-            var user = await _userService.GetUserByNameAsync(author);
+            var user = await _userService.GetUserByUserNameAsync(author);
             if (user is not null)
             {
                 Observations = await _obsService.GetObservationsByUserAsync(user.Id, PublicModel.PAGE_SIZE);
@@ -24,7 +24,7 @@ public class UserTimelineModel(IObservationService service, IUserService uServic
         }
         else
         {
-            var user = await _userService.GetUserByNameAsync(author);
+            var user = await _userService.GetUserByUserNameAsync(author);
             if (user is not null)
             {
                 Observations = await _obsService.GetObservationsByUserAsync(
