@@ -39,9 +39,9 @@ build: $(foreach platform,$(PLATFORMS),${BASE_PATH}bin/Release/*/$(platform)/pub
 zip:
 	rm -rf dist/*.zip
 	@mkdir -p dist
-	@$(foreach platform,$(PLATFORMS),\
-		ext="$(call get_ext,$(platform))"; \
-		zip -j dist/bison-$(platform).zip ${BASE_PATH}bin/Release/*/$(platform)/publish/$(BUILD_PROJECT)$$ext; ${BASE_PATH}bin/Release/*/$(platform)/publish/appsettings.json ${BASE_PATH}bin/Release/*/$(platform)/publish/wwwroot \
+	$(foreach platform,$(PLATFORMS),\
+		(ext="$(call get_ext,$(platform))"; CURRENT="$$(pwd)"; \
+		cd ${BASE_PATH}bin/Release/*/$(platform)/publish && zip -r -9 -J $$CURRENT/dist/bison-$(platform).zip ./*); \
 	)
 
 ci: build zip
