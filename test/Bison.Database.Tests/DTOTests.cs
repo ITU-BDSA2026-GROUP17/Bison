@@ -24,7 +24,6 @@ public class DTOTests
         userDTO.Should().NotBeNull();
         user.Should().NotBeNull();
         userDTO.Name.Should().Be(user.Name);
-        userDTO.Email.Should().Be(user.Email);
         userDTO.Id.Should().Be(user.Id);
         user.Should().BeEquivalentTo(userBase);
     }
@@ -36,7 +35,7 @@ public class DTOTests
         using var dbOptions = new DbOptions();
         var db = new UserService(new DatabaseRepository(dbOptions.BisonDbContext));
 
-        var userDTO = new UserDTO(123, "test", "test@email");
+        var userDTO = new UserDTO("123", "test", "test@example.com");
 
         //Act
         var user = await db.ToUserAsync(userDTO);
@@ -63,7 +62,6 @@ public class DTOTests
         userDTO.Should().NotBeNull();
         user.Should().NotBeNull();
         user.Name.Should().Be(userDTO.Name);
-        user.Email.Should().Be(userDTO.Email);
         user.Id.Should().Be(userDTO.Id);
     }
 
@@ -98,7 +96,7 @@ public class DTOTests
         using var dbOptions = new DbOptions();
         var db = new ObservationService(new DatabaseRepository(dbOptions.BisonDbContext));
 
-        var obsDTO = new ObservationDTO(123, "time", new UserDTO(123, "name", "email"), "taxonName", "desc");
+        var obsDTO = new ObservationDTO(123, "time", new UserDTO("123", "name", "test@example.com"), "taxonName", "desc");
 
         //Act
         var obs = await db.ToObservationAsync(obsDTO);
@@ -142,7 +140,7 @@ public class DTOTests
         var db = new ProposalService(new DatabaseRepository(dbOptions.BisonDbContext));
 
         var pplDTOList = await db.GetProposalsByObservationIdAsync(3);
-        var pplDTO = pplDTOList[1]; // Using index 1 to improve branch coverage. 
+        var pplDTO = pplDTOList[1]; // Using index 1 to improve branch coverage.
 
         //Act
         var ppl = await db.ToProposalAsync(pplDTO);
@@ -165,7 +163,7 @@ public class DTOTests
         using var dbOptions = new DbOptions();
         var db = new ProposalService(new DatabaseRepository(dbOptions.BisonDbContext));
 
-        var pplDTO = new ProposalDTO(123, "time", 0, new UserDTO(123, "name", "email"), "taxonName", "desc");
+        var pplDTO = new ProposalDTO(123, "time", 0, new UserDTO("123", "name", "test@example.com"), "taxonName", "desc");
 
         //Act
         var ppl = await db.ToProposalAsync(pplDTO);
@@ -211,7 +209,7 @@ public class DTOTests
         var db = new CommentService(new DatabaseRepository(dbOptions.BisonDbContext));
 
         var cmtDTOList = await db.GetCommentsByObservationIdAsync(3);
-        var cmtDTO = cmtDTOList[1]; // Using index 1 to improve branch coverage. 
+        var cmtDTO = cmtDTOList[1]; // Using index 1 to improve branch coverage.
 
         //Act
         var cmt = await db.ToCommentAsync(cmtDTO);
@@ -233,7 +231,7 @@ public class DTOTests
         using var dbOptions = new DbOptions();
         var db = new CommentService(new DatabaseRepository(dbOptions.BisonDbContext));
 
-        var cmtDTO = new CommentDTO(123, "time", 0, new UserDTO(123, "name", "email"), "desc");
+        var cmtDTO = new CommentDTO(123, "time", 0, new UserDTO("123", "name", "test@example.com"), "desc");
 
         //Act
         var cmt = await db.ToCommentAsync(cmtDTO);

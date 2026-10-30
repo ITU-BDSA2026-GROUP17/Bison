@@ -5,7 +5,7 @@ using Bison.Models;
 public interface ICommentService
 {
     public Task<List<CommentDTO>> GetCommentsByObservationIdAsync(int observationId, int? limit = null, int? skip = null);
-    public Task<CommentDTO> CreateCommentAsync(int authorId, int observationId, string comment);
+    public Task<CommentDTO> CreateCommentAsync(string authorId, int observationId, string comment);
 
     public static CommentDTO ToCommentDTO(Comment comment)
     {

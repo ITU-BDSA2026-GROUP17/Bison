@@ -6,9 +6,9 @@ using Bison.Models;
 
 public interface IUserService
 {
-    public Task<UserDTO?> GetUserByIdAsync(int userId);
-    public Task<UserDTO?> GetUserByNameAsync(string name);
-    public Task<UserDTO> CreateUserAsync(string name, string email);
+    public Task<UserDTO?> GetUserByIdAsync(string userId);
+    public Task<UserDTO?> GetUserByUserNameAsync(string username);
+    public Task<UserDTO> CreateUserAsync(string username, string email, string name);
 
     public static bool IsValidEmail(string? email)
     {
@@ -26,10 +26,10 @@ public interface IUserService
     }
     public static UserDTO ToUserDTO(User user)
     {
-        return new UserDTO(user.Id, user.Name, user.Email);
+        return new UserDTO(user.Id, user.Name, user.UserName);
     }
 
     public Task<User?> ToUserAsync(UserDTO userDTO);
 }
 
-public record UserDTO(int Id, string Name, string Email);
+public record UserDTO(string Id, string Name, string? Username);

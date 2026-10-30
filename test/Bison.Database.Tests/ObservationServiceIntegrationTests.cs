@@ -32,7 +32,7 @@ public class ObservationServiceIntegrationTests
         obs.Count.Should().Be(0);
     }
     [Property]
-    public static async Task EmptyDbCreateObsTest(int userId, NonWhiteSpaceString description)
+    public static async Task EmptyDbCreateObsTest(NonWhiteSpaceString userId, NonWhiteSpaceString description)
     {
         //Arrange
         using var dbOptions = new DbOptions();
@@ -43,14 +43,14 @@ public class ObservationServiceIntegrationTests
         //Act
         try
         {
-            await db.CreateObservationAsync(userId, taxon.DWC_TaxonId, description.Item);
+            await db.CreateObservationAsync(userId.Item, taxon.DWC_TaxonId, description.Item);
             Assert.Fail("User does not exist, this should throw an error");
         }
         //Assert
         catch (UserDoesNotExistException e)
         {
-            e.Message.Should().Be($"User with ID {userId} does not exist");
-            e.UserId.Should().Be(userId);
+            e.Message.Should().Be($"User with ID {userId.Item} does not exist");
+            e.UserId.Should().Be(userId.Item);
         }
     }
     [Property]
@@ -61,7 +61,7 @@ public class ObservationServiceIntegrationTests
         dbOptions.SeedTaxonsOnly();
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var db = new ObservationService(repo);
-        var user = await repo.CreateUser("test", "test@example.com");
+        var user = await repo.CreateUser("test", "test@example.com", "test");
 
         if (await repo.GetTaxonByDWCId(taxonId.Item) is not null)
             return; // make sure that the "taxonId" is invalid.
@@ -88,7 +88,7 @@ public class ObservationServiceIntegrationTests
         var taxon = (await ProposalServiceIntegrationTests.TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var db = new ObservationService(repo);
-        var user = await repo.CreateUser("testUser", "test@example.com");
+        var user = await repo.CreateUser("testUser", "test@example.com", "test");
 
         //Act
         var obs = await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, description.Item);
@@ -113,7 +113,7 @@ public class ObservationServiceIntegrationTests
         var taxon = (await ProposalServiceIntegrationTests.TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var db = new ObservationService(repo);
-        var user = await repo.CreateUser("testUser", "test@example.com");
+        var user = await repo.CreateUser("testUser", "test@example.com", "test");
         List<ObservationDTO> list = [
             await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, "test1"),
             await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, "test2"),
@@ -140,7 +140,7 @@ public class ObservationServiceIntegrationTests
         var taxon = (await ProposalServiceIntegrationTests.TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var db = new ObservationService(repo);
-        var user = await repo.CreateUser("testUser", "test@example.com");
+        var user = await repo.CreateUser("testUser", "test@example.com", "test");
         List<ObservationDTO> list = [
             await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, "test1"),
             await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, "test2"),

@@ -20,6 +20,9 @@ builder.Services.AddDbContext<BisonDbContext>(options =>
         options.UseSqlite($"Data Source={tempPath}");
     }
 });
+builder.Services.AddDefaultIdentity<Bison.Models.User>(options =>
+    options.SignIn.RequireConfirmedAccount = true
+).AddEntityFrameworkStores<BisonDbContext>();
 builder.Services.AddScoped<IDatabaseRepository, DatabaseRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IObservationService, ObservationService>();
@@ -49,6 +52,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.MapRazorPages();
+app.UseAuthentication();
+app.UseAuthorization();
 
+app.MapRazorPages();
 app.Run();

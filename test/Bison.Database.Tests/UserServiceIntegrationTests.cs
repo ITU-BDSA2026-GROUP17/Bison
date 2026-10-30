@@ -29,7 +29,6 @@ public class UserServiceIntegrationTests
         userDTO.Should().NotBeNull();
         userDTO.Id.Should().Be(user.Id);
         userDTO.Name.Should().Be(user.Name);
-        userDTO.Email.Should().Be(user.Email);
     }
 
     [Fact]
@@ -43,23 +42,22 @@ public class UserServiceIntegrationTests
         var user = (await UserGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
 
         // Act
-        var userDTO = await db.GetUserByNameAsync(user.Name);
+        var userDTO = await db.GetUserByUserNameAsync(user.Name);
 
         // Assert
         userDTO.Should().NotBeNull();
         userDTO.Id.Should().Be(user.Id);
         userDTO.Name.Should().Be(user.Name);
-        userDTO.Email.Should().Be(user.Email);
     }
     [Property]
-    public static async Task EmptyDbGetUserDTOByIdReturnTest(int userId)
+    public static async Task EmptyDbGetUserDTOByIdReturnTest(NonWhiteSpaceString userId)
     {
         // Arrange
         using var dbOptions = new DbOptions();
         var db = new UserService(new DatabaseRepository(dbOptions.BisonDbContext));
 
         // Act
-        var userDTO = await db.GetUserByIdAsync(userId);
+        var userDTO = await db.GetUserByIdAsync(userId.Item);
 
         // Assert
         userDTO.Should().BeNull();
@@ -73,32 +71,35 @@ public class UserServiceIntegrationTests
         var db = new UserService(new DatabaseRepository(dbOptions.BisonDbContext));
 
         // Act
-        var userDTO = await db.GetUserByNameAsync(name.Item);
+        var userDTO = await db.GetUserByUserNameAsync(name.Item);
 
         // Assert
         userDTO.Should().BeNull();
     }
 
     [Property]
-    public static async Task CreateUserDTOTest(NonWhiteSpaceString name, MailAddress email)
+    public static async Task CreateUserDTOTest(NonWhiteSpaceString username, MailAddress email, NonWhiteSpaceString name)
     {
         // Arrange
         using var dbOptions = new DbOptions();
         var db = new UserService(new DatabaseRepository(dbOptions.BisonDbContext));
 
         // Act
-        var userDTO = await db.CreateUserAsync(name.Item, email.Address);
-        var nameUserDTO = await db.GetUserByNameAsync(name.Item);
+        var userDTO = await db.CreateUserAsync(username.Item, email.Address, name.Item);
+        var nameUserDTO = await db.GetUserByUserNameAsync(username.Item);
         var idUserDTO = await db.GetUserByIdAsync(userDTO.Id);
 
         // Assert
         userDTO.Should().NotBeNull();
         userDTO.Name.Should().Be(name.Item);
+        userDTO.Username.Should().Be(username.Item);
 
         nameUserDTO.Id.Should().Be(userDTO.Id);
+        nameUserDTO.Username.Should().Be(userDTO.Username);
         nameUserDTO.Name.Should().Be(userDTO.Name);
 
         idUserDTO.Id.Should().Be(userDTO.Id);
+        idUserDTO.Username.Should().Be(userDTO.Username);
         idUserDTO.Name.Should().Be(userDTO.Name);
     }
 

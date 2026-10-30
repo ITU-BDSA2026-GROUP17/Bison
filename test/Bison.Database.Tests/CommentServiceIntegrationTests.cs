@@ -21,7 +21,7 @@ public class CommentServiceIntegrationTests
         com.Count.Should().Be(0);
     }
     [Property]
-    public static async Task EmptyDbCreateCommentTest(int userId, int obsId, NonWhiteSpaceString comment)
+    public static async Task EmptyDbCreateCommentTest(NonWhiteSpaceString userId, int obsId, NonWhiteSpaceString comment)
     {
         //Arrange
         using var dbOptions = new DbOptions();
@@ -31,14 +31,14 @@ public class CommentServiceIntegrationTests
         //Act
         try
         {
-            await db.CreateCommentAsync(userId, obsId, comment.Item);
+            await db.CreateCommentAsync(userId.Item, obsId, comment.Item);
             Assert.Fail("No user, should throw an exception");
         }
         //Assert
         catch (UserDoesNotExistException e)
         {
-            e.Message.Should().Be($"User with ID {userId} does not exist");
-            e.UserId.Should().Be(userId);
+            e.Message.Should().Be($"User with ID {userId.Item} does not exist");
+            e.UserId.Should().Be(userId.Item);
         }
     }
     [Property]
@@ -48,7 +48,7 @@ public class CommentServiceIntegrationTests
         using var dbOptions = new DbOptions();
         dbOptions.SeedTaxonsOnly();
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
-        var user = await repo.CreateUser("testName", "test@example.com");
+        var user = await repo.CreateUser("testName", "test@example.com", "testName");
         var db = new CommentService(repo);
 
         //Act
@@ -72,7 +72,7 @@ public class CommentServiceIntegrationTests
         dbOptions.SeedTaxonsOnly();
         var taxon = (await ProposalServiceIntegrationTests.TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
-        var user = await repo.CreateUser("testName", "test@example.com");
+        var user = await repo.CreateUser("testName", "test@example.com", "testName");
         var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation");
         var db = new CommentService(repo);
 
@@ -102,7 +102,7 @@ public class CommentServiceIntegrationTests
         dbOptions.SeedTaxonsOnly();
         var taxon = (await ProposalServiceIntegrationTests.TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
-        var user = await repo.CreateUser("testName", "test@example.com");
+        var user = await repo.CreateUser("testName", "test@example.com", "testName");
         var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation");
         var cmt = await repo.CreateComment(user.Id, obs.Id, comment.Item);
         var db = new CommentService(repo);
@@ -128,7 +128,7 @@ public class CommentServiceIntegrationTests
         dbOptions.SeedTaxonsOnly();
         var taxon = (await ProposalServiceIntegrationTests.TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
-        var user = await repo.CreateUser("testName", "test@example.com");
+        var user = await repo.CreateUser("testName", "test@example.com", "testName");
         var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation");
         var db = new CommentService(repo);
         List<CommentDTO> list = [

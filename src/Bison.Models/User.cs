@@ -1,24 +1,26 @@
+using System.Diagnostics.CodeAnalysis;
+
+using Microsoft.AspNetCore.Identity;
+
 namespace Bison.Models;
 
-#pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
-public sealed class User : IEquatable<User>
-#pragma warning restore CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
+public sealed class User : IdentityUser
 {
-    public int Id { get; set; }
     public required string Name { get; set; }
-    public required string Email { get; set; }
 
     public List<Post> Posts { get; set; } = [];
 
-    public bool Equals(User? other)
+    public User() : base()
     {
-        return other is null ?
-            this is null :
-            this is not null && Id == other.Id && Name == other.Name && Email == other.Email;
+
     }
 
-    public override bool Equals(object? obj)
+    [SetsRequiredMembers]
+    public User(string username, string email, string name) : base()
     {
-        return obj is User other && Equals(other);
+        UserName = username;
+        Email = email;
+
+        Name = name;
     }
 }

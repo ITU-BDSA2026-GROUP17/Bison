@@ -60,16 +60,16 @@ public static class DbSeeder
             foreach (var t in taxons) t.Parent?.Children.Add(t);
 
             // Authors
-            var a1 = new User() { Id = 1, Name = "Roger Histand", Email = "Roger+Histand@hotmail.com" };
-            var a2 = new User() { Id = 2, Name = "Luanna Muro", Email = "Luanna-Muro@ku.dk" };
-            var a3 = new User() { Id = 3, Name = "Wendell Ballan", Email = "Wendell-Ballan@gmail.com" };
-            var a4 = new User() { Id = 4, Name = "Nathan Sirmon", Email = "Nathan+Sirmon@dtu.dk" };
-            var a5 = new User() { Id = 5, Name = "Quintin Sitts", Email = "Quintin+Sitts@itu.dk" };
-            var a6 = new User() { Id = 6, Name = "Mellie Yost", Email = "Mellie+Yost@ku.dk" };
-            var a7 = new User() { Id = 7, Name = "Malcolm Janski", Email = "Malcolm-Janski@gmail.com" };
-            var a8 = new User() { Id = 8, Name = "Octavio Wagganer", Email = "Octavio.Wagganer@dtu.dk" };
-            var a9 = new User() { Id = 9, Name = "Johnnie Calixto", Email = "Johnnie+Calixto@itu.dk" };
-            var a10 = new User() { Id = 10, Name = "Jacqualine Gilcoine", Email = "Jacqualine.Gilcoine@gmail.com" };
+            var a1 = new User("RogerHistand", "Roger+Histand@hotmail.com", "Roger Histand");
+            var a2 = new User( "LuannaMuro", "Luanna-Muro@ku.dk", "Luanna Muro");
+            var a3 = new User("WendellBallan", "Wendell-Ballan@gmail.com", "Wendell Ballan");
+            var a4 = new User( "NathanSirmon", "Nathan+Sirmon@dtu.dk", "Nathan Sirmon");
+            var a5 = new User( "QuintinSitts", "Quintin+Sitts@itu.dk", "Quintin Sitts");
+            var a6 = new User( "MellieYost", "Mellie+Yost@ku.dk", "Mellie Yost");
+            var a7 = new User( "MalcolmJanski", "Malcolm-Janski@gmail.com", "Malcolm Janski");
+            var a8 = new User( "OctavioWagganer", "Octavio.Wagganer@dtu.dk", "Octavio Wagganer");
+            var a9 = new User( "JohnnieCalixto", "Johnnie+Calixto@itu.dk", "Johnnie Calixto");
+            var a10 = new User( "JacqualineGilcoine", "Jacqualine.Gilcoine@gmail.com", "Jacqualine Gilcoine");
 
             var users = new List<User>() { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 };
 

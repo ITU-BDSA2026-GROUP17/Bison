@@ -13,7 +13,7 @@ public class ProposalService(IDatabaseRepository databaseRepository) : IProposal
             .Select(IProposalService.ToProposalDTO)
         ];
     }
-    public async Task<ProposalDTO> CreateProposalAsync(int authorId, int observationId, string taxonId, string text)
+    public async Task<ProposalDTO> CreateProposalAsync(string authorId, int observationId, string taxonId, string text)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(text);
         var ppl = await _repository.CreateProposal(authorId, observationId, taxonId, text);

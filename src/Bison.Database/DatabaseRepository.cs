@@ -34,23 +34,19 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
         return await _dbContext.Taxons.FindAsync(taxonId);
     }
 
-    public async Task<User> CreateUser(string name, string email)
+    public async Task<User> CreateUser(string username, string email, string name)
     {
-        var res = _dbContext.Users.Add(new User()
-        {
-            Name = name,
-            Email = email
-        });
+        var res = _dbContext.Users.Add(new User(username, email, name));
         await _dbContext.SaveChangesAsync();
         return res.Entity;
     }
-    public async Task<User?> GetUserById(int userId)
+    public async Task<User?> GetUserById(string userId)
     {
         return await _dbContext.Users.FindAsync(userId);
     }
-    public async Task<User?> GetUserByName(string name)
+    public async Task<User?> GetUserByUserName(string username)
     {
-        return await _dbContext.Users.FirstOrDefaultAsync(u => u.Name == name);
+        return await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == username);
     }
 
     public async Task<Observation?> GetObservation(int id)
@@ -77,7 +73,7 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
         }
         return await query.ToListAsync();
     }
-    public async Task<List<Observation>> GetObservationsByUser(int userId, int? limit = null, int? skip = null)
+    public async Task<List<Observation>> GetObservationsByUser(string userId, int? limit = null, int? skip = null)
     {
         IQueryable<Observation> query = _dbContext.Posts
             .Include("Taxon")
@@ -95,7 +91,7 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
         }
         return await query.ToListAsync();
     }
-    public async Task<Observation> CreateObservation(int userId, string taxonId, string observation)
+    public async Task<Observation> CreateObservation(string userId, string taxonId, string observation)
     {
         var author = await _dbContext.Users.FindAsync(userId)
             ?? throw new UserDoesNotExistException(userId);
@@ -129,7 +125,7 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
         }
         return await query.ToListAsync();
     }
-    public async Task<Comment> CreateComment(int authorId, int observationId, string comment)
+    public async Task<Comment> CreateComment(string authorId, int observationId, string comment)
     {
         var author = await _dbContext.Users.FindAsync(authorId)
             ?? throw new UserDoesNotExistException(authorId);
@@ -168,7 +164,7 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
         }
         return await query.ToListAsync();
     }
-    public async Task<Proposal> CreateProposal(int authorId, int observationId, string taxonId, string text)
+    public async Task<Proposal> CreateProposal(string authorId, int observationId, string taxonId, string text)
     {
         var author = await _dbContext.Users.FindAsync(authorId)
             ?? throw new UserDoesNotExistException(authorId);
