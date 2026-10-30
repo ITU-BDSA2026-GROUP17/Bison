@@ -14,7 +14,8 @@ in {
         pkgs.roslyn-ls
         pkgs.z3
     ];
-    env.DOTNET_ROOT = "${my-dotnet-bundle}";
+    env.DOTNET_ROOT = "${my-dotnet-bundle}/share/dotnet";
+    env.DOTNET_HOST_PATH = "${my-dotnet-bundle}/share/dotnet/dotnet";
     
     scripts.watcher = {
         exec = ''

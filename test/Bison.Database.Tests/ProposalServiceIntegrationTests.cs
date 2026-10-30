@@ -127,6 +127,32 @@ public class ProposalServiceIntegrationTests
         }
     }
     [Property]
+    public static async Task CreateProposalOnCommentTest(NonWhiteSpaceString comment)
+    {
+        //Arrange
+        using var dbOptions = new DbOptions();
+        dbOptions.SeedTaxonsOnly();
+        var taxon = (await ProposalServiceIntegrationTests.TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
+        var repo = new DatabaseRepository(dbOptions.BisonDbContext);
+        var user = await repo.CreateUser("testName", "test@example.com");
+        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation");
+        var cmt = await repo.CreateComment(user.Id, obs.Id, comment.Item);
+        var db = new ProposalService(repo);
+
+        //Act
+        try
+        {
+            var ppl = await db.CreateProposalAsync(user.Id, cmt.Id, taxon.DWC_TaxonId, comment.Item);
+            Assert.Fail("Invalid observation Id, should throw an exception");
+        }
+        //Assert
+        catch (ObservationDoesNotExistException e)
+        {
+            e.Message.Should().Be($"Observation with ID {cmt.Id} does not exist");
+            e.ObservationId.Should().Be(cmt.Id);
+        }
+    }
+    [Property]
     public static async Task CreateProposalTest(NonWhiteSpaceString text)
     {
         //Arrange
