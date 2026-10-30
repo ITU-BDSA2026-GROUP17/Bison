@@ -78,7 +78,6 @@ public class ObservationServiceIntegrationTests
             err.Message.Should().Be($"Taxon with ID {taxonId.Item} does not exist");
             err.TaxonId.Should().Be(taxonId.Item);
         }
-
     }
     [Property]
     public static async Task CreateObsTest(NonWhiteSpaceString description)
