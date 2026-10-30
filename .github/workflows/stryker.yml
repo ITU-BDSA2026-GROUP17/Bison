@@ -6,6 +6,38 @@ env:
     DOTNET_VERSION: "8.0.x"
 
 jobs:
+    coverage-report:
+        name: stryker
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v7
+            - name: Setup .NET
+              uses: actions/setup-dotnet@v6
+              with:
+                  dotnet-version: ${{ env.DOTNET_VERSION }}
+
+            - name: Restore Local Tools
+              run: dotnet tool restore
+
+            - name: Install Dependencies
+              run: dotnet restore
+
+            - name: Build
+              run: dotnet build --no-restore
+
+            - name: Test
+              run: dotnet test && make coverage-report
+
+            - name: Zip results
+              run: zip -j coverage-report.zip coverage-report/*
+
+            - name: Save Coverlet Coverage Result
+              uses: actions/upload-artifact@v7
+              with:
+                  name: "coverlet-coverage-report"
+                  path: coverage-report.zip
+                  retention-days: 7
     stryker:
         name: stryker
         runs-on: ubuntu-latest

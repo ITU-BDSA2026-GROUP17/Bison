@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Bison.Models\Bison.Models.csproj" />
+    <ProjectReference Include="..\Bison.Verified\Bison.Verified.csproj" />
     <InternalsVisibleTo Include="Bison.Database.Tests"/>
   </ItemGroup>
 

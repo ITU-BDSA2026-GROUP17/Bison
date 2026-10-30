@@ -500,3 +500,6 @@ devenv.local.yaml
 # our files
 dist/
 Bison.db
+
+# coverage report files
+coverage-report/
