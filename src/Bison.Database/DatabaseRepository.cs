@@ -12,7 +12,7 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
     public async Task<List<Taxon>> GetTaxons(int? limit = null, int? skip = null)
     {
         IQueryable<Taxon> query = _dbContext.Taxons
-            .OrderByDescending(obs => obs.Id);
+            .OrderByDescending(t => t.Id);
         if (skip is int skipAmount)
         {
             query = query.Skip(skipAmount);
