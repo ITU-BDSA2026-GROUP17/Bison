@@ -1,6 +1,7 @@
 using Bison.Database;
 using Bison.Database.Services;
 
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,6 +29,19 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IObservationService, ObservationService>();
 builder.Services.AddScoped<IProposalService, ProposalService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
+
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = "GitHub";
+    }).AddCookie().AddGitHub(o =>
+    {
+        o.ClientId = builder.Configuration["authentication.github.clientId"] ?? "";
+        o.ClientSecret = builder.Configuration["authentication.github.clientSecret"] ?? "";
+        o.CallbackPath = "/signin-github";
+    });
+
 
 var app = builder.Build();
 

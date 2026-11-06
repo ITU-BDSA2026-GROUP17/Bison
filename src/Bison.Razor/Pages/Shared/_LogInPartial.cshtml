@@ -8,7 +8,7 @@
     @if (User.Identity is not null && signInManager.IsSignedIn(User))
     {
         <div>
-            <a href="/@(User.Identity.Name)">
+            <a href="/obs/@(User.Identity.Name)">
                 My Observations
             </a>
             |

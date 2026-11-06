@@ -61,15 +61,15 @@ public static class DbSeeder
 
             // Authors
             var a1 = new User("RogerHistand", "Roger+Histand@hotmail.com", "Roger Histand");
-            var a2 = new User( "LuannaMuro", "Luanna-Muro@ku.dk", "Luanna Muro");
+            var a2 = new User("LuannaMuro", "Luanna-Muro@ku.dk", "Luanna Muro");
             var a3 = new User("WendellBallan", "Wendell-Ballan@gmail.com", "Wendell Ballan");
-            var a4 = new User( "NathanSirmon", "Nathan+Sirmon@dtu.dk", "Nathan Sirmon");
-            var a5 = new User( "QuintinSitts", "Quintin+Sitts@itu.dk", "Quintin Sitts");
-            var a6 = new User( "MellieYost", "Mellie+Yost@ku.dk", "Mellie Yost");
-            var a7 = new User( "MalcolmJanski", "Malcolm-Janski@gmail.com", "Malcolm Janski");
-            var a8 = new User( "OctavioWagganer", "Octavio.Wagganer@dtu.dk", "Octavio Wagganer");
-            var a9 = new User( "JohnnieCalixto", "Johnnie+Calixto@itu.dk", "Johnnie Calixto");
-            var a10 = new User( "JacqualineGilcoine", "Jacqualine.Gilcoine@gmail.com", "Jacqualine Gilcoine");
+            var a4 = new User("NathanSirmon", "Nathan+Sirmon@dtu.dk", "Nathan Sirmon");
+            var a5 = new User("QuintinSitts", "Quintin+Sitts@itu.dk", "Quintin Sitts");
+            var a6 = new User("MellieYost", "Mellie+Yost@ku.dk", "Mellie Yost");
+            var a7 = new User("MalcolmJanski", "Malcolm-Janski@gmail.com", "Malcolm Janski");
+            var a8 = new User("OctavioWagganer", "Octavio.Wagganer@dtu.dk", "Octavio Wagganer");
+            var a9 = new User("JohnnieCalixto", "Johnnie+Calixto@itu.dk", "Johnnie Calixto");
+            var a10 = new User("JacqualineGilcoine", "Jacqualine.Gilcoine@gmail.com", "Jacqualine Gilcoine");
 
             var users = new List<User>() { a1, a2, a3, a4, a5, a6, a7, a8, a9, a10 };
 
