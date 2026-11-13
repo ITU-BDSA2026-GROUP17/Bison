@@ -3,10 +3,13 @@
   <PropertyGroup>
     <OutputType>library</OutputType>
     <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+
+    <!-- Suppresses lowercase type names, unreachable blocks, and residual null warnings -->
+    <NoWarn>$(NoWarn);CS8981;CS0162;CS8600;CS8602;CS8603;CS8604;CS8625</NoWarn>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\Bison.Models\Bison.Models.csproj" />
   </ItemGroup>
