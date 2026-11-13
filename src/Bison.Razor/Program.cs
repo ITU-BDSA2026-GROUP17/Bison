@@ -37,7 +37,6 @@ builder.Services.AddAuthentication().AddGitHub(o =>
         o.CallbackPath = "/signin-github";
     });
 
-
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
