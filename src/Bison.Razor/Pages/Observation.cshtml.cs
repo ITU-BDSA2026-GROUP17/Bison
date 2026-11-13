@@ -21,5 +21,6 @@ public class ObservationModel(IObservationService observationService, ICommentSe
         Proposals = await _proposalService.GetProposalsByObservationIdAsync(id);
         return Page();
     }
-    //TODO: pagination for comments and proposals, when they have a superclass
+    // TODO: pagination for comments and proposals, when they have a superclass
+    // TODO: make function "GetSubPostsForObservationAsync(int id)
 }

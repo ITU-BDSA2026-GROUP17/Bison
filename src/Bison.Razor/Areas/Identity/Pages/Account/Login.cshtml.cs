@@ -1,7 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// taken from Microsoft.AspNetCore.Identity.UI
-
+// NOTE: taken from Microsoft.AspNetCore.Identity.UI
 
 using System.ComponentModel.DataAnnotations;
 
