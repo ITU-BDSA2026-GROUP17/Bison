@@ -1,7 +1,6 @@
 using Bison.Database;
 using Bison.Database.Services;
 
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
