@@ -54,7 +54,7 @@ jobs:
                   path: ${{env.DOTNET_ROOT}}/myapp
 
             - name: Login to Azure
-              uses: azure/login@v2
+              uses: azure/login@v3
               with:
                   client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_984F9E14341F4A0784D6733FEF4095D2 }}
                   tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_51FE0B8E0350444D958C9A07DC0F5BFC }}

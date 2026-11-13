@@ -23,9 +23,10 @@ public class IntegrationTests
         var taxonGenerator = (await ProposalServiceIntegrationTests.TaxonGenerator(dbOptions.BisonDbContext)).Generator;
 
         var users = await Task.WhenAll((
-            from name in StringGenerator
+            from username in StringGenerator
             from email in ArbMap.Default.GeneratorFor<MailAddress>()
-            select userService.CreateUserAsync(name.Item, email.Address)
+            from name in StringGenerator
+            select userService.CreateUserAsync(username.Item, email.Address, name.Item)
         ).Sample(5));
         var observations = await Task.WhenAll((
             from author in Gen.Elements(users)

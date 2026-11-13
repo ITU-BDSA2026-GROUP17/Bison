@@ -8,19 +8,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.31" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.31" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SQLite" Version="8.0.31" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="8.0.31" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="resources/**/*"/>
+    <EmbeddedResource Include="resources/**/*" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Bison.Models\Bison.Models.csproj" />
     <ProjectReference Include="..\Bison.Verified\Bison.Verified.csproj" />
-    <InternalsVisibleTo Include="Bison.Database.Tests"/>
+    <InternalsVisibleTo Include="Bison.Database.Tests" />
   </ItemGroup>
 
 </Project>

@@ -2,7 +2,6 @@
 @model Bison.Razor.Pages.UserTimelineModel
 @{
     ViewData["Title"] = "Bison";
-    Layout = "Shared/_Layout";
     var routeName = HttpContext.GetRouteValue("author");
 }
 
@@ -17,7 +16,7 @@
                 <li>
                     <p>
                         <strong>
-                            <a href="/obs/@ob.Author.Name">@ob.Author.Name</a>
+                            <a href="/obs/@ob.Author.Username">@ob.Author.Name</a>
                         </strong>
                         @ob.Description
                         <small>&mdash; @ob.CreatedAt</small>
