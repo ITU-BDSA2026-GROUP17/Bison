@@ -12,7 +12,6 @@ public sealed class User : IdentityUser
 
     public User() : base()
     {
-
     }
 
     [SetsRequiredMembers]
