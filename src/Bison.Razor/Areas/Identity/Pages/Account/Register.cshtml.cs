@@ -18,25 +18,8 @@ using Microsoft.AspNetCore.WebUtilities;
 
 namespace Bison.Razor.Areas.Identity.Pages.Account;
 
-public class RegisterInputModel
+public class RegistrationWithPasswordInputModel : RegistrationNoPasswordInputModel
 {
-    [Required]
-    [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 4)]
-    [DataType(DataType.Text)]
-    [Display(Name = "Name")]
-    public string Name { get; set; } = default!;
-
-    [Required]
-    [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 4)]
-    [DataType(DataType.Text)]
-    [Display(Name = "Username")]
-    public string Username { get; set; } = default!;
-
-    [Required]
-    [EmailAddress]
-    [Display(Name = "Email")]
-    public string Email { get; set; } = default!;
-
     [Required]
     [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
     [DataType(DataType.Password)]
@@ -60,7 +43,7 @@ public class RegisterModel : PageModel
     private readonly IEmailSender<User> _emailSender;
 
     [BindProperty]
-    public RegisterInputModel Input { get; set; } = default!;
+    public RegistrationWithPasswordInputModel Input { get; set; } = default!;
 
     public string? ReturnUrl { get; set; }
 
