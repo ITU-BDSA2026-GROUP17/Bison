@@ -30,6 +30,6 @@ public class UserService(IDatabaseRepository databaseRepository) : IUserService
 
     public async Task<User?> ToUserAsync(UserDTO userDTO)
     {
-        return await _repository.GetUserByUserName(userDTO.Name);
+        return await _repository.GetUserByUserName(userDTO.Username ?? "");
     }
 }

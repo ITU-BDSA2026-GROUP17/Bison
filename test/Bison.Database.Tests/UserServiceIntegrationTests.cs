@@ -42,12 +42,12 @@ public class UserServiceIntegrationTests
         var user = (await UserGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
 
         // Act
-        var userDTO = await db.GetUserByUserNameAsync(user.Name);
+        var userDTO = await db.GetUserByUserNameAsync(user.UserName);
 
         // Assert
         userDTO.Should().NotBeNull();
         userDTO.Id.Should().Be(user.Id);
-        userDTO.Name.Should().Be(user.Name);
+        userDTO.Username.Should().Be(user.UserName);
     }
     [Property]
     public static async Task EmptyDbGetUserDTOByIdReturnTest(NonWhiteSpaceString userId)
