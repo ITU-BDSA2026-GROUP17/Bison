@@ -13,7 +13,7 @@ public class CommentService(IDatabaseRepository databaseRepository) : ICommentSe
             .Select(ICommentService.ToCommentDTO)
         ];
     }
-    public async Task<CommentDTO> CreateCommentAsync(int authorId, int observationId, string comment)
+    public async Task<CommentDTO> CreateCommentAsync(string authorId, int observationId, string comment)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(comment);
         var cmt = await _repository.CreateComment(authorId, observationId, comment);

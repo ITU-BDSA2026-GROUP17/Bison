@@ -5,10 +5,10 @@ namespace Bison.Database.Services;
 public interface IObservationService
 {
     public Task<ObservationDTO?> GetObservationByIdAsync(int id);
-    public Task<List<ObservationDTO>> GetObservationsByUserAsync(int userId, int? limit = null, int? skip = null);
+    public Task<List<ObservationDTO>> GetObservationsByUserAsync(string userId, int? limit = null, int? skip = null);
     public Task<List<ObservationDTO>> GetObservationsByTaxonAsync(string taxonId, int? limit = null, int? skip = null);
     public Task<List<ObservationDTO>> GetObservationsAsync(int? limit = null, int? skip = null);
-    public Task<ObservationDTO> CreateObservationAsync(int userId, string taxonId, string description);
+    public Task<ObservationDTO> CreateObservationAsync(string userId, string taxonId, string description);
 
     public static ObservationDTO ToObservationDTO(Observation observation)
     {

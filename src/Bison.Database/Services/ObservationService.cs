@@ -13,7 +13,7 @@ public class ObservationService(IDatabaseRepository databaseRepository) : IObser
         var obs = await _repository.GetObservation(id);
         return obs is null ? null : IObservationService.ToObservationDTO(obs);
     }
-    public async Task<List<ObservationDTO>> GetObservationsByUserAsync(int userId, int? limit = null, int? skip = null)
+    public async Task<List<ObservationDTO>> GetObservationsByUserAsync(string userId, int? limit = null, int? skip = null)
     {
         return [.. (await _repository.GetObservationsByUser(userId, limit, skip))
             .Select(IObservationService.ToObservationDTO)
@@ -34,7 +34,7 @@ public class ObservationService(IDatabaseRepository databaseRepository) : IObser
         var obs = await _repository.GetObservations(limit, skip);
         return [.. obs.Select(IObservationService.ToObservationDTO)];
     }
-    public async Task<ObservationDTO> CreateObservationAsync(int userId, string taxonId, string description)
+    public async Task<ObservationDTO> CreateObservationAsync(string userId, string taxonId, string description)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(description);
         var obs = await _repository.CreateObservation(userId, taxonId, description);

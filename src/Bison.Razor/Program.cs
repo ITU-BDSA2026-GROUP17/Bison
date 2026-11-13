@@ -1,6 +1,7 @@
 using Bison.Database;
 using Bison.Database.Services;
 
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,11 +21,21 @@ builder.Services.AddDbContext<BisonDbContext>(options =>
         options.UseSqlite($"Data Source={tempPath}");
     }
 });
+builder.Services.AddDefaultIdentity<Bison.Models.User>(options =>
+    options.SignIn.RequireConfirmedAccount = true
+).AddEntityFrameworkStores<BisonDbContext>();
 builder.Services.AddScoped<IDatabaseRepository, DatabaseRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IObservationService, ObservationService>();
 builder.Services.AddScoped<IProposalService, ProposalService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
+
+builder.Services.AddAuthentication().AddGitHub(o =>
+    {
+        o.ClientId = builder.Configuration["authentication:github:clientId"] ?? "";
+        o.ClientSecret = builder.Configuration["authentication:github:clientSecret"] ?? "";
+        o.CallbackPath = "/signin-github";
+    });
 
 var app = builder.Build();
 
@@ -49,6 +60,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.MapRazorPages();
+app.UseAuthentication();
+app.UseAuthorization();
 
+app.MapRazorPages();
 app.Run();

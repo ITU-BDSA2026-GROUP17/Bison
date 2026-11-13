@@ -27,7 +27,7 @@ public class ProposalServiceIntegrationTests
         ppl.Count.Should().Be(0);
     }
     [Property]
-    public static async Task EmptyDbCreateProposalWithInvalidTaxonIdTest(int userId, int obsId, string invalidTaxonId)
+    public static async Task EmptyDbCreateProposalWithInvalidTaxonIdTest(NonWhiteSpaceString userId, int obsId, string invalidTaxonId)
     {
         //Arrange
         using var dbOptions = new DbOptions();
@@ -40,18 +40,18 @@ public class ProposalServiceIntegrationTests
         //Act
         try
         {
-            await db.CreateProposalAsync(userId, obsId, invalidTaxonId, "prop1");
+            await db.CreateProposalAsync(userId.Item, obsId, invalidTaxonId, "prop1");
             Assert.Fail("No user, should throw an exception");
         }
         //Assert
         catch (UserDoesNotExistException e)
         {
-            e.Message.Should().Be($"User with ID {userId} does not exist");
-            e.UserId.Should().Be(userId);
+            e.Message.Should().Be($"User with ID {userId.Item} does not exist");
+            e.UserId.Should().Be(userId.Item);
         }
     }
     [Property]
-    public static async Task EmptyDbCreateProposalWithValidTaxonIdTest(int userId, int obsId)
+    public static async Task EmptyDbCreateProposalWithValidTaxonIdTest(NonWhiteSpaceString userId, int obsId)
     {
         //Arrange
         using var dbOptions = new DbOptions();
@@ -62,14 +62,14 @@ public class ProposalServiceIntegrationTests
         //Act
         try
         {
-            await db.CreateProposalAsync(userId, obsId, taxon.DWC_TaxonId, "prop1");
+            await db.CreateProposalAsync(userId.Item, obsId, taxon.DWC_TaxonId, "prop1");
             Assert.Fail("No user, should throw an exception");
         }
         //Assert
         catch (UserDoesNotExistException e)
         {
-            e.Message.Should().Be($"User with ID {userId} does not exist");
-            e.UserId.Should().Be(userId);
+            e.Message.Should().Be($"User with ID {userId.Item} does not exist");
+            e.UserId.Should().Be(userId.Item);
         }
     }
     [Property]
@@ -79,7 +79,7 @@ public class ProposalServiceIntegrationTests
         using var dbOptions = new DbOptions();
         dbOptions.SeedTaxonsOnly();
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
-        var user = await repo.CreateUser("testName", "test@example.com");
+        var user = await repo.CreateUser("testName", "test@example.com", "test");
         var db = new ProposalService(repo);
 
         var taxon = (await TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
@@ -106,7 +106,7 @@ public class ProposalServiceIntegrationTests
         var taxon = (await TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
 
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
-        var user = await repo.CreateUser("testName", "test@example.com");
+        var user = await repo.CreateUser("testName", "test@example.com", "test");
         var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation");
         var db = new ProposalService(repo);
 
@@ -134,7 +134,7 @@ public class ProposalServiceIntegrationTests
         dbOptions.SeedTaxonsOnly();
         var taxon = (await ProposalServiceIntegrationTests.TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
-        var user = await repo.CreateUser("testName", "test@example.com");
+        var user = await repo.CreateUser("testName", "test@example.com", "test");
         var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation");
         var cmt = await repo.CreateComment(user.Id, obs.Id, comment.Item);
         var db = new ProposalService(repo);
@@ -161,7 +161,7 @@ public class ProposalServiceIntegrationTests
         var taxon = (await TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
 
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
-        var user = await repo.CreateUser("testName", "test@example.com");
+        var user = await repo.CreateUser("testName", "test@example.com", "test");
         var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation");
         var db = new ProposalService(repo);
         var userDB = new UserService(repo);
@@ -199,7 +199,7 @@ public class ProposalServiceIntegrationTests
         dbOptions.SeedTaxonsOnly();
         var taxonIds = (await TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(5);
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
-        var user = await repo.CreateUser("testName", "test@example.com");
+        var user = await repo.CreateUser("testName", "test@example.com", "test");
         var obs = await repo.CreateObservation(user.Id, taxonIds[0].DWC_TaxonId, "TestLocation");
         var db = new ProposalService(repo);
         List<ProposalDTO> list = [

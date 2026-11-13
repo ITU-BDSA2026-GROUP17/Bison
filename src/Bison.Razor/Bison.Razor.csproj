@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <OutputType>exe</OutputType>
@@ -9,9 +9,13 @@
     <PublishSingleFile>true</PublishSingleFile> <!-- Compiles all files into one executable -->
     <SelfContained>false</SelfContained> <!-- But require the .NET runtime (assumed everyone has it) -->
     <PublishReadyToRun>false</PublishReadyToRun> <!-- Maybe update to true later if needed -->
+    <UserSecretsId>ab558621-3980-4dd4-b3a7-f244af521c45</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNet.Security.OAuth.GitHub" Version="8.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.31" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.31" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.31" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SQLite" Version="8.0.31" />
   </ItemGroup>
