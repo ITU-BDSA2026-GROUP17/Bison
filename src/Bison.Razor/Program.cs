@@ -19,8 +19,16 @@ builder.Services.AddRazorPages();
 logger.LogTrace("Adding DbContext");
 builder.Services.AddDbContext<BisonDbContext>((options) =>
     {
-        if (builder.Configuration["BISONDBPATH"] is string dbPath)
+        if (
+            builder.Configuration["BISONDBPATH"] is string dbPath &&
+            !File.GetAttributes(dbPath).HasFlag(FileAttributes.Directory)
+        )
         {
+            if (Path.GetDirectoryName(dbPath) is string dirPath)
+            {
+                Directory.CreateDirectory(dirPath);
+                // ensures the directory of the file exists SQLite will fail with error 14
+            }
             options.UseSqlite($"Data Source={dbPath}");
         }
         else
