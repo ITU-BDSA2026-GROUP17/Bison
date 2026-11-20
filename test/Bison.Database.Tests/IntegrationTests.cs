@@ -32,7 +32,7 @@ public class IntegrationTests
             from author in Gen.Elements(users)
             from taxon in taxonGenerator
             from text in StringGenerator
-            select observationService.CreateObservationAsync(author.Id, taxon.DWC_TaxonId, text.Item)
+            select observationService.CreateObservationAsync(author.Id, taxon.DWC_TaxonId, text.Item, null)
         ).Sample(25));
         var comments = (await Task.WhenAll((
             from author in Gen.Elements(users)

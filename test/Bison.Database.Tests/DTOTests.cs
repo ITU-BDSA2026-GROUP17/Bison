@@ -96,7 +96,7 @@ public class DTOTests
         using var dbOptions = new DbOptions();
         var db = new ObservationService(new DatabaseRepository(dbOptions.BisonDbContext));
 
-        var obsDTO = new ObservationDTO(123, "time", new UserDTO("123", "name", "test@example.com"), "taxonName", "desc");
+        var obsDTO = new ObservationDTO(123, "time", new UserDTO("123", "name", "test@example.com"), "taxonName", "desc", null);
 
         //Act
         var obs = await db.ToObservationAsync(obsDTO);
