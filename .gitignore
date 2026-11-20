@@ -499,6 +499,7 @@ devenv.local.yaml
 
 # our files
 dist/
+pictures/
 Bison.db
 
 # coverage report files

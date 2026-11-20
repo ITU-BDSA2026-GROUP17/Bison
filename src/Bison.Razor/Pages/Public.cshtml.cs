@@ -10,10 +10,15 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Bison.Razor.Pages;
 
+[RequestFormLimits(MultipartBodyLengthLimit = 33_554_432)]
 public class CreateObservationInputModel
 {
     [Required]
-    [StringLength(512, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 4)]
+    [StringLength(
+        512,
+        ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.",
+        MinimumLength = 4)
+    ]
     [DataType(DataType.Text)]
     [Display(Name = "Observation")]
     public string Observation { get; set; } = default!;
@@ -22,6 +27,17 @@ public class CreateObservationInputModel
     [DataType(DataType.Text)]
     [Display(Name = "Taxonomy")]
     public string TaxonId { get; set; } = default!;
+
+    [DataType(DataType.Upload)]
+    [Validators.ContentHeader(
+        "image/png,image/jpeg,image/gif", // make sure to update accept in .cshtml if it changes
+        ErrorMessage = "Photo must be a png, jpeg, or gif.")
+    ]
+    [Validators.FileSize(
+        5_242_880, // 5MB
+        ErrorMessage = "Your photo must be less than 5 megabytes"
+    )]
+    public IFormFile? Photo { get; set; } = default;
 }
 
 public partial class PublicModel(
@@ -29,7 +45,8 @@ public partial class PublicModel(
     ITaxonService taxonService,
     ILogger<PublicModel> logger,
     UserManager<User> userService,
-    SignInManager<User> signInManager
+    SignInManager<User> signInManager,
+    IConfiguration options
 ) : PageModel
 {
     internal static readonly int PAGE_SIZE = 32;
@@ -40,6 +57,8 @@ public partial class PublicModel(
 
     private readonly UserManager<User> _userManager = userService;
     private readonly SignInManager<User> _signInManager = signInManager;
+
+    private readonly string _pictureBasePath = options.GetValue<string>("PictureBasePath")!;
 
     public string? BackwardUrl;
     public string? ForwardUrl;
@@ -99,7 +118,7 @@ public partial class PublicModel(
 
     public async Task<ActionResult> OnPostAsync([FromQuery] int page = 0, [FromQuery] string taxonId = "")
     {
-        BisonLogger.LogRequestWithParams(_logger, "POST", "Public", [page, taxonId, Input.Observation, Input.TaxonId]);
+        BisonLogger.LogRequestWithParams(_logger, "POST", "Public", [page, taxonId, Input.Observation, Input.TaxonId, Input.Photo]);
 
         var userId = _userManager.GetUserId(User);
         if (!_signInManager.IsSignedIn(User) || userId is null)
@@ -118,7 +137,31 @@ public partial class PublicModel(
 
         LogIsValidModel(_logger);
 
-        await _service.CreateObservationAsync(userId, taxon.DwCId, Input.Observation);
+        string? picturePath = null;
+
+        try
+        {
+            if (Input.Photo is { Length: > 0 })
+            {
+                var ext = Path.GetExtension(Input.Photo.FileName)
+                    .ToLowerInvariant()
+                    .Replace(".", string.Empty);
+                var guid = Guid.NewGuid();
+
+                Directory.CreateDirectory(_pictureBasePath);
+                var path = Path.Combine(_pictureBasePath, $"{guid}.{ext}");
+
+                await using var stream = System.IO.File.Create(path);
+                await Input.Photo.CopyToAsync(stream);
+                picturePath = path;
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+
+        await _service.CreateObservationAsync(userId, taxon.DwCId, Input.Observation, picturePath);
 
         Input = default!;
         ModelState.Clear();
@@ -132,7 +175,7 @@ public partial class PublicModel(
 
     [LoggerMessage(Level = LogLevel.Trace, Message = "Failed to get observations filtered by taxon, defaulting to getting all observations on page {page}")]
     public static partial void LogGetWithoutTaxonId(ILogger logger, int page);
-    
+
     [LoggerMessage(Level = LogLevel.Trace, Message = "Invalid taxon id '{taxon}' is given, returning page")]
     public static partial void LogInvalidTaxon(ILogger logger, string taxon);
 
