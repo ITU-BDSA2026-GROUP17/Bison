@@ -1,11 +1,33 @@
 ﻿@page "/"
+@using Bison.Models
 @model Bison.Razor.Pages.PublicModel
+@inject SignInManager<User> signInManager
+@inject UserManager<User> userManager
 @{
     ViewData["Title"] = "Bison";
 }
 
 <div>
     <h2> Public Timeline </h2>
+
+    @if (User.Identity is not null && signInManager.IsSignedIn(User)) {
+        <div class="observationbox">
+            <h3>What did you see, @((await userManager.GetUserAsync(User))!.Name)?</h3>
+            @using (Html.BeginForm(FormMethod.Post)) {
+                <div class="form-floating mb-3">
+                    @Html.TextBoxFor(model => model.Input.Observation)
+                    @Html.ValidationMessageFor(model => model.Input.Observation)
+                </div>
+                <div class="form-floating mb-3">
+                   	@Html.DropDownListFor(model => model.Input.TaxonId, Model.Taxons, "Select a Taxonomy", "")
+                   	@Html.ValidationMessageFor(model => model.Input.TaxonId)
+                </div>
+                <div>
+                    <button id="observation-submit" type="submit">Share</button>
+                </div>
+            }
+        </div>
+    }
 
     @if (Model.Observations is not null && Model.Observations.Any())
     {
@@ -18,7 +40,7 @@
                             <a href="/obs/@obs.Author.Username">@obs.Author.Name</a>
                         </strong>
                         @obs.Description
-                        <small>&mdash; @obs.CreatedAt</small>
+                        <small>&mdash; (@obs.TaxonName) @obs.CreatedAt</small>
                     </p>
                 </li>
             }
@@ -28,4 +50,12 @@
     {
         <em>There are no observations so far.</em>
     }
+    <div style="display: flex; min-width: 100%;">
+        @if (Model.BackwardUrl is not null) {
+            <a href="@Model.BackwardUrl" style="justify-self: flex-start; width: 100%;">Previous Page</a>
+        }
+        @if (Model.ForwardUrl is not null) {
+            <a href="@Model.ForwardUrl" style="justify-self: flex-end; width: 100%; text-align: right;">Next Page</a>
+        }
+    </div>
 </div>
