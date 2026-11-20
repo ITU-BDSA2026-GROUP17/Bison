@@ -12,7 +12,6 @@ public interface IObservationService
 
     public static ObservationDTO ToObservationDTO(Observation observation)
     {
-
         return new ObservationDTO(
             observation.Id,
             observation.CreatedAt.ToString(IDatabaseRepository.DATE_FORMAT),
