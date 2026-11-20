@@ -2,6 +2,7 @@ using Bison.Database.Exceptions;
 using Bison.Models;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Bison.Database;
 
@@ -27,6 +28,12 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
     {
         return await _dbContext.Taxons
             .Where(t => t.DWC_TaxonId == taxonId)
+            .FirstOrDefaultAsync();
+    }
+    public async Task<Taxon?> GetTaxonByVernacularName(string vernacularName)
+    {
+        return await _dbContext.Taxons
+            .Where(t => t.VernacularName == vernacularName)
             .FirstOrDefaultAsync();
     }
     public async Task<Taxon?> GetTaxonByNumericId(int taxonId)
@@ -91,7 +98,7 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
         }
         return await query.ToListAsync();
     }
-    public async Task<Observation> CreateObservation(string userId, string taxonId, string observation)
+    public async Task<Observation> CreateObservation(string userId, string taxonId, string observation, string? picturePath)
     {
         var author = await _dbContext.Users.FindAsync(userId)
             ?? throw new UserDoesNotExistException(userId);
@@ -101,7 +108,8 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
         {
             Author = author,
             Text = observation,
-            Taxon = taxon
+            Taxon = taxon,
+            PicturePath = picturePath
         });
         await _dbContext.SaveChangesAsync();
         return (Observation)res.Entity;

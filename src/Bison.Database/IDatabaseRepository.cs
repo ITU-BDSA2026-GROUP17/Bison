@@ -11,6 +11,7 @@ public interface IDatabaseRepository
 
     public Task<Taxon?> GetTaxonByDWCId(string taxonId);
     public Task<Taxon?> GetTaxonByNumericId(int taxonId);
+    public Task<Taxon?> GetTaxonByVernacularName(string vernacularName);
     public Task<List<Taxon>> GetTaxons(int? limit = null, int? skip = null);
 
     public Task<User> CreateUser(string username, string email, string name);
@@ -20,7 +21,7 @@ public interface IDatabaseRepository
     public Task<Observation?> GetObservation(int id);
     public Task<List<Observation>> GetObservations(int? limit = null, int? skip = null);
     public Task<List<Observation>> GetObservationsByUser(string userId, int? limit = null, int? skip = null);
-    public Task<Observation> CreateObservation(string userId, string taxonId, string observation);
+    public Task<Observation> CreateObservation(string userId, string taxonId, string observation, string? picturePath);
 
     public Task<List<Comment>> GetCommentsForObservation(int observationId, int? limit = null, int? skip = null);
     public Task<Comment> CreateComment(string authorId, int observationId, string comment);

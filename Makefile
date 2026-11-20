@@ -15,7 +15,7 @@ version := 0.0.0
 endif
 
 run:
-	BISONDBPATH="$$(pwd)/bison.db" dotnet run --project ${BASE_PATH}${BUILD_PROJECT}.csproj --launch-profile https
+	BISONDBPATH="$$(pwd)/bison.db" PictureBasePath="$$(pwd)/pictures/" dotnet run --project ${BASE_PATH}${BUILD_PROJECT}.csproj --launch-profile https
 
 all: build
 
