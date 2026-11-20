@@ -29,7 +29,8 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
             .Where(t => t.DWC_TaxonId == taxonId)
             .FirstOrDefaultAsync();
     }
-    public async Task<Taxon?> GetTaxonByVernacularName(string vernacularName) {
+    public async Task<Taxon?> GetTaxonByVernacularName(string vernacularName)
+    {
         return await _dbContext.Taxons
             .Where(t => t.VernacularName == vernacularName)
             .FirstOrDefaultAsync();
@@ -96,17 +97,22 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
         }
         return await query.ToListAsync();
     }
-    public async Task<Observation> CreateObservation(string userId, string taxonId, string observation)
+    public async Task<Observation> CreateObservation(string userId, string taxonId, string observation, string? picturePath)
     {
         var author = await _dbContext.Users.FindAsync(userId)
             ?? throw new UserDoesNotExistException(userId);
         var taxon = await GetTaxonByDWCId(taxonId) ?? throw new TaxonIdDoesNotExistException(taxonId);
+        if (picturePath is not null && !File.Exists(picturePath))
+        {
+            throw new FileNotFoundException(picturePath);
+        }
 
         var res = _dbContext.Posts.Add(new Observation()
         {
             Author = author,
             Text = observation,
-            Taxon = taxon
+            Taxon = taxon,
+            PicturePath = picturePath
         });
         await _dbContext.SaveChangesAsync();
         return (Observation)res.Entity;
