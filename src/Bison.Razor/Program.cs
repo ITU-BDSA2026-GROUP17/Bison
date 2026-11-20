@@ -21,7 +21,10 @@ builder.Services.AddDbContext<BisonDbContext>((options) =>
     {
         if (
             builder.Configuration["BISONDBPATH"] is string dbPath &&
-            !File.GetAttributes(dbPath).HasFlag(FileAttributes.Directory)
+            (
+                !File.Exists(dbPath) ||
+                !File.GetAttributes(dbPath).HasFlag(FileAttributes.Directory)
+            )
         )
         {
             if (Path.GetDirectoryName(dbPath) is string dirPath)
