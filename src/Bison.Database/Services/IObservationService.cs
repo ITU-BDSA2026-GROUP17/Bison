@@ -8,7 +8,7 @@ public interface IObservationService
     public Task<List<ObservationDTO>> GetObservationsByUserAsync(string userId, int? limit = null, int? skip = null);
     public Task<List<ObservationDTO>> GetObservationsByTaxonAsync(string taxonId, int? limit = null, int? skip = null);
     public Task<List<ObservationDTO>> GetObservationsAsync(int? limit = null, int? skip = null);
-    public Task<ObservationDTO> CreateObservationAsync(string userId, string taxonId, string description);
+    public Task<ObservationDTO> CreateObservationAsync(string userId, string taxonId, string description, string? picturePath = null);
 
     public static ObservationDTO ToObservationDTO(Observation observation)
     {
@@ -17,7 +17,8 @@ public interface IObservationService
             observation.CreatedAt.ToString(IDatabaseRepository.DATE_FORMAT),
             IUserService.ToUserDTO(observation.Author),
             observation.Taxon.VernacularName,
-            observation.Text
+            observation.Text,
+            observation.PicturePath
         );
     }
     public Task<Observation?> ToObservationAsync(ObservationDTO observationDTO);
@@ -25,4 +26,4 @@ public interface IObservationService
 
 // CreatedAt should preferably be a DateTime if localization across different date formats is needed
 // However, for now it will be ISO 8601 string
-public record ObservationDTO(int Id, string CreatedAt, UserDTO Author, string? TaxonName, string Description);
+public record ObservationDTO(int Id, string CreatedAt, UserDTO Author, string? TaxonName, string Description, string? PicturePath = null);

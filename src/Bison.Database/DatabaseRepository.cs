@@ -91,7 +91,7 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
         }
         return await query.ToListAsync();
     }
-    public async Task<Observation> CreateObservation(string userId, string taxonId, string observation)
+    public async Task<Observation> CreateObservation(string userId, string taxonId, string observation, string? picturePath = null)
     {
         var author = await _dbContext.Users.FindAsync(userId)
             ?? throw new UserDoesNotExistException(userId);
@@ -101,7 +101,8 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
         {
             Author = author,
             Text = observation,
-            Taxon = taxon
+            Taxon = taxon,
+            PicturePath = picturePath
         });
         await _dbContext.SaveChangesAsync();
         return (Observation)res.Entity;

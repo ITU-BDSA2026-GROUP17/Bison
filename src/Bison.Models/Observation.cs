@@ -37,3 +37,4 @@ public sealed class Observation : Post, IEquatable<Observation>
         }
     }
 }
+
