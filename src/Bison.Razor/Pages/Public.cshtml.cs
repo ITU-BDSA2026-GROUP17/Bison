@@ -153,7 +153,7 @@ public partial class PublicModel(
 
                 await using var stream = System.IO.File.Create(path);
                 await Input.Photo.CopyToAsync(stream);
-                picturePath = path;
+                picturePath = $"{guid}.{ext}";
             }
         }
         catch (Exception e)
@@ -161,8 +161,10 @@ public partial class PublicModel(
             Console.WriteLine(e);
         }
 
-        await _service.CreateObservationAsync(userId, taxon.DwCId, Input.Observation, picturePath);
+        var obs = await _service.CreateObservationAsync(userId, taxon.DwCId, Input.Observation, picturePath);
 
+        LogCreatedObservation(_logger, obs.Id);
+        
         Input = default!;
         ModelState.Clear();
 
@@ -178,6 +180,9 @@ public partial class PublicModel(
 
     [LoggerMessage(Level = LogLevel.Trace, Message = "Invalid taxon id '{taxon}' is given, returning page")]
     public static partial void LogInvalidTaxon(ILogger logger, string taxon);
+
+    [LoggerMessage(Level = LogLevel.Trace, Message = "Created observation with id {obsId}")]
+    public static partial void LogCreatedObservation(ILogger logger, int obsId);
 
     [LoggerMessage(Level = LogLevel.Trace, Message = "Input model is valid")]
     public static partial void LogIsValidModel(ILogger logger);

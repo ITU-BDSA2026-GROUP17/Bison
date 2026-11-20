@@ -10,9 +10,9 @@
 <div>
     <h2> Public Timeline </h2>
 
-    @if (User.Identity is not null && signInManager.IsSignedIn(User)) {
+    @if (signInManager.IsSignedIn(User)) {
         <div class="observationbox">
-            <h3>What did you see, @((await userManager.GetUserAsync(User))!.Name)?</h3>
+            <h3>What did you see, @((await userManager.GetUserAsync(User))?.Name)?</h3>
             @using (Html.BeginForm(FormMethod.Post, new { enctype="multipart/form-data"})) {
                 <div class="form-floating mb-3">
                     @Html.TextBoxFor(model => model.Input.Observation)

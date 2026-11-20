@@ -2,11 +2,13 @@ using Bison.Database.Exceptions;
 using Bison.Models;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Bison.Database;
 
-public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
+public class DatabaseRepository(IConfiguration configuration, BisonDbContext dbContext) : IDatabaseRepository
 {
+    private readonly IConfiguration _configuration = configuration;
     private readonly BisonDbContext _dbContext = dbContext;
 
     public async Task<List<Taxon>> GetTaxons(int? limit = null, int? skip = null)
@@ -102,9 +104,9 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
         var author = await _dbContext.Users.FindAsync(userId)
             ?? throw new UserDoesNotExistException(userId);
         var taxon = await GetTaxonByDWCId(taxonId) ?? throw new TaxonIdDoesNotExistException(taxonId);
-        if (picturePath is not null && !File.Exists(picturePath))
+        if (picturePath is not null && !File.Exists(Path.Combine(_configuration["PictureBasePath"]!, picturePath)))
         {
-            throw new FileNotFoundException(picturePath);
+            throw new FileNotFoundException(Path.Combine(_configuration["PictureBasePath"]!, picturePath));
         }
 
         var res = _dbContext.Posts.Add(new Observation()
