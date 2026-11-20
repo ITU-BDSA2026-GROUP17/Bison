@@ -29,6 +29,11 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
             .Where(t => t.DWC_TaxonId == taxonId)
             .FirstOrDefaultAsync();
     }
+    public async Task<Taxon?> GetTaxonByVernacularName(string vernacularName) {
+        return await _dbContext.Taxons
+            .Where(t => t.VernacularName == vernacularName)
+            .FirstOrDefaultAsync();
+    }
     public async Task<Taxon?> GetTaxonByNumericId(int taxonId)
     {
         return await _dbContext.Taxons.FindAsync(taxonId);

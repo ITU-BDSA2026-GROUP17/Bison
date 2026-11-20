@@ -46,6 +46,7 @@ logger.LogTrace("Adding Repository");
 builder.Services.AddScoped<IDatabaseRepository, DatabaseRepository>();
 logger.LogTrace("Adding Services");
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ITaxonService, TaxonService>();
 builder.Services.AddScoped<IObservationService, ObservationService>();
 builder.Services.AddScoped<IProposalService, ProposalService>();
 builder.Services.AddScoped<ICommentService, CommentService>();

@@ -11,6 +11,7 @@ public interface IDatabaseRepository
 
     public Task<Taxon?> GetTaxonByDWCId(string taxonId);
     public Task<Taxon?> GetTaxonByNumericId(int taxonId);
+    public Task<Taxon?> GetTaxonByVernacularName(string vernacularName);
     public Task<List<Taxon>> GetTaxons(int? limit = null, int? skip = null);
 
     public Task<User> CreateUser(string username, string email, string name);
