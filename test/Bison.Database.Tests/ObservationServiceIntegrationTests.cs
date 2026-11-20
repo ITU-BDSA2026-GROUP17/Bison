@@ -43,7 +43,7 @@ public class ObservationServiceIntegrationTests
         //Act
         try
         {
-            await db.CreateObservationAsync(userId.Item, taxon.DWC_TaxonId, description.Item, null);
+            await db.CreateObservationAsync(userId.Item, taxon.DWC_TaxonId, description.Item);
             Assert.Fail("User does not exist, this should throw an error");
         }
         //Assert
@@ -69,7 +69,7 @@ public class ObservationServiceIntegrationTests
         //Act
         try
         {
-            await db.CreateObservationAsync(user.Id, taxonId.Item, description.Item, null);
+            await db.CreateObservationAsync(user.Id, taxonId.Item, description.Item);
             Assert.Fail("Taxon does not exist, this should throw an error");
         }
         //Assert
@@ -91,7 +91,7 @@ public class ObservationServiceIntegrationTests
         var user = await repo.CreateUser("testUser", "test@example.com", "test");
 
         //Act
-        var obs = await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, description.Item, null);
+        var obs = await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, description.Item);
         var idObs = await db.GetObservationByIdAsync(obs.Id);
 
         //Assert
@@ -115,11 +115,11 @@ public class ObservationServiceIntegrationTests
         var db = new ObservationService(repo);
         var user = await repo.CreateUser("testUser", "test@example.com", "test");
         List<ObservationDTO> list = [
-            await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, "test1,"),
-            await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, "test2,"),
-            await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, "test3,"),
-            await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, "test4,"),
-            await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, "test5,"),
+            await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, "test1"),
+            await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, "test2"),
+            await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, "test3"),
+            await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, "test4"),
+            await db.CreateObservationAsync(user.Id, taxon.DWC_TaxonId, "test5"),
         ];
 
         //Act
