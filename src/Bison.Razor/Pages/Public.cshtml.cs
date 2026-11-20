@@ -164,7 +164,7 @@ public partial class PublicModel(
         var obs = await _service.CreateObservationAsync(userId, taxon.DwCId, Input.Observation, picturePath);
 
         LogCreatedObservation(_logger, obs.Id);
-        
+
         Input = default!;
         ModelState.Clear();
 
