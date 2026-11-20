@@ -5,6 +5,7 @@ public sealed class Observation : Post, IEquatable<Observation>
 #pragma warning restore CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
 {
     public required Taxon Taxon { get; set; }
+    public string? PicturePath { get; set; }
 
     public List<Comment> Comments { get; set; } = [];
     public List<Proposal> Proposals { get; set; } = [];
@@ -22,5 +23,17 @@ public sealed class Observation : Post, IEquatable<Observation>
     public Taxon GetTaxon()
     {
         return Taxon;
+    }
+
+    public FileStream? GetPicture()
+    {
+        try
+        {
+            return File.OpenRead(PicturePath!); // we will catch null expections anyway
+        }
+        catch
+        {
+            return null;
+        }
     }
 }

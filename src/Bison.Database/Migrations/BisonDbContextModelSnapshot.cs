@@ -292,6 +292,9 @@ namespace Bison.Database.Migrations
                 {
                     b.HasBaseType("Bison.Models.Post");
 
+                    b.Property<string>("PicturePath")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("TaxonId")
                         .HasColumnType("INTEGER");
 
