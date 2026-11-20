@@ -107,7 +107,7 @@ public class ProposalServiceIntegrationTests
 
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var user = await repo.CreateUser("testName", "test@example.com", "test");
-        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation", null);
+        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation");
         var db = new ProposalService(repo);
 
         if (await dbOptions.BisonDbContext.Taxons.Where(t => t.DWC_TaxonId == invalidTaxonId).FirstOrDefaultAsync() is not null)
@@ -135,7 +135,7 @@ public class ProposalServiceIntegrationTests
         var taxon = (await ProposalServiceIntegrationTests.TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var user = await repo.CreateUser("testName", "test@example.com", "test");
-        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation", null);
+        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation");
         var cmt = await repo.CreateComment(user.Id, obs.Id, comment.Item);
         var db = new ProposalService(repo);
 
@@ -162,7 +162,7 @@ public class ProposalServiceIntegrationTests
 
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var user = await repo.CreateUser("testName", "test@example.com", "test");
-        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation", null);
+        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation");
         var db = new ProposalService(repo);
         var userDB = new UserService(repo);
         var obsDB = new ObservationService(repo);
@@ -200,7 +200,7 @@ public class ProposalServiceIntegrationTests
         var taxonIds = (await TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(5);
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var user = await repo.CreateUser("testName", "test@example.com", "test");
-        var obs = await repo.CreateObservation(user.Id, taxonIds[0].DWC_TaxonId, "TestLocation", null);
+        var obs = await repo.CreateObservation(user.Id, taxonIds[0].DWC_TaxonId, "TestLocation");
         var db = new ProposalService(repo);
         List<ProposalDTO> list = [
             await db.CreateProposalAsync(user.Id, obs.Id, taxonIds[0].DWC_TaxonId, "prop1"),
