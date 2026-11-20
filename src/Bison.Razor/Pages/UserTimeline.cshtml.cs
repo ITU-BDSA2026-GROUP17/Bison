@@ -14,7 +14,7 @@ public partial class UserTimelineModel(IObservationService service, IUserService
 
     public async Task<ActionResult> OnGet([FromRoute] string author, [FromQuery] int page)
     {
-        BisonLogger.LogRequestWithParams(_logger, "UserTimeline", [author, page]);
+        BisonLogger.LogRequestWithParams(_logger, "GET", "UserTimeline", [author, page]);
 
         page = page < 1 ? 0 : page;
 

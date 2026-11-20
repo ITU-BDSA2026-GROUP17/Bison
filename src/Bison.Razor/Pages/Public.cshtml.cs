@@ -16,7 +16,7 @@ public partial class PublicModel(IObservationService service, ILogger<PublicMode
 
     public async Task<ActionResult> OnGet([FromQuery] int page, [FromQuery] string taxonId)
     {
-        BisonLogger.LogRequestWithParams(_logger, "Public", [page, taxonId]);
+        BisonLogger.LogRequestWithParams(_logger, "GET", "Public", [page, taxonId]);
         try
         {
             page = page < 2 ? 0 : page;
