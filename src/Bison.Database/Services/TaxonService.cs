@@ -31,5 +31,4 @@ public class TaxonService(IDatabaseRepository databaseRepository) : ITaxonServic
     {
         return _repository.GetTaxonByDWCId(taxonDto.DwCId);
     }
-
 }
