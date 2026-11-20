@@ -9,6 +9,10 @@
     {
         <h2> Public Timeline </h2>
         <ul id="messagelist" class="observations">
+            @if (@Model.Observation.PicturePath is not null)
+            {
+                <img src="@Model.Observation.PicturePath" height=300>
+            }
             <li>
                 <p>
                     <strong>

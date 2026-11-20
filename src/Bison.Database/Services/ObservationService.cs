@@ -34,10 +34,10 @@ public class ObservationService(IDatabaseRepository databaseRepository) : IObser
         var obs = await _repository.GetObservations(limit, skip);
         return [.. obs.Select(IObservationService.ToObservationDTO)];
     }
-    public async Task<ObservationDTO> CreateObservationAsync(string userId, string taxonId, string description)
+    public async Task<ObservationDTO> CreateObservationAsync(string userId, string taxonId, string description, string picturePath)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(description);
-        var obs = await _repository.CreateObservation(userId, taxonId, description);
+        var obs = await _repository.CreateObservation(userId, taxonId, description, picturePath);
         return IObservationService.ToObservationDTO(obs);
     }
     public async Task<Observation?> ToObservationAsync(ObservationDTO observationDTO)
