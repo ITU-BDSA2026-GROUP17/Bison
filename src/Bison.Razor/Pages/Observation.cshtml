@@ -7,11 +7,11 @@
 <div>
     @if (Model.Observation is not null)
     {
-        <h2> Public Timeline </h2>
+        <h2> Observation @Model.Observation.Id </h2>
         <ul id="messagelist" class="observations">
-            @if (@Model.Observation.PicturePath is not null)
+            @if (Model.Observation.PicturePath is not null)
             {
-                <img src="@Model.Observation.PicturePath" height=300>
+                <img src="@Url.Content("~/pictures/" + Model.Observation.PicturePath)" height=300>
             }
             <li>
                 <p>
