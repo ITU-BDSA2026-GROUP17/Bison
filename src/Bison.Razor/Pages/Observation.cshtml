@@ -76,20 +76,6 @@
                 }
             }
         </ul>
-        <ul id="messagelist" class="observations">
-            @foreach (var proposal in Model.Proposals)
-            {
-                <li>
-                    <p>
-                        <strong>
-                            <a href="/@proposal.Author.Username">@proposal.Author.Name</a>
-                        </strong>
-                        @proposal.Taxon.VernacularName
-                        <small>&mdash; @proposal.CreatedAt</small>
-                    </p>
-                </li>
-            }
-        </ul>
     }
     else
     {
