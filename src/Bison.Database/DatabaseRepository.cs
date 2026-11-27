@@ -56,6 +56,15 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
         return await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == username);
     }
 
+    public async Task<Post?> GetPost(int id)
+    {
+        return await _dbContext.Posts
+            .Include("Observation")
+            .Include("Taxon")
+            .Where(p => p.Id == id)
+            .FirstOrDefaultAsync();
+    }
+
     public async Task<Observation?> GetObservation(int id)
     {
         return await _dbContext.Posts

@@ -18,6 +18,8 @@ public interface IDatabaseRepository
     public Task<User?> GetUserById(string userId);
     public Task<User?> GetUserByUserName(string name);
 
+    public Task<Post?> GetPost(int id);
+
     public Task<Observation?> GetObservation(int id);
     public Task<List<Observation>> GetObservations(int? limit = null, int? skip = null);
     public Task<List<Observation>> GetObservationsByUser(string userId, int? limit = null, int? skip = null);
