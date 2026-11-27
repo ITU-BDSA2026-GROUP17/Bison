@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Diagnostics;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
@@ -26,6 +27,12 @@ public class ServerProcess
                 Arguments = "run --project src/Bison.Razor",
                 WorkingDirectory = rootDir,
             };
+
+            // copy parent env to child process
+            foreach (DictionaryEntry entry in Environment.GetEnvironmentVariables())
+            {
+                info.AddEnvironmentVariable(entry.Key.ToString() ?? "", entry.Value?.ToString());
+            }
 
             info.AddEnvironmentVariable("PictureBasePath", Path.Join(rootDir, "/pictures/"));
 
