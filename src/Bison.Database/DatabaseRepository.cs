@@ -115,6 +115,27 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
         return (Observation)res.Entity;
     }
 
+    public async Task<List<Post>> GetSubpostsForObservation(int observationId, int? limit = null, int? skip = null)
+    {
+        IQueryable<Post> query = _dbContext.Posts
+            .Include("Observation")
+            .Include("Taxon")
+            .Where(p =>
+                (p is Comment && ((Comment)p).Observation.Id == observationId) ||
+                (p is Proposal && ((Proposal)p).Observation.Id == observationId)
+            )
+            .OrderByDescending(p => p.Id);
+        if (skip is int skipAmount)
+        {
+            query = query.Skip(skipAmount);
+        }
+        if (limit is int limitAmount)
+        {
+            query = query.Take(limitAmount);
+        }
+        return await query.ToListAsync();
+    }
+
     public async Task<List<Comment>> GetCommentsForObservation(int observationId, int? limit = null, int? skip = null)
     {
         IQueryable<Comment> query = _dbContext.Posts

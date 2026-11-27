@@ -18,8 +18,8 @@
                         <strong>
                             <a href="/obs/@ob.Author.Username">@ob.Author.Name</a>
                         </strong>
-                        @ob.Description
-                        <small>&mdash; @ob.CreatedAt</small>
+                        <a style="color:black;" href="/ob/@ob.Id">@ob.Description</a>
+                        <small>&mdash; (@(ob.Taxon.VernacularName is not null ? ob.Taxon.VernacularName : ob.Taxon.DwCId)) @ob.CreatedAt</small>
                     </p>
                 </li>
             }

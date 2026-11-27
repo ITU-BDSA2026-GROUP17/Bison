@@ -1,5 +1,9 @@
 ﻿@page "/ob/{id}"
+@using Bison.Database.Services
+@using Bison.Models
 @model Bison.Razor.Pages.ObservationModel
+@inject SignInManager<User> signInManager
+@inject UserManager<User> userManager
 @{
     ViewData["Title"] = "Bison";
 }
@@ -11,7 +15,7 @@
         <ul id="messagelist" class="observations">
             @if (Model.Observation.PicturePath is not null)
             {
-                <img src="@Url.Content("~/pictures/" + Model.Observation.PicturePath)" height=300>
+                <img src="@Url.Content("~/pictures/" + Model.Observation.PicturePath)" style="max-width:300px; max-height:300px; aspect-ratio:auto">
             }
             <li>
                 <p>
@@ -19,36 +23,57 @@
                         <a href="/@Model.Observation.Author.Username">@Model.Observation.Author.Name</a>
                     </strong>
                     @Model.Observation.Description
-                    <small>&mdash; @Model.Observation.CreatedAt</small>
+                    <small>&mdash; (@(Model.Observation.Taxon.VernacularName is not null ? Model.Observation.Taxon.VernacularName : Model.Observation.Taxon.DwCId)) @Model.Observation.CreatedAt</small>
                 </p>
             </li>
         </ul>
+        @if (signInManager.IsSignedIn(User)) {
+            <div class="observationbox">
+                <h3>Have a comment, @((await userManager.GetUserAsync(User))?.Name)?</h3>
+                @using (Html.BeginForm(FormMethod.Post, new { enctype="multipart/form-data"})) {
+                    <div class="form-floating mb-3">
+                        @Html.TextBoxFor(model => model.Input.Text)
+                        @Html.ValidationMessageFor(model => model.Input.Text)
+                    </div>
+                    <div class="form-floating mb-3">
+                       	@Html.DropDownListFor(model => model.Input.TaxonId, Model.Taxons, "Select a Taxonomy", "")
+                       	@Html.ValidationMessageFor(model => model.Input.TaxonId)
+                        <span>Psst, choose "None" for a normal comment!</span>
+                    </div>
+                    <div>
+                        <button id="observation-submit" type="submit">Share</button>
+                    </div>
+                }
+            </div>
+        }
         <ul id="messagelist" class="observations">
-            @foreach (var comment in Model.Comments)
+            @foreach (var subpost in Model.Subposts)
             {
-                <li>
-                    <p>
-                        <strong>
-                            <a href="/@comment.Author.Username">@comment.Author.Name</a>
-                        </strong>
-                        @comment.Comment
-                        <small>&mdash; @comment.CreatedAt</small>
-                    </p>
-                </li>
-            }
-        </ul>
-        <ul id="messagelist" class="observations">
-            @foreach (var proposal in Model.Proposals)
-            {
-                <li>
-                    <p>
-                        <strong>
-                            <a href="/@proposal.Author.Username">@proposal.Author.Name</a>
-                        </strong>
-                        @proposal.TaxonName
-                        <small>&mdash; @proposal.CreatedAt</small>
-                    </p>
-                </li>
+                @if(subpost.CommentDTO is CommentDTO comment)
+                {
+                    <li>
+                        <p>
+                            <strong>
+                                <a href="/@comment.Author.Username">@comment.Author.Name</a>
+                            </strong>
+                            @comment.Comment
+                            <small>&mdash; @comment.CreatedAt</small>
+                        </p>
+                    </li>
+                } else if(subpost.ProposalDTO is ProposalDTO proposal)
+                {
+                    <li>
+                        <p>
+                            <strong>
+                                <a href="/@proposal.Author.Username">@proposal.Author.Name</a>
+                            </strong>
+                            PROPOSES: "@(proposal.Taxon.VernacularName is not null ? proposal.Taxon.VernacularName : proposal.Taxon.DwCId)"
+                            <br>
+                            @proposal.Text
+                            <small>&mdash; @proposal.CreatedAt</small>
+                        </p>
+                    </li>
+                }
             }
         </ul>
     }
@@ -56,4 +81,13 @@
     {
         <h2>404 - Observation id does not exist</h2>
     }
+
+    <div style="display: flex; min-width: 100%;">
+        @if (Model.BackwardUrl is not null) {
+            <a href="@Model.BackwardUrl" style="justify-self: flex-start; width: 100%;">Previous Page</a>
+        }
+        @if (Model.ForwardUrl is not null) {
+            <a href="@Model.ForwardUrl" style="justify-self: flex-end; width: 100%; text-align: right;">Next Page</a>
+        }
+    </div>
 </div>

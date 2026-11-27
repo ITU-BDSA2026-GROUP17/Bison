@@ -130,12 +130,12 @@ public partial class PublicModel(
         var taxon = await _taxonService.GetTaxonById(Input.TaxonId);
         if (taxon is null)
         {
-            LogInvalidTaxon(_logger, Input.TaxonId);
+            BisonLogger.LogInvalidTaxon(_logger, Input.TaxonId);
             ModelState.AddModelError("Input.TaxonId", "Invalid taxonomy chosen, please choose another.");
             return await OnGet(page, taxonId ?? "");
         }
 
-        LogIsValidModel(_logger);
+        BisonLogger.LogIsValidModel(_logger);
 
         string? picturePath = null;
 
@@ -178,12 +178,6 @@ public partial class PublicModel(
     [LoggerMessage(Level = LogLevel.Trace, Message = "Failed to get observations filtered by taxon, defaulting to getting all observations on page {page}")]
     public static partial void LogGetWithoutTaxonId(ILogger logger, int page);
 
-    [LoggerMessage(Level = LogLevel.Trace, Message = "Invalid taxon id '{taxon}' is given, returning page")]
-    public static partial void LogInvalidTaxon(ILogger logger, string taxon);
-
     [LoggerMessage(Level = LogLevel.Trace, Message = "Created observation with id {obsId}")]
     public static partial void LogCreatedObservation(ILogger logger, int obsId);
-
-    [LoggerMessage(Level = LogLevel.Trace, Message = "Input model is valid")]
-    public static partial void LogIsValidModel(ILogger logger);
 }

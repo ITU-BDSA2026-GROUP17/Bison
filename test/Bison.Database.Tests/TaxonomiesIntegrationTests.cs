@@ -1,3 +1,5 @@
+using Bison.Database.Services;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace Bison.Database.Tests;
@@ -10,7 +12,7 @@ public class TaxonomiesIntegrationTest
         // Arrange
         using var dbOptions = new DbOptions();
         dbOptions.SeedTaxonsOnly();
-        var db = dbOptions.BisonDbContext;
+        var db = new TaxonService(new DatabaseRepository(dbOptions.BisonDbContext));
         var idList = new (string, string)[]
         {
             ("MSTSNM:Arter:c18811f4-f785-ea11-aa77-501ac539d1ea", "Sølvhejre"),
@@ -24,16 +26,16 @@ public class TaxonomiesIntegrationTest
         {
             // Act
             Console.WriteLine(item.ToString());
-            var taxon = await db.Taxons.Where(t => t.DWC_TaxonId == item.Item1).FirstAsync();
+            var taxon = await db.GetTaxonById(item.Item1);
             // Assert
             taxon.Should().NotBeNull();
             taxon.VernacularName.Should().Be(item.Item2);
 
             // Act
-            var taxon2 = await db.Taxons.Where(t => t.VernacularName == item.Item2).FirstAsync();
+            var taxon2 = await db.GetTaxonByVernacularName(item.Item2);
             // Assert
             taxon2.Should().NotBeNull();
-            taxon2.DWC_TaxonId.Should().Be(item.Item1);
+            taxon2.DwCId.Should().Be(item.Item1);
         }
     }
 
@@ -43,7 +45,7 @@ public class TaxonomiesIntegrationTest
         // Arrange
         using var dbOptions = new DbOptions();
         dbOptions.SeedTaxonsOnly();
-        var db = dbOptions.BisonDbContext;
+        var db = new TaxonService(new DatabaseRepository(dbOptions.BisonDbContext));
         var list = new string[]
         {
             "thisisnotreal",
@@ -59,9 +61,11 @@ public class TaxonomiesIntegrationTest
         {
             // Act
             Console.WriteLine(str);
-            var taxon = await db.Taxons.Where(t => t.DWC_TaxonId == str).FirstOrDefaultAsync();
+            var taxon1 = await db.GetTaxonById(str);
+            var taxon2 = await db.GetTaxonByVernacularName(str);
             // Assert
-            taxon.Should().BeNull();
+            taxon1.Should().BeNull();
+            taxon2.Should().BeNull();
         }
     }
 
@@ -71,7 +75,7 @@ public class TaxonomiesIntegrationTest
         // Arrange
         using var dbOptions = new DbOptions();
         dbOptions.SeedTaxonsOnly();
-        var db = dbOptions.BisonDbContext;
+        var db = new TaxonService(new DatabaseRepository(dbOptions.BisonDbContext));
         var idList = new (string, string)[]
         {
             ("MSTSNM:Arter:c18811f4-f785-ea11-aa77-501ac539d1ea", "MSTSNM:Arter:7f9ef9f3-f785-ea11-aa77-501ac539d1ea"),
@@ -84,18 +88,18 @@ public class TaxonomiesIntegrationTest
         {
             // Act
             Console.WriteLine(item.ToString());
-            var taxon = await db.Taxons.Where(t => t.DWC_TaxonId == item.Item1).FirstAsync();
+            var taxon = await db.GetTaxonById(item.Item1);
             // Assert
             taxon.Should().NotBeNull();
-            taxon.Parent.Should().NotBeNull();
-            taxon.Parent.DWC_TaxonId.Should().Be(item.Item2);
+            taxon.ParentId.Should().NotBeNull();
+            taxon.ParentId.Should().Be(item.Item2);
         }
 
         // Act
-        var aarefodede = await db.Taxons.Where(t => t.DWC_TaxonId == "MSTSNM:Arter:3e4e67e4-f785-ea11-aa77-501ac539d1ea").FirstAsync();
+        var aarefodede = await db.GetTaxonById("MSTSNM:Arter:3e4e67e4-f785-ea11-aa77-501ac539d1ea");
         // Assert
         aarefodede.Should().NotBeNull();
-        aarefodede.Parent.Should().BeNull();
+        aarefodede.ParentId.Should().BeNull();
     }
 
     [Fact]
@@ -104,7 +108,7 @@ public class TaxonomiesIntegrationTest
         // Arrange
         using var dbOptions = new DbOptions();
         dbOptions.SeedTaxonsOnly();
-        var db = dbOptions.BisonDbContext;
+        var db = new TaxonService(new DatabaseRepository(dbOptions.BisonDbContext));
         var list = new (string, int)[]
         {
             ("MSTSNM:Arter:3e4e67e4-f785-ea11-aa77-501ac539d1ea", 6),
@@ -116,7 +120,7 @@ public class TaxonomiesIntegrationTest
         foreach (var parent in list)
         {
             // Act
-            var taxon = await db.Taxons.Where(t => t.DWC_TaxonId == parent.Item1).FirstAsync();
+            var taxon = await db.ToTaxonAsync(await db.GetTaxonById(parent.Item1));
             // Assert
             taxon.Should().NotBeNull();
             taxon.Children.Count.Should().Be(parent.Item2);

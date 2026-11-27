@@ -97,12 +97,12 @@ public class ObservationServiceIntegrationTests
         //Assert
         obs.Author.Id.Should().Be(user.Id);
         obs.Description.Should().Be(description.Item);
-        obs.TaxonName.Should().Be(taxon.VernacularName);
+        obs.Taxon.VernacularName.Should().Be(taxon.VernacularName);
 
         idObs.Id.Should().Be(obs.Id);
         idObs.Author.Id.Should().Be(user.Id);
         idObs.Description.Should().Be(description.Item);
-        idObs.TaxonName.Should().Be(taxon.VernacularName);
+        idObs.Taxon.VernacularName.Should().Be(taxon.VernacularName);
     }
     [Fact]
     public static async Task PaginationWorksTest()
