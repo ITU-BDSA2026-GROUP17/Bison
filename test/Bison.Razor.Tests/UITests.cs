@@ -1,3 +1,6 @@
+using Deque.AxeCore.Commons;
+using Deque.AxeCore.Playwright;
+
 namespace Bison.Razor.Tests;
 
 [TestFixture]
@@ -87,5 +90,17 @@ public partial class UITests : PageTest
         await Expect(Page.Locator("#messagelist li p strong a")
             .Filter(new() { HasNotText = "Roger Histand" }))
             .ToHaveCountAsync(0);
+    }
+
+    [TestCase("/")]
+    [TestCase("/ob/3")]
+    [TestCase("/obs/RogerHistand")]
+    [Test]
+    public async Task AxeCheckPageIsClean(string page)
+    {
+        await Page!.GotoAsync(page);
+
+        AxeResult axeResults = await Page!.RunAxe();
+        Assert.That(axeResults.Violations, Is.Null.Or.Empty);
     }
 }
