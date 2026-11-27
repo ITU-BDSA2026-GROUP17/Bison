@@ -73,13 +73,17 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
             .FirstOrDefaultAsync() is Observation obs ? obs : null;
     }
 
-    public async Task EditObservation(int obsId, Taxon? newTaxon = null, string? newText = null, string? newPicturePath = null)
+    public async Task EditObservation(int obsId, string? newTaxonId = null, string? newText = null, string? newPicturePath = null)
     {
         var obs = await GetObservation(obsId) ?? throw new ObservationDoesNotExistException(obsId); ; // observation does not exist
 
-        if (newTaxon != null)
+        if (newTaxonId != null)
         {
-            obs.Taxon = newTaxon;
+            var newTaxon = await GetTaxonByDWCId(newTaxonId);
+            if (newTaxon != null)
+            {
+                obs.Taxon = newTaxon;
+            }
         }
         if (newText != null)
         {
@@ -198,6 +202,16 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
         await _dbContext.SaveChangesAsync();
         return (Comment)res.Entity;
     }
+    public async Task EditComment(int commentId, string? newText = null)
+    {
+        var com = (Comment?)await GetPost(commentId) ?? throw new PostDoesNotExistException(commentId);
+
+        if (newText != null)
+        {
+            com.Text = newText;
+        }
+        await _dbContext.SaveChangesAsync();
+    }
 
     public async Task<List<Proposal>> GetProposalsForObservation(int observationId, int? limit = null, int? skip = null)
     {
@@ -238,5 +252,23 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
         });
         await _dbContext.SaveChangesAsync();
         return (Proposal)res.Entity;
+    }
+    public async Task EditProposal(int proposalId, string? newTaxonId = null, string? newText = null)
+    {
+        var ppl = (Proposal?)await GetPost(proposalId) ?? throw new PostDoesNotExistException(proposalId);
+
+        if (newTaxonId != null)
+        {
+            var newTaxon = await GetTaxonByDWCId(newTaxonId);
+            if (newTaxon != null)
+            {
+                ppl.Taxon = newTaxon;
+            }
+        }
+        if (newText != null)
+        {
+            ppl.Text = newText;
+        }
+        await _dbContext.SaveChangesAsync();
     }
 }

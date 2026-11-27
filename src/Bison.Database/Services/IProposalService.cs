@@ -6,6 +6,7 @@ public interface IProposalService
 {
     public Task<List<ProposalDTO>> GetProposalsByObservationIdAsync(int observationId, int? limit = null, int? skip = null);
     public Task<ProposalDTO> CreateProposalAsync(string authorId, int observationId, string taxonId, string text);
+    public Task EditProposalAsync(int proposalId, string? newTaxonId = null, string? newText = null);
 
     public static ProposalDTO ToProposalDTO(Proposal proposal)
     {

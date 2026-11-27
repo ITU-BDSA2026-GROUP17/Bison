@@ -9,7 +9,7 @@ public interface IObservationService
     public Task<List<ObservationDTO>> GetObservationsByTaxonAsync(string taxonId, int? limit = null, int? skip = null);
     public Task<List<ObservationDTO>> GetObservationsAsync(int? limit = null, int? skip = null);
     public Task<ObservationDTO> CreateObservationAsync(string userId, string taxonId, string description, string? picturePath = null);
-    public Task<ObservationDTO?> EditObservationAsync(string userId, int obsId, string? newTaxonId = null, string? newDescription = null, string? newPicturePath = null);
+    public Task<ObservationDTO?> EditObservationAsync(int obsId, string? newTaxonId = null, string? newDescription = null, string? newPicturePath = null);
     public Task<List<SubPostDTO>> GetSubPostsAsync(int id, int? limit = null, int? skip = null);
 
     public static ObservationDTO ToObservationDTO(Observation observation)

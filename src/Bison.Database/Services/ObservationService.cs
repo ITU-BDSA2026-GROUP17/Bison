@@ -40,42 +40,9 @@ public class ObservationService(IDatabaseRepository databaseRepository) : IObser
         var obs = await _repository.CreateObservation(userId, taxonId, description, picturePath);
         return IObservationService.ToObservationDTO(obs);
     }
-    public async Task<ObservationDTO?> EditObservationAsync(string userId, int obsId, string? newTaxonId = null, string? newDescription = null, string? newPicturePath = null)
+    public async Task<ObservationDTO?> EditObservationAsync(int obsId, string? newTaxonId = null, string? newDescription = null, string? newPicturePath = null)
     {
-        //check userId is a valid user
-        var author = await _repository.GetUserById(userId);
-        if (author == null)
-        {
-            return null;
-        }
-
-        // make sure observation exists
-        var obs = await _repository.GetObservation(obsId);
-        if (obs == null)
-        {
-            return null;
-        }
-
-        //check user is owner of observation
-        if (obs.Author.Id != userId)
-        {
-            return null;
-        }
-
-        //set up Taxon
-        Taxon? newTaxon = null;
-
-        if (newTaxonId != null)
-        {
-            newTaxon = await _repository.GetTaxonByDWCId(newTaxonId);
-            if (newTaxon == null)
-            {
-                // uh fuck um thats bad :3
-                return null;
-            }
-        }
-
-        await _repository.EditObservation(obsId, newTaxon, newDescription, newPicturePath);
+        await _repository.EditObservation(obsId, newTaxonId, newDescription, newPicturePath);
         return await GetObservationByIdAsync(obsId);
     }
 
