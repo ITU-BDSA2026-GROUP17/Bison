@@ -20,7 +20,7 @@
             <li>
                 <p>
                     <strong>
-                        <a href="/@Model.Observation.Author.Username">@Model.Observation.Author.Name</a>
+                        <a href="/obs/@Model.Observation.Author.Username">@Model.Observation.Author.Name</a>
                     </strong>
                     @Model.Observation.Description
                     <small>&mdash; (@(Model.Observation.Taxon.VernacularName is not null ? Model.Observation.Taxon.VernacularName : Model.Observation.Taxon.DwCId)) @Model.Observation.CreatedAt</small>
@@ -54,7 +54,7 @@
                     <li>
                         <p>
                             <strong>
-                                <a href="/@comment.Author.Username">@comment.Author.Name</a>
+                                <a href="/obs/@comment.Author.Username">@comment.Author.Name</a>
                             </strong>
                             @comment.Comment
                             <small>&mdash; @comment.CreatedAt</small>
@@ -65,7 +65,7 @@
                     <li>
                         <p>
                             <strong>
-                                <a href="/@proposal.Author.Username">@proposal.Author.Name</a>
+                                <a href="/obs/@proposal.Author.Username">@proposal.Author.Name</a>
                             </strong>
                             PROPOSES: "@(proposal.Taxon.VernacularName is not null ? proposal.Taxon.VernacularName : proposal.Taxon.DwCId)"
                             <br>

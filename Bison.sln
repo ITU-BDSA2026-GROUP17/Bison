@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bison.Razor", "src\Bison.Ra
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bison.Verified", "src\Bison.Verified\Bison.Verified.csproj", "{F47CF810-6083-4774-8D7C-7A8ED595EC69}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bison.Razor.Tests", "test\Bison.Razor.Tests\Bison.Razor.Tests.csproj", "{C6F43ACB-FF12-435D-8456-CF251CA04EBC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{F47CF810-6083-4774-8D7C-7A8ED595EC69}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F47CF810-6083-4774-8D7C-7A8ED595EC69}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F47CF810-6083-4774-8D7C-7A8ED595EC69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6F43ACB-FF12-435D-8456-CF251CA04EBC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6F43ACB-FF12-435D-8456-CF251CA04EBC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6F43ACB-FF12-435D-8456-CF251CA04EBC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6F43ACB-FF12-435D-8456-CF251CA04EBC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,5 +59,6 @@ Global
 		{CB89B4DE-DE26-4845-B871-81EEC30F4B11} = {BD550F16-6450-4819-9363-55CB65A3F982}
 		{DC618774-B657-4393-9680-79E8306CC2F3} = {BD550F16-6450-4819-9363-55CB65A3F982}
 		{F47CF810-6083-4774-8D7C-7A8ED595EC69} = {BD550F16-6450-4819-9363-55CB65A3F982}
+		{C6F43ACB-FF12-435D-8456-CF251CA04EBC} = {5506CDEA-2B69-49CF-90C1-ADD84A9A4511}
 	EndGlobalSection
 EndGlobal
