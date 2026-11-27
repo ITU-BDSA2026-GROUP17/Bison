@@ -220,7 +220,7 @@ public class ObservationServiceIntegrationTests
         var oldId = obs.Id;
 
         //Act
-        var editedObs = await db.EditObservationAsync(obs.Author.Id, obs.Id, null, newDescription.Item);
+        var editedObs = await db.EditObservationAsync(obs.Id, null, newDescription.Item);
 
         //Assert
         editedObs.Author.Should().Be(oldAuthor);
@@ -249,7 +249,7 @@ public class ObservationServiceIntegrationTests
         var oldId = obs.Id;
 
         //Act
-        var editedObs = await db.EditObservationAsync(obs.Author.Id, obs.Id, newTaxon.DWC_TaxonId);
+        var editedObs = await db.EditObservationAsync(obs.Id, newTaxon.DWC_TaxonId);
 
         //Assert
         editedObs.Author.Should().Be(oldAuthor);
