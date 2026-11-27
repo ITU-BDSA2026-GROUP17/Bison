@@ -40,8 +40,30 @@ public class ObservationService(IDatabaseRepository databaseRepository) : IObser
         var obs = await _repository.CreateObservation(userId, taxonId, description, picturePath);
         return IObservationService.ToObservationDTO(obs);
     }
+    public async Task<List<SubPostDTO>> GetSubPostsAsync(int id, int? limit = null, int? skip = null)
+    {
+        var obs = await _repository.GetSubpostsForObservation(id, limit, skip);
+        return [.. obs.Select(IObservationService.ToPostDTO)];
+    }
+
     public async Task<Observation?> ToObservationAsync(ObservationDTO observationDTO)
     {
         return await _repository.GetObservation(observationDTO.Id);
+    }
+    public async Task<Post?> ToPostAsync(SubPostDTO subPostDTO)
+    {
+        if (subPostDTO.CommentDTO is not null == subPostDTO.ProposalDTO is not null)
+        {
+            throw new ArgumentException("SubPostDTO contains either both or none of comment or proposal DTOs");
+        }
+        if (subPostDTO.CommentDTO is CommentDTO commentDTO)
+        {
+            return await new CommentService(_repository).ToCommentAsync(commentDTO);
+        }
+        else if (subPostDTO.ProposalDTO is ProposalDTO proposalDTO)
+        {
+            return await new ProposalService(_repository).ToProposalAsync(proposalDTO);
+        }
+        throw new ArgumentException("SubPostDTO contains neither comment nor proposal DTOs");
     }
 }
