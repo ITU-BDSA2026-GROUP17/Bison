@@ -101,32 +101,17 @@ public partial class EditPostModel(
     {
         BisonLogger.LogRequestWithParams(_logger, "POST", "EditPost", [page, Input.Text, Input.TaxonId]);
 
-        var userId = _userManager.GetUserId(User);
-        if (!_signInManager.IsSignedIn(User) || userId is null)
-            return Forbid();
-
         var post = (await _postService.GetPostAsync(id))!;
-
-        if (post is null || post.Author.Username != User.Identity?.Name) return Redirect("/");
+        var userId = _userManager.GetUserId(User);
+        if (!_signInManager.IsSignedIn(User) || userId is null || post is null || post.Author.Id != userId)
+            return Redirect("/");
 
         if (!ModelState.IsValid)
             return await OnGet(id);
 
         BisonLogger.LogIsValidModel(_logger);
 
-        if (post.Observation is not null)
-        {
-            await _observationService.EditObservationAsync(id, Input.TaxonId, Input.Text);
-        }
-        if (post.Comment is not null)
-        {
-            await _commentService.EditCommentAsync(id, Input.Text);
-        }
-        if (post.Proposal is not null)
-        {
-            await _proposalService.EditProposalAsync(id, Input.TaxonId, Input.Text);
-        }
-
+        await UpdatePost(id, post);
         LogEditedPost(_logger, post.Type, id);
 
         Input = new();
@@ -134,6 +119,22 @@ public partial class EditPostModel(
 
         BisonLogger.ReturningPage(_logger);
         return Redirect(returnUrl);
+    }
+
+    private async Task UpdatePost(int obsId, PostDTO post)
+    {
+        if (post.Observation is not null)
+        {
+            await _observationService.EditObservationAsync(obsId, Input.TaxonId, Input.Text);
+        }
+        if (post.Comment is not null)
+        {
+            await _commentService.EditCommentAsync(obsId, Input.Text);
+        }
+        if (post.Proposal is not null)
+        {
+            await _proposalService.EditProposalAsync(obsId, Input.TaxonId, Input.Text);
+        }
     }
 
     [LoggerMessage(Level = LogLevel.Trace, Message = "Edited {type} with id {id}")]
