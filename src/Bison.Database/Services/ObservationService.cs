@@ -43,8 +43,8 @@ public class ObservationService(IDatabaseRepository databaseRepository) : IObser
     public async Task<ObservationDTO?> EditObservationAsync(string userId, int obsId, string? newTaxonId = null, string? newDescription = null, string? newPicturePath = null)
     {
         //check userId is a valid user
-        var auth = await _repository.GetUserById(userId);
-        if (auth == null)
+        var author = await _repository.GetUserById(userId);
+        if (author == null)
         {
             return null;
         }
@@ -70,12 +70,12 @@ public class ObservationService(IDatabaseRepository databaseRepository) : IObser
             newTaxon = await _repository.GetTaxonByDWCId(newTaxonId);
             if (newTaxon == null)
             {
-                // uh fuck um thats bad
+                // uh fuck um thats bad :3
                 return null;
             }
         }
 
-        _repository.EditObservation(obsId, newTaxon, newDescription, newPicturePath);
+        await _repository.EditObservation(obsId, newTaxon, newDescription, newPicturePath);
         return await GetObservationByIdAsync(obsId);
     }
 

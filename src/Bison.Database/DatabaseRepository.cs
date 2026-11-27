@@ -64,7 +64,7 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
             .FirstOrDefaultAsync() is Observation obs ? obs : null;
     }
 
-    public async void EditObservation(int obsId, Taxon? newTaxon = null, string? newText = null, string? newPicturePath = null)
+    public async Task EditObservation(int obsId, Taxon? newTaxon = null, string? newText = null, string? newPicturePath = null)
     {
         var obs = await GetObservation(obsId) ?? throw new ObservationDoesNotExistException(obsId); ; // observation does not exist
 
@@ -77,8 +77,7 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
             obs.Text = newText;
         }
         obs.PicturePath = newPicturePath; //picture path is allowed to be null
-        _dbContext.SaveChanges();
-        ;
+        await _dbContext.SaveChangesAsync();
     }
     public async Task<List<Observation>> GetObservations(int? limit = null, int? skip = null)
     {
