@@ -25,7 +25,7 @@ public partial class UserTimelineModel(IObservationService service, IUserService
 
         if (page > 1)
         {
-            BackwardUrl = $"/?page={page - 1}";
+            BackwardUrl = $"/obs/{author}?page={page - 1}";
         }
 
         LogGetNormalizedPage(_logger, page);
@@ -42,7 +42,7 @@ public partial class UserTimelineModel(IObservationService service, IUserService
 
         if (Observations?.Count == PublicModel.PAGE_SIZE)
         {
-            ForwardUrl = $"/?page={page + 1}";
+            ForwardUrl = $"/obs/{author}?page={page + 1}";
         }
 
         BisonLogger.ReturningPage(_logger);
