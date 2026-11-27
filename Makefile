@@ -32,7 +32,7 @@ dafny:
 
 coverage-report: $(wildcard test/**/coverage.cobertura.xml)
 	@dotnet tool restore
-	dotnet reportgenerator -reports:"test/**/coverage.cobertura.xml" -targetdir:"coveragereport" -reporttypes:Html
+	dotnet reportgenerator -reports:"test/**/coverage.cobertura.xml" -targetdir:"coverage-report" -reporttypes:Html
 
 build: $(foreach platform,$(PLATFORMS),${BASE_PATH}bin/Release/*/$(platform)/publish/$(BUILD_PROJECT)$(call get_ext,$(platform)))
 

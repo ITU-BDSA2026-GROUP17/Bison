@@ -15,6 +15,10 @@ public class TaxonService(IDatabaseRepository databaseRepository) : ITaxonServic
 
     public async Task<TaxonDTO?> GetTaxonByVernacularName(string vernacularName)
     {
+        if (vernacularName is null)
+        {
+            return null; // there are multiple, and therefore we will not return any
+        }
         var taxon = await _repository.GetTaxonByVernacularName(vernacularName);
         return taxon is not null ? ITaxonService.ToTaxonDTO(taxon) : null;
     }
