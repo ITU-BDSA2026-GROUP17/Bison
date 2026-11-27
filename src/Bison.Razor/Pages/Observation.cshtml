@@ -23,12 +23,15 @@
                         <a href="/@Model.Observation.Author.Username">@Model.Observation.Author.Name</a>
                     </strong>
                     @Model.Observation.Description
-                    <small>&mdash; (@(Model.Observation.Taxon.VernacularName is not null ? Model.Observation.Taxon.VernacularName : Model.Observation.Taxon.DwCId)) @Model.Observation.CreatedAt</small>    
+                    <small>&mdash; (@(Model.Observation.Taxon.VernacularName is not null ? Model.Observation.Taxon.VernacularName : Model.Observation.Taxon.DwCId)) @Model.Observation.CreatedAt</small>
                     @if (Model.Observation.Author.Username == User.Identity?.Name)
                     {
-                        <form method="get">
-                            <button type="submit" asp-page="./Public">Edit</button>
-                        </form>
+                        <a
+                            style="color:black;"
+                            href="/post/@(Model.Observation.Id)/edit?returnUrl=%2Fob%2F@(Model.Observation.Id)"
+                        >
+                            <button>Edit</button>
+                        </a>
                     }
                 </p>
             </li>
@@ -64,6 +67,15 @@
                             </strong>
                             @comment.Comment
                             <small>&mdash; @comment.CreatedAt</small>
+                            @if (comment.Author.Username == User.Identity?.Name)
+                            {
+                                <a
+                                    style="color:black;"
+                                    href="/post/@(comment.Id)/edit?returnUrl=%2Fob%2F@(Model.Observation.Id)"
+                                >
+                                    <button>Edit</button>
+                                </a>
+                            }
                         </p>
                     </li>
                 } else if(subpost.ProposalDTO is ProposalDTO proposal)
@@ -77,6 +89,15 @@
                             <br>
                             @proposal.Text
                             <small>&mdash; @proposal.CreatedAt</small>
+                            @if (proposal.Author.Username == User.Identity?.Name)
+                            {
+                                <a
+                                    style="color:black;"
+                                    href="/post/@(proposal.Id)/edit?returnUrl=%2Fob%2F@(Model.Observation.Id)"
+                                >
+                                    <button>Edit</button>
+                                </a>
+                            }
                         </p>
                     </li>
                 }

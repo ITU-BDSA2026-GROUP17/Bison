@@ -153,7 +153,7 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
                 (p is Comment && ((Comment)p).Observation.Id == observationId) ||
                 (p is Proposal && ((Proposal)p).Observation.Id == observationId)
             )
-            .OrderByDescending(p => p.Id);
+            .OrderBy(p => p.Id);
         if (skip is int skipAmount)
         {
             query = query.Skip(skipAmount);

@@ -109,7 +109,7 @@ public partial class ObservationModel(
             // valid taxon => create proposal
             var ppl = await _proposalService.CreateProposalAsync(userId, id, taxon.DwCId, Input.Text);
 
-            LogCreatedComment(_logger, ppl.Id);
+            LogCreatedProposal(_logger, ppl.Id);
         }
         else
         {
@@ -126,6 +126,9 @@ public partial class ObservationModel(
         return await OnGet(id, 0);
     }
 
-    [LoggerMessage(Level = LogLevel.Trace, Message = "Created comment with id {obsId}")]
-    public static partial void LogCreatedComment(ILogger logger, int obsId);
+    [LoggerMessage(Level = LogLevel.Trace, Message = "Created proposal with id {id}")]
+    public static partial void LogCreatedProposal(ILogger logger, int id);
+
+    [LoggerMessage(Level = LogLevel.Trace, Message = "Created comment with id {id}")]
+    public static partial void LogCreatedComment(ILogger logger, int id);
 }

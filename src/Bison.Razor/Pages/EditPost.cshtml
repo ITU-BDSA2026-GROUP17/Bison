@@ -1,0 +1,31 @@
+@page "/post/{id}/edit"
+@using Bison.Database.Services
+@using Bison.Models
+@model Bison.Razor.Pages.EditPostModel
+@inject SignInManager<User> signInManager
+@inject UserManager<User> userManager
+@{
+    ViewData["Title"] = "Edit Post";
+}
+
+<div>
+    <h2> Editing @Model.Post.Type @Model.Post.Id </h2>
+    <div class="observationbox">
+        @using (Html.BeginForm(FormMethod.Post, new { enctype="multipart/form-data"})) {
+            <div class="form-floating mb-3">
+                @Html.TextBoxFor(model => model.Input.Text)
+                @Html.ValidationMessageFor(model => model.Input.Text)
+            </div>
+            @if(Model.Post.Comment is null)
+            {
+                <div class="form-floating mb-3">
+                   	@Html.DropDownListFor(model => model.Input.TaxonId, Model.Taxons, "Select a Taxonomy", "")
+                   	@Html.ValidationMessageFor(model => model.Input.TaxonId)
+                </div>
+            }
+            <div>
+                <button id="edit-post-submit" type="submit">Confirm</button>
+            </div>
+        }
+    </div>
+</div>
