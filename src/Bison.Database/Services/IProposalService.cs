@@ -14,7 +14,7 @@ public interface IProposalService
             proposal.CreatedAt.ToString(IDatabaseRepository.DATE_FORMAT),
             proposal.Observation.Id,
             IUserService.ToUserDTO(proposal.Author),
-            proposal.Taxon.VernacularName,
+            ITaxonService.ToTaxonDTO(proposal.Taxon),
             proposal.Text
         );
     }
@@ -22,4 +22,4 @@ public interface IProposalService
     public Task<Proposal?> ToProposalAsync(ProposalDTO proposalDTO);
 }
 
-public record ProposalDTO(int Id, string CreatedAt, int ObservationId, UserDTO Author, string? TaxonName, string Text);
+public record ProposalDTO(int Id, string CreatedAt, int ObservationId, UserDTO Author, TaxonDTO Taxon, string Text);

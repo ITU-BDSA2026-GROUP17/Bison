@@ -19,7 +19,7 @@
                         <a href="/@Model.Observation.Author.Username">@Model.Observation.Author.Name</a>
                     </strong>
                     @Model.Observation.Description
-                    <small>&mdash; @Model.Observation.CreatedAt</small>
+                    <small>&mdash; (@(Model.Observation.Taxon.VernacularName is not null ? Model.Observation.Taxon.VernacularName : Model.Observation.Taxon.DwCId)) @Model.Observation.CreatedAt</small>
                 </p>
             </li>
         </ul>
@@ -45,7 +45,7 @@
                         <strong>
                             <a href="/@proposal.Author.Username">@proposal.Author.Name</a>
                         </strong>
-                        @proposal.TaxonName
+                        @proposal.Taxon.VernacularName
                         <small>&mdash; @proposal.CreatedAt</small>
                     </p>
                 </li>
