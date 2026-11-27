@@ -31,7 +31,6 @@ public class ServerProcess
 
             return info;
         }
-
     }
 
     private string? _dbFilePath;
