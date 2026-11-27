@@ -37,13 +37,9 @@ jobs:
             - name: Build Dafny
               run: make dafny
 
-            - name: Build
-              run: dotnet build --no-restore
-
             - name: Publish and Zip
               run: |
-                  make all
-                  make zip
+                  make ci
               env:
                   BISON_VERSION: ${{ github.ref_name }}
 
