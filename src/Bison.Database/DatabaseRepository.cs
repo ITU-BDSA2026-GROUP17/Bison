@@ -63,6 +63,23 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
             .Where(p => p.Id == id)
             .FirstOrDefaultAsync() is Observation obs ? obs : null;
     }
+
+    public async void EditObservation(int obsId, Taxon? newTaxon = null, string? newText = null, string? newPicturePath = null)
+    {
+        var obs = await GetObservation(obsId) ?? throw new ObservationDoesNotExistException(obsId); ; // observation does not exist
+
+        if (newTaxon != null)
+        {
+            obs.Taxon = newTaxon;
+        }
+        if (newText != null)
+        {
+            obs.Text = newText;
+        }
+        obs.PicturePath = newPicturePath; //picture path is allowed to be null
+        _dbContext.SaveChanges();
+        ;
+    }
     public async Task<List<Observation>> GetObservations(int? limit = null, int? skip = null)
     {
         IQueryable<Observation> query = _dbContext.Posts

@@ -22,6 +22,7 @@ public interface IDatabaseRepository
     public Task<List<Observation>> GetObservations(int? limit = null, int? skip = null);
     public Task<List<Observation>> GetObservationsByUser(string userId, int? limit = null, int? skip = null);
     public Task<Observation> CreateObservation(string userId, string taxonId, string observation, string? picturePath = null);
+    public void EditObservation(int obsId, Taxon? newTaxon = null, string? newText = null, string? newPicturePath = null);
 
     public Task<List<Post>> GetSubpostsForObservation(int id, int? limit = null, int? skip = null);
 
