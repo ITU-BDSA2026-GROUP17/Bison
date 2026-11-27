@@ -62,5 +62,11 @@ jobs:
             - name: Build
               run: dotnet build --no-restore
 
+            - name: Ensure browsers are installed
+              run: pwsh test/Bison.Razor.Tests/bin/Debug/net8.0/playwright.ps1 install --with-deps
+
             - name: Test
               run: dotnet test --no-build --verbosity normal
+              env:
+                  authentication__github__clientId: ${{ secrets.AUTHENTICATION__GITHUB__CLIENTID }}
+                  authentication__github__clientSecret: ${{ secrets.AUTHENTICATION__GITHUB__CLIENTSECRET }}
