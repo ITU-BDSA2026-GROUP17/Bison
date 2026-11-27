@@ -23,7 +23,11 @@
                         <a href="/@Model.Observation.Author.Username">@Model.Observation.Author.Name</a>
                     </strong>
                     @Model.Observation.Description
-                    <small>&mdash; (@(Model.Observation.Taxon.VernacularName is not null ? Model.Observation.Taxon.VernacularName : Model.Observation.Taxon.DwCId)) @Model.Observation.CreatedAt</small>
+                    <small>&mdash; (@(Model.Observation.Taxon.VernacularName is not null ? Model.Observation.Taxon.VernacularName : Model.Observation.Taxon.DwCId)) @Model.Observation.CreatedAt</small>    
+                    @if (Model.Observation.Author.Username == User.Identity?.Name)
+                    {
+                        <button onclick="edit()">Edit</button>
+                    }
                 </p>
             </li>
         </ul>
