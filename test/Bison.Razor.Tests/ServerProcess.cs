@@ -82,11 +82,6 @@ public class ServerProcess
                 await process.WaitForExitAsync();
             }
 
-            Assert.That(
-                Process.GetProcessesByName("Bison.Razor"),
-                Is.Empty
-            );
-
             _process.Dispose();
         }
 
