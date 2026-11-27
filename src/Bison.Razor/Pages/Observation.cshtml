@@ -26,7 +26,9 @@
                     <small>&mdash; (@(Model.Observation.Taxon.VernacularName is not null ? Model.Observation.Taxon.VernacularName : Model.Observation.Taxon.DwCId)) @Model.Observation.CreatedAt</small>    
                     @if (Model.Observation.Author.Username == User.Identity?.Name)
                     {
-                        <button onclick="edit()">Edit</button>
+                        <form method="get">
+                            <button type="submit" asp-page="./Public">Edit</button>
+                        </form>
                     }
                 </p>
             </li>
