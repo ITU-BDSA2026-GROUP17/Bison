@@ -85,7 +85,11 @@ public class ServerProcess
             _process.Dispose();
         }
 
-        if (_dbFilePath is not null)
-            File.Delete(_dbFilePath);
+        try
+        {
+            if (_dbFilePath is not null)
+                File.Delete(_dbFilePath);
+        }
+        catch { }
     }
 }
