@@ -2,6 +2,7 @@ using Bison.Database;
 using Bison.Database.Services;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -88,6 +89,12 @@ if (!app.Environment.IsDevelopment())
 logger.LogTrace("Setting up HTTPS and static files");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(builder.Configuration["PictureBasePath"]!),
+    RequestPath = "/pictures"
+});
 
 logger.LogTrace("Setting up HTTP routing");
 app.UseRouting();

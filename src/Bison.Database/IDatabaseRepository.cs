@@ -21,7 +21,7 @@ public interface IDatabaseRepository
     public Task<Observation?> GetObservation(int id);
     public Task<List<Observation>> GetObservations(int? limit = null, int? skip = null);
     public Task<List<Observation>> GetObservationsByUser(string userId, int? limit = null, int? skip = null);
-    public Task<Observation> CreateObservation(string userId, string taxonId, string observation, string? picturePath);
+    public Task<Observation> CreateObservation(string userId, string taxonId, string observation, string? picturePath = null);
 
     public Task<List<Comment>> GetCommentsForObservation(int observationId, int? limit = null, int? skip = null);
     public Task<Comment> CreateComment(string authorId, int observationId, string comment);

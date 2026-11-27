@@ -25,6 +25,7 @@ public class ObservationModel(
     {
         BisonLogger.LogRequestWithParams(_logger, "GET", "Observation", [id]);
         Observation = await _observationService.GetObservationByIdAsync(id);
+
         Comments = await _commentService.GetCommentsByObservationIdAsync(id);
         Proposals = await _proposalService.GetProposalsByObservationIdAsync(id);
         BisonLogger.ReturningPage(_logger);
