@@ -67,3 +67,6 @@ jobs:
 
             - name: Test
               run: dotnet test --no-build --verbosity normal
+              env:
+                  authentication__github__clientId: ${{ secrets.AUTHENTICATION__GITHUB__CLIENTID }}
+                  authentication__github__clientSecret: ${{ secrets.AUTHENTICATION__GITHUB__CLIENTSECRET }}
