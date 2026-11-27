@@ -75,7 +75,7 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
 
     public async Task EditObservation(int obsId, string? newTaxonId = null, string? newText = null, string? newPicturePath = null)
     {
-        var obs = await GetObservation(obsId) ?? throw new ObservationDoesNotExistException(obsId); ; // observation does not exist
+        var obs = await GetObservation(obsId) ?? throw new ObservationDoesNotExistException(obsId); // observation does not exist
 
         if (newTaxonId != null)
         {
