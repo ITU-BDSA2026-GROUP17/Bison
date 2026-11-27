@@ -31,6 +31,9 @@ jobs:
 
             - name: Test
               run: dotnet test && make coverage-report
+              env:
+                  authentication__github__clientId: ${{ secrets.AUTHENTICATION__GITHUB__CLIENTID }}
+                  authentication__github__clientSecret: ${{ secrets.AUTHENTICATION__GITHUB__CLIENTSECRET }}
 
             - name: Zip results
               run: zip -j coverage-report.zip coverage-report/*
@@ -66,6 +69,9 @@ jobs:
 
             - name: Test
               run: dotnet tool run stryker
+              env:
+                  authentication__github__clientId: ${{ secrets.AUTHENTICATION__GITHUB__CLIENTID }}
+                  authentication__github__clientSecret: ${{ secrets.AUTHENTICATION__GITHUB__CLIENTSECRET }}
 
             - name: Save Stryker Result
               uses: actions/upload-artifact@v7
