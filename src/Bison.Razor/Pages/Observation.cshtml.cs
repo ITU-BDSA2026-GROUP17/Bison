@@ -81,7 +81,6 @@ public partial class ObservationModel(
             (page - 1) * PublicModel.PAGE_SIZE
         );
 
-
         if (Subposts.Count == PublicModel.PAGE_SIZE)
         {
             ForwardUrl = $"/?page={page + 1}";
@@ -126,7 +125,6 @@ public partial class ObservationModel(
         BisonLogger.ReturningPage(_logger);
         return await OnGet(id, 0);
     }
-
 
     [LoggerMessage(Level = LogLevel.Trace, Message = "Created comment with id {obsId}")]
     public static partial void LogCreatedComment(ILogger logger, int obsId);

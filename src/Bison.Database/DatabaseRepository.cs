@@ -121,8 +121,8 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
             .Include("Observation")
             .Include("Taxon")
             .Where(p =>
-                p is Comment && ((Comment)p).Observation.Id == observationId ||
-                p is Proposal && ((Proposal)p).Observation.Id == observationId
+                (p is Comment && ((Comment)p).Observation.Id == observationId) ||
+                (p is Proposal && ((Proposal)p).Observation.Id == observationId)
             )
             .OrderByDescending(p => p.Id);
         if (skip is int skipAmount)
