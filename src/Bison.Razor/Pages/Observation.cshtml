@@ -15,7 +15,7 @@
         <ul id="messagelist" class="observations">
             @if (Model.Observation.PicturePath is not null)
             {
-                <img src="@Url.Content("~/pictures/" + Model.Observation.PicturePath)" height=300>
+                <img src="@Url.Content("~/pictures/" + Model.Observation.PicturePath)" style="max-width:300px; max-height:300px; aspect-ratio:auto">
             }
             <li>
                 <p>
