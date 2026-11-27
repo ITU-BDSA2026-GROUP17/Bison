@@ -23,7 +23,7 @@ public class ObservationModel(
 
     public async Task<ActionResult> OnGet([FromRoute] int id)
     {
-        BisonLogger.LogRequestWithParams(_logger, "Observation", [id]);
+        BisonLogger.LogRequestWithParams(_logger, "GET", "Observation", [id]);
         Observation = await _observationService.GetObservationByIdAsync(id);
 
         Comments = await _commentService.GetCommentsByObservationIdAsync(id);

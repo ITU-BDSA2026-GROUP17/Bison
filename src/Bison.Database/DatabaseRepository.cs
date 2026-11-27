@@ -2,6 +2,7 @@ using Bison.Database.Exceptions;
 using Bison.Models;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Bison.Database;
 
@@ -27,6 +28,12 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
     {
         return await _dbContext.Taxons
             .Where(t => t.DWC_TaxonId == taxonId)
+            .FirstOrDefaultAsync();
+    }
+    public async Task<Taxon?> GetTaxonByVernacularName(string vernacularName)
+    {
+        return await _dbContext.Taxons
+            .Where(t => t.VernacularName == vernacularName)
             .FirstOrDefaultAsync();
     }
     public async Task<Taxon?> GetTaxonByNumericId(int taxonId)
