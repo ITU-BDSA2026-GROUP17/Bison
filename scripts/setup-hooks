@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+# make sure to run script from git root
+if [[ $PWD/ == *"scripts/" ]]; then
+    PWD=$(echo ${PWD%/*})
+fi
+
+if [ ! -d ".git/hooks" ]; then
+    echo ".git/hooks folder doesn't exist, creating..."
+	mkdir -p .git/hooks
+	echo "done"
+fi
+
+if [ -f ".git/hooks/pre-commit" ]; then
+    rm -rf .git/hooks/pre-commit
+fi
+
+touch .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+echo "#!/usr/bin/env sh" > .git/hooks/pre-commit
+
+echo "
+dotnet format
+git diff --name-only --cached --diff-filter=d | xargs -l git add
+" >> .git/hooks/pre-commit
