@@ -107,7 +107,7 @@ public class ProposalServiceIntegrationTests
 
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var user = await repo.CreateUser("testName", "test@example.com", "test");
-        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation");
+        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation", null);
         var db = new ProposalService(repo);
 
         if (await dbOptions.BisonDbContext.Taxons.Where(t => t.DWC_TaxonId == invalidTaxonId).FirstOrDefaultAsync() is not null)
@@ -135,7 +135,7 @@ public class ProposalServiceIntegrationTests
         var taxon = (await ProposalServiceIntegrationTests.TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var user = await repo.CreateUser("testName", "test@example.com", "test");
-        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation");
+        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation", null);
         var cmt = await repo.CreateComment(user.Id, obs.Id, comment.Item);
         var db = new ProposalService(repo);
 
@@ -162,7 +162,7 @@ public class ProposalServiceIntegrationTests
 
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var user = await repo.CreateUser("testName", "test@example.com", "test");
-        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation");
+        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation", null);
         var db = new ProposalService(repo);
         var userDB = new UserService(repo);
         var obsDB = new ObservationService(repo);
@@ -191,6 +191,120 @@ public class ProposalServiceIntegrationTests
         gottenPpl.Taxon.Id.Should().Be(taxon.Id);
         gottenPpl.Text.Should().Be(text.Item);
     }
+    [Property]
+    public static async Task EditTaxonValidProposalTest(NonWhiteSpaceString text)
+    {
+        //Arrange
+        using var dbOptions = new DbOptions();
+        dbOptions.SeedDatabase();
+        var taxonSamples = (await TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(2);
+        var taxon1 = taxonSamples[0];
+        var taxon2 = taxonSamples[1];
+        while (taxon1.DWC_TaxonId == taxon2.DWC_TaxonId) taxon2 = (await TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
+
+        var repo = new DatabaseRepository(dbOptions.BisonDbContext);
+        var user = await repo.CreateUser("testName", "test@example.com", "test");
+        var obs = await repo.CreateObservation(user.Id, taxon1.DWC_TaxonId, "TestLocation", null);
+        var db = new ProposalService(repo);
+        var userDB = new UserService(repo);
+        var obsDB = new ObservationService(repo);
+        var postDB = new PostService(repo);
+
+        //Act
+        var pplDTO = await db.CreateProposalAsync(user.Id, obs.Id, taxon1.DWC_TaxonId, text.Item);
+        await db.EditProposalAsync(
+            pplDTO.Id,
+            taxon2.DWC_TaxonId,
+            null
+        );
+        var finalDTO = (await postDB.GetPostAsync(pplDTO.Id)).Proposal!;
+
+        //Assert
+        pplDTO.Should().NotBeNull();
+        finalDTO.Should().NotBeNull();
+        finalDTO.Text.Should().Be(pplDTO.Text); // did not get edited
+        finalDTO.Taxon.DwCId.Should().NotBe(pplDTO.Taxon.DwCId);
+        finalDTO.Taxon.DwCId.Should().Be(taxon2.DWC_TaxonId);
+    }
+    [Property]
+    public static async Task EditTextValidProposalTest(NonWhiteSpaceString text)
+    {
+        //Arrange
+        using var dbOptions = new DbOptions();
+        dbOptions.SeedDatabase();
+        var taxon = (await TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
+        var repo = new DatabaseRepository(dbOptions.BisonDbContext);
+        var user = await repo.CreateUser("testName", "test@example.com", "test");
+        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation", null);
+        var db = new ProposalService(repo);
+        var userDB = new UserService(repo);
+        var obsDB = new ObservationService(repo);
+        var postDB = new PostService(repo);
+
+        //Act
+        var pplDTO = await db.CreateProposalAsync(user.Id, obs.Id, taxon.DWC_TaxonId, text.Item);
+        await db.EditProposalAsync(
+            pplDTO.Id,
+            null,
+            "woah! new text: " + text.Item.Length
+        );
+        var finalDTO = (await postDB.GetPostAsync(pplDTO.Id)).Proposal!;
+
+        //Assert
+        pplDTO.Should().NotBeNull();
+        finalDTO.Should().NotBeNull();
+        finalDTO.Text.Should().NotBe(pplDTO.Text);
+        finalDTO.Text.Should().Be("woah! new text: " + text.Item.Length);
+        finalDTO.Taxon.DwCId.Should().Be(pplDTO.Taxon.DwCId); // did not get edited
+    }
+    [Property]
+    public static async Task EditNonExistantProposalTest(NonWhiteSpaceString text, int postId)
+    {
+        //Arrange
+        using var dbOptions = new DbOptions();
+        var db = new ProposalService(new DatabaseRepository(dbOptions.BisonDbContext));
+
+        //Act
+        try
+        {
+            await db.EditProposalAsync(
+                postId,
+                null,
+                text.Item
+            );
+            //Assert
+            Assert.Fail("Should've thrown exception by now");
+        }
+        catch (PostDoesNotExistException e)
+        {
+            e.Message.Should().Be($"Post with ID {postId} does not exist");
+            e.PostId.Should().Be(postId);
+        }
+    }
+    [Property]
+    public static async Task EditInvalidProposalTest(NonWhiteSpaceString text)
+    {
+        //Arrange
+        using var dbOptions = new DbOptions();
+        var db = new ProposalService(new DatabaseRepository(dbOptions.BisonDbContext));
+
+        //Act
+        try
+        {
+            await db.EditProposalAsync(
+                13, // this is a commment => post does not exist exception
+                null,
+                text.Item
+            );
+            //Assert
+            Assert.Fail("Should've thrown exception by now");
+        }
+        catch (PostDoesNotExistException e)
+        {
+            e.Message.Should().Be("Post with ID 13 does not exist");
+            e.PostId.Should().Be(13);
+        }
+    }
     [Fact]
     public static async Task PaginationWorksTest()
     {
@@ -200,7 +314,7 @@ public class ProposalServiceIntegrationTests
         var taxonIds = (await TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(5);
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var user = await repo.CreateUser("testName", "test@example.com", "test");
-        var obs = await repo.CreateObservation(user.Id, taxonIds[0].DWC_TaxonId, "TestLocation");
+        var obs = await repo.CreateObservation(user.Id, taxonIds[0].DWC_TaxonId, "TestLocation", null);
         var db = new ProposalService(repo);
         List<ProposalDTO> list = [
             await db.CreateProposalAsync(user.Id, obs.Id, taxonIds[0].DWC_TaxonId, "prop1"),

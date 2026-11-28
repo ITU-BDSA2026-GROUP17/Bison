@@ -19,6 +19,11 @@ public class CommentService(IDatabaseRepository databaseRepository) : ICommentSe
         var cmt = await _repository.CreateComment(authorId, observationId, comment);
         return ICommentService.ToCommentDTO(cmt);
     }
+    public async Task EditCommentAsync(int commentId, string? newText = null)
+    {
+        await _repository.EditComment(commentId, newText);
+    }
+
     public async Task<Comment?> ToCommentAsync(CommentDTO commentDTO)
     {
         var comments = await _repository.GetCommentsForObservation(commentDTO.ObservationId);

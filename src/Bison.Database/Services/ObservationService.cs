@@ -34,14 +34,42 @@ public class ObservationService(IDatabaseRepository databaseRepository) : IObser
         var obs = await _repository.GetObservations(limit, skip);
         return [.. obs.Select(IObservationService.ToObservationDTO)];
     }
-    public async Task<ObservationDTO> CreateObservationAsync(string userId, string taxonId, string description)
+    public async Task<ObservationDTO> CreateObservationAsync(string userId, string taxonId, string description, string? picturePath = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(description);
-        var obs = await _repository.CreateObservation(userId, taxonId, description);
+        var obs = await _repository.CreateObservation(userId, taxonId, description, picturePath);
         return IObservationService.ToObservationDTO(obs);
     }
+    public async Task<ObservationDTO?> EditObservationAsync(int obsId, string? newTaxonId = null, string? newDescription = null, string? newPicturePath = null)
+    {
+        await _repository.EditObservation(obsId, newTaxonId, newDescription, newPicturePath);
+        return await GetObservationByIdAsync(obsId);
+    }
+
+    public async Task<List<SubPostDTO>> GetSubPostsAsync(int id, int? limit = null, int? skip = null)
+    {
+        var obs = await _repository.GetSubpostsForObservation(id, limit, skip);
+        return [.. obs.Select(IObservationService.ToPostDTO)];
+    }
+
     public async Task<Observation?> ToObservationAsync(ObservationDTO observationDTO)
     {
         return await _repository.GetObservation(observationDTO.Id);
+    }
+    public async Task<Post?> ToPostAsync(SubPostDTO subPostDTO)
+    {
+        if (subPostDTO.CommentDTO is not null == subPostDTO.ProposalDTO is not null)
+        {
+            throw new ArgumentException("SubPostDTO contains either both or none of comment or proposal DTOs");
+        }
+        if (subPostDTO.CommentDTO is CommentDTO commentDTO)
+        {
+            return await new CommentService(_repository).ToCommentAsync(commentDTO);
+        }
+        else if (subPostDTO.ProposalDTO is ProposalDTO proposalDTO)
+        {
+            return await new ProposalService(_repository).ToProposalAsync(proposalDTO);
+        }
+        throw new ArgumentException("SubPostDTO contains neither comment nor proposal DTOs");
     }
 }

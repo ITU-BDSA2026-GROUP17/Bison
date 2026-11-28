@@ -85,7 +85,7 @@ public class DTOTests
         obs.Id.Should().Be(obsDTO.Id);
         obs.CreatedAt.ToString(IDatabaseRepository.DATE_FORMAT).Should().Be(obsDTO.CreatedAt);
         IUserService.ToUserDTO(obs.Author).Should().Be(obsDTO.Author);
-        obs.Taxon.VernacularName.Should().Be(obsDTO.TaxonName);
+        obs.Taxon.VernacularName.Should().Be(obsDTO.Taxon.VernacularName);
         obs.Text.Should().Be(obsDTO.Description);
     }
 
@@ -96,7 +96,7 @@ public class DTOTests
         using var dbOptions = new DbOptions();
         var db = new ObservationService(new DatabaseRepository(dbOptions.BisonDbContext));
 
-        var obsDTO = new ObservationDTO(123, "time", new UserDTO("123", "name", "test@example.com"), "taxonName", "desc");
+        var obsDTO = new ObservationDTO(123, "time", new UserDTO("123", "name", "test@example.com"), new TaxonDTO("", "taxonName", null), "desc");
 
         //Act
         var obs = await db.ToObservationAsync(obsDTO);
@@ -126,7 +126,7 @@ public class DTOTests
         obs.Id.Should().Be(obsDTO.Id);
         obs.CreatedAt.ToString(IDatabaseRepository.DATE_FORMAT).Should().Be(obsDTO.CreatedAt);
         IUserService.ToUserDTO(obs.Author).Should().Be(obsDTO.Author);
-        obs.Taxon.VernacularName.Should().Be(obsDTO.TaxonName);
+        obs.Taxon.VernacularName.Should().Be(obsDTO.Taxon.VernacularName);
         obs.Text.Should().Be(obsDTO.Description);
     }
 
@@ -152,7 +152,7 @@ public class DTOTests
         ppl.CreatedAt.ToString(IDatabaseRepository.DATE_FORMAT).Should().Be(pplDTO.CreatedAt);
         ppl.Observation.Id.Should().Be(pplDTO.ObservationId);
         IUserService.ToUserDTO(ppl.Author).Should().Be(pplDTO.Author);
-        ppl.Taxon.VernacularName.Should().Be(pplDTO.TaxonName);
+        ppl.Taxon.VernacularName.Should().Be(pplDTO.Taxon.VernacularName);
         ppl.Text.Should().Be(pplDTO.Text);
     }
 
@@ -163,7 +163,7 @@ public class DTOTests
         using var dbOptions = new DbOptions();
         var db = new ProposalService(new DatabaseRepository(dbOptions.BisonDbContext));
 
-        var pplDTO = new ProposalDTO(123, "time", 0, new UserDTO("123", "name", "test@example.com"), "taxonName", "desc");
+        var pplDTO = new ProposalDTO(123, "time", 0, new UserDTO("123", "name", "test@example.com"), new TaxonDTO("", "taxonName", null), "desc");
 
         //Act
         var ppl = await db.ToProposalAsync(pplDTO);
@@ -195,7 +195,7 @@ public class DTOTests
         ppl.CreatedAt.ToString(IDatabaseRepository.DATE_FORMAT).Should().Be(pplDTO.CreatedAt);
         ppl.Observation.Id.Should().Be(pplDTO.ObservationId);
         IUserService.ToUserDTO(ppl.Author).Should().Be(pplDTO.Author);
-        ppl.Taxon.VernacularName.Should().Be(pplDTO.TaxonName);
+        ppl.Taxon.VernacularName.Should().Be(pplDTO.Taxon.VernacularName);
         ppl.Text.Should().Be(pplDTO.Text);
     }
 
@@ -264,5 +264,173 @@ public class DTOTests
         cmt.Observation.Id.Should().Be(cmtDTO.ObservationId);
         IUserService.ToUserDTO(cmt.Author).Should().Be(cmtDTO.Author);
         cmt.Text.Should().Be(cmtDTO.Comment);
+    }
+
+    // Comments
+    [Fact]
+    public async Task SubpostDTOToPostAsyncSuccessfulTest()
+    {
+        //Arrange
+        using var dbOptions = new DbOptions();
+        dbOptions.SeedDatabase();
+        var db = new ObservationService(new DatabaseRepository(dbOptions.BisonDbContext));
+
+        var subPostDTOList = await db.GetSubPostsAsync(3);
+        var postDTO = subPostDTOList[1]; // Using index 1 to improve branch coverage.
+
+        //Act
+        var post = await db.ToPostAsync(postDTO);
+
+        //Assert
+        postDTO.Should().NotBeNull();
+        post.Should().NotBeNull();
+        post.Id.Should().Be(postDTO.CommentDTO?.Id ?? postDTO.ProposalDTO?.Id);
+        post.CreatedAt.ToString(IDatabaseRepository.DATE_FORMAT).Should().Be(postDTO.CommentDTO?.CreatedAt ?? postDTO.ProposalDTO?.CreatedAt);
+        3.Should().Be(postDTO.ObservationId);
+        IUserService.ToUserDTO(post.Author).Should().Be(postDTO.CommentDTO?.Author ?? postDTO.ProposalDTO?.Author);
+        post.Text.Should().Be(postDTO.CommentDTO?.Comment ?? postDTO.ProposalDTO?.Text);
+    }
+
+    [Fact]
+    public async Task CommentSubpostDTOToPostAsyncPostDoesNotExistTest()
+    {
+        //Arrange
+        using var dbOptions = new DbOptions();
+        var db = new ObservationService(new DatabaseRepository(dbOptions.BisonDbContext));
+
+        var user = new UserDTO("123", "name", "test@example.com");
+        var subPostDTO = new SubPostDTO(123,
+            new CommentDTO(1234, "", 123, user, ""),
+            null
+        );
+
+        //Act
+        var post = await db.ToPostAsync(subPostDTO);
+
+        //Assert
+        subPostDTO.Should().NotBeNull();
+        post.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task ProposalSubpostDTOToPostAsyncPostDoesNotExistTest()
+    {
+        //Arrange
+        using var dbOptions = new DbOptions();
+        var db = new ObservationService(new DatabaseRepository(dbOptions.BisonDbContext));
+
+        var user = new UserDTO("123", "name", "test@example.com");
+        var subPostDTO = new SubPostDTO(123,
+            null,
+            new ProposalDTO(1234, "", 123, user, new TaxonDTO("", "", null), "")
+        );
+
+        //Act
+        var post = await db.ToPostAsync(subPostDTO);
+
+        //Assert
+        subPostDTO.Should().NotBeNull();
+        post.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task PostAsyncToSubpostDTOTest()
+    {
+        //Arrange
+        using var dbOptions = new DbOptions();
+        dbOptions.SeedDatabase();
+        var repo = new DatabaseRepository(dbOptions.BisonDbContext);
+        var db = new ObservationService(repo);
+
+        var postList = await repo.GetSubpostsForObservation(3);
+        var post = postList[0];
+
+        //Act
+        var postDTO = IObservationService.ToPostDTO(post);
+
+        //Assert
+        postDTO.Should().NotBeNull();
+        post.Should().NotBeNull();
+        post.Id.Should().Be(postDTO.CommentDTO?.Id ?? postDTO.ProposalDTO?.Id);
+        post.CreatedAt.ToString(IDatabaseRepository.DATE_FORMAT).Should().Be(postDTO.CommentDTO?.CreatedAt ?? postDTO.ProposalDTO?.CreatedAt);
+        3.Should().Be(postDTO.ObservationId);
+        IUserService.ToUserDTO(post.Author).Should().Be(postDTO.CommentDTO?.Author ?? postDTO.ProposalDTO?.Author);
+        post.Text.Should().Be(postDTO.CommentDTO?.Comment ?? postDTO.ProposalDTO?.Text);
+    }
+
+    [Fact]
+    public async Task InvalidPostAsyncToSubpostDTOTest()
+    {
+        //Arrange
+        using var dbOptions = new DbOptions();
+        dbOptions.SeedDatabase();
+        var repo = new DatabaseRepository(dbOptions.BisonDbContext);
+
+        var post = await repo.GetObservation(3);
+
+        //Act
+        try
+        {
+            IObservationService.ToPostDTO(post);
+
+            //Assert
+            Assert.Fail("Should've thrown an exception by now lol");
+        }
+        catch (ArgumentException e)
+        {
+            e.ParamName.Should().Be("post");
+            e.Message.Should().Be("Invalid subpost given (Parameter 'post')");
+        }
+    }
+
+    [Fact]
+    public async Task HasBothSubPostDTOAsyncToPostTest()
+    {
+        //Arrange
+        using var dbOptions = new DbOptions();
+        var db = new ObservationService(databaseRepository: new DatabaseRepository(dbOptions.BisonDbContext));
+
+        var user = new UserDTO("", "", "");
+        var post = new SubPostDTO(
+            1,
+            new CommentDTO(2, "", 1, user, ""),
+            new ProposalDTO(3, "", 1, user, new TaxonDTO("", "", null), "")
+        );
+
+        //Act
+        try
+        {
+            await db.ToPostAsync(post);
+
+            //Assert
+            Assert.Fail("Should've thrown an exception by now lol");
+        }
+        catch (ArgumentException e)
+        {
+            e.Message.Should().Be("SubPostDTO contains either both or none of comment or proposal DTOs");
+        }
+    }
+    [Fact]
+    public async Task HasNoneSubPostDTOAsyncToPostTest()
+    {
+        //Arrange
+        using var dbOptions = new DbOptions();
+        var db = new ObservationService(databaseRepository: new DatabaseRepository(dbOptions.BisonDbContext));
+
+        var user = new UserDTO("", "", "");
+        var post = new SubPostDTO(1, null, null);
+
+        //Act
+        try
+        {
+            await db.ToPostAsync(post);
+
+            //Assert
+            Assert.Fail("Should've thrown an exception by now lol");
+        }
+        catch (ArgumentException e)
+        {
+            e.Message.Should().Be("SubPostDTO contains either both or none of comment or proposal DTOs");
+        }
     }
 }

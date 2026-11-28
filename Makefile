@@ -15,7 +15,7 @@ version := 0.0.0
 endif
 
 run:
-	BISONDBPATH="$$(pwd)/bison.db" dotnet run --project ${BASE_PATH}${BUILD_PROJECT}.csproj --launch-profile https
+	BISONDBPATH="$$(pwd)/bison.db" PictureBasePath="$$(pwd)/pictures/" dotnet run --project ${BASE_PATH}${BUILD_PROJECT}.csproj --launch-profile https
 
 all: build
 
@@ -32,7 +32,7 @@ dafny:
 
 coverage-report: $(wildcard test/**/coverage.cobertura.xml)
 	@dotnet tool restore
-	dotnet reportgenerator -reports:"test/**/coverage.cobertura.xml" -targetdir:"coveragereport" -reporttypes:Html
+	dotnet reportgenerator -reports:"test/**/coverage.cobertura.xml" -targetdir:"coverage-report" -reporttypes:Html
 
 build: $(foreach platform,$(PLATFORMS),${BASE_PATH}bin/Release/*/$(platform)/publish/$(BUILD_PROJECT)$(call get_ext,$(platform)))
 
@@ -47,4 +47,4 @@ zip:
 ci: build zip
 
 clean:
-	rm -rf ./src/**/bin/ ./src/**/obj/ ./test/**/bin/ ./test/**/obj/ ./dist/*.zip
+	rm -rf ./src/**/bin/ ./src/**/obj/ ./test/**/bin/ ./test/**/obj/ ./test/**/coverage/ ./coverage-report/ ./StrykerOutput/ ./dist/*.zip

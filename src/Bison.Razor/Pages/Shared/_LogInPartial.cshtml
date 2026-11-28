@@ -3,7 +3,6 @@
 @inject SignInManager<User> signInManager
 @inject UserManager<User> userManager
 @inject ILogger<BisonLogger> logger
-@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     if (User.Identity is not null && signInManager.IsSignedIn(User))
         logger.LogTrace("User is logged in");

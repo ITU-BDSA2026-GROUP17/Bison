@@ -18,8 +18,8 @@
                         <strong>
                             <a href="/obs/@ob.Author.Username">@ob.Author.Name</a>
                         </strong>
-                        @ob.Description
-                        <small>&mdash; @ob.CreatedAt</small>
+                        <a style="color:black;" href="/ob/@ob.Id">@ob.Description</a>
+                        <small>&mdash; (@(ob.Taxon.VernacularName is not null ? ob.Taxon.VernacularName : ob.Taxon.DwCId)) @ob.CreatedAt</small>
                     </p>
                 </li>
             }
@@ -29,4 +29,12 @@
     {
         <em>There are no Observations so far.</em>
     }
+    <div style="display: flex; min-width: 100%;">
+        @if (Model.BackwardUrl is not null) {
+            <a href="@Model.BackwardUrl" style="justify-self: flex-start; width: 100%;">Previous Page</a>
+        }
+        @if (Model.ForwardUrl is not null) {
+            <a href="@Model.ForwardUrl" style="justify-self: flex-end; width: 100%; text-align: right;">Next Page</a>
+        }
+    </div>
 </div>

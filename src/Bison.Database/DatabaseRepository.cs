@@ -2,6 +2,7 @@ using Bison.Database.Exceptions;
 using Bison.Models;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Bison.Database;
 
@@ -12,7 +13,7 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
     public async Task<List<Taxon>> GetTaxons(int? limit = null, int? skip = null)
     {
         IQueryable<Taxon> query = _dbContext.Taxons
-            .OrderByDescending(t => t.Id);
+            .OrderBy(t => t.Id);
         if (skip is int skipAmount)
         {
             query = query.Skip(skipAmount);
@@ -27,6 +28,12 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
     {
         return await _dbContext.Taxons
             .Where(t => t.DWC_TaxonId == taxonId)
+            .FirstOrDefaultAsync();
+    }
+    public async Task<Taxon?> GetTaxonByVernacularName(string vernacularName)
+    {
+        return await _dbContext.Taxons
+            .Where(t => t.VernacularName == vernacularName)
             .FirstOrDefaultAsync();
     }
     public async Task<Taxon?> GetTaxonByNumericId(int taxonId)
@@ -49,12 +56,41 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
         return await _dbContext.Users.FirstOrDefaultAsync(u => u.UserName == username);
     }
 
+    public async Task<Post?> GetPost(int id)
+    {
+        return await _dbContext.Posts
+            .Include("Observation")
+            .Include("Taxon")
+            .Where(p => p.Id == id)
+            .FirstOrDefaultAsync();
+    }
+
     public async Task<Observation?> GetObservation(int id)
     {
         return await _dbContext.Posts
             .Include("Taxon")
             .Where(p => p.Id == id)
             .FirstOrDefaultAsync() is Observation obs ? obs : null;
+    }
+
+    public async Task EditObservation(int obsId, string? newTaxonId = null, string? newText = null, string? newPicturePath = null)
+    {
+        var obs = await GetObservation(obsId) ?? throw new ObservationDoesNotExistException(obsId); // observation does not exist
+
+        if (newTaxonId != null)
+        {
+            var newTaxon = await GetTaxonByDWCId(newTaxonId);
+            if (newTaxon != null)
+            {
+                obs.Taxon = newTaxon;
+            }
+        }
+        if (newText != null)
+        {
+            obs.Text = newText;
+        }
+        obs.PicturePath = newPicturePath; //picture path is allowed to be null
+        await _dbContext.SaveChangesAsync();
     }
     public async Task<List<Observation>> GetObservations(int? limit = null, int? skip = null)
     {
@@ -91,7 +127,7 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
         }
         return await query.ToListAsync();
     }
-    public async Task<Observation> CreateObservation(string userId, string taxonId, string observation)
+    public async Task<Observation> CreateObservation(string userId, string taxonId, string observation, string? picturePath = null)
     {
         var author = await _dbContext.Users.FindAsync(userId)
             ?? throw new UserDoesNotExistException(userId);
@@ -101,10 +137,32 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
         {
             Author = author,
             Text = observation,
-            Taxon = taxon
+            Taxon = taxon,
+            PicturePath = picturePath
         });
         await _dbContext.SaveChangesAsync();
         return (Observation)res.Entity;
+    }
+
+    public async Task<List<Post>> GetSubpostsForObservation(int observationId, int? limit = null, int? skip = null)
+    {
+        IQueryable<Post> query = _dbContext.Posts
+            .Include("Observation")
+            .Include("Taxon")
+            .Where(p =>
+                (p is Comment && ((Comment)p).Observation.Id == observationId) ||
+                (p is Proposal && ((Proposal)p).Observation.Id == observationId)
+            )
+            .OrderBy(p => p.Id);
+        if (skip is int skipAmount)
+        {
+            query = query.Skip(skipAmount);
+        }
+        if (limit is int limitAmount)
+        {
+            query = query.Take(limitAmount);
+        }
+        return await query.ToListAsync();
     }
 
     public async Task<List<Comment>> GetCommentsForObservation(int observationId, int? limit = null, int? skip = null)
@@ -143,6 +201,17 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
         });
         await _dbContext.SaveChangesAsync();
         return (Comment)res.Entity;
+    }
+    public async Task EditComment(int commentId, string? newText = null)
+    {
+        var post = await GetPost(commentId) ?? throw new PostDoesNotExistException(commentId);
+        if (post is not Comment com) throw new PostDoesNotExistException(commentId);
+
+        if (newText != null)
+        {
+            com.Text = newText;
+        }
+        await _dbContext.SaveChangesAsync();
     }
 
     public async Task<List<Proposal>> GetProposalsForObservation(int observationId, int? limit = null, int? skip = null)
@@ -184,5 +253,24 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
         });
         await _dbContext.SaveChangesAsync();
         return (Proposal)res.Entity;
+    }
+    public async Task EditProposal(int proposalId, string? newTaxonId = null, string? newText = null)
+    {
+        var post = await GetPost(proposalId) ?? throw new PostDoesNotExistException(proposalId);
+        if (post is not Proposal ppl) throw new PostDoesNotExistException(proposalId);
+
+        if (newTaxonId != null)
+        {
+            var newTaxon = await GetTaxonByDWCId(newTaxonId);
+            if (newTaxon != null)
+            {
+                ppl.Taxon = newTaxon;
+            }
+        }
+        if (newText != null)
+        {
+            ppl.Text = newText;
+        }
+        await _dbContext.SaveChangesAsync();
     }
 }

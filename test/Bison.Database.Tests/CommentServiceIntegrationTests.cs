@@ -73,7 +73,7 @@ public class CommentServiceIntegrationTests
         var taxon = (await ProposalServiceIntegrationTests.TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var user = await repo.CreateUser("testName", "test@example.com", "testName");
-        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation");
+        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation", null);
         var db = new CommentService(repo);
 
         //Act
@@ -103,7 +103,7 @@ public class CommentServiceIntegrationTests
         var taxon = (await ProposalServiceIntegrationTests.TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var user = await repo.CreateUser("testName", "test@example.com", "testName");
-        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation");
+        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation", null);
         var cmt = await repo.CreateComment(user.Id, obs.Id, comment.Item);
         var db = new CommentService(repo);
 
@@ -120,6 +120,83 @@ public class CommentServiceIntegrationTests
             e.ObservationId.Should().Be(cmt.Id);
         }
     }
+    [Property]
+    public static async Task EditTextValidCommentTest(NonWhiteSpaceString text)
+    {
+        //Arrange
+        using var dbOptions = new DbOptions();
+        dbOptions.SeedDatabase();
+        var taxon = (await ProposalServiceIntegrationTests.TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
+        var repo = new DatabaseRepository(dbOptions.BisonDbContext);
+        var user = await repo.CreateUser("testName", "test@example.com", "test");
+        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation", null);
+        var db = new CommentService(repo);
+        var userDB = new UserService(repo);
+        var obsDB = new ObservationService(repo);
+        var postDB = new PostService(repo);
+
+        //Act
+        var cmtDTO = await db.CreateCommentAsync(user.Id, obs.Id, text.Item);
+        await db.EditCommentAsync(
+            cmtDTO.Id,
+            "woah! new text: " + text.Item.Length
+        );
+        var finalDTO = (await postDB.GetPostAsync(cmtDTO.Id)).Comment!;
+
+        //Assert
+        cmtDTO.Should().NotBeNull();
+        finalDTO.Should().NotBeNull();
+        finalDTO.Comment.Should().NotBe(cmtDTO.Comment);
+        finalDTO.Comment.Should().Be("woah! new text: " + text.Item.Length);
+    }
+    [Property]
+    public static async Task EditNonExistantCommentTest(NonWhiteSpaceString text, int postId)
+    {
+        //Arrange
+        using var dbOptions = new DbOptions();
+        var db = new CommentService(new DatabaseRepository(dbOptions.BisonDbContext));
+
+        //Act
+        try
+        {
+            await db.EditCommentAsync(
+                postId,
+                text.Item
+            );
+            //Assert
+            Assert.Fail("Should've thrown exception by now");
+        }
+        catch (PostDoesNotExistException e)
+        {
+            e.Message.Should().Be($"Post with ID {postId} does not exist");
+            e.PostId.Should().Be(postId);
+        }
+    }
+    [Property]
+    public static async Task EditInvalidCommentTest(NonWhiteSpaceString text)
+    {
+        //Arrange
+        using var dbOptions = new DbOptions();
+        var db = new CommentService(new DatabaseRepository(dbOptions.BisonDbContext));
+
+        //Act
+        try
+        {
+            await db.EditCommentAsync(
+                24, // this is a proposal => post does not exist exception
+                text.Item
+            );
+            //Assert
+            Assert.Fail("Should've thrown exception by now");
+        }
+        catch (PostDoesNotExistException e)
+        {
+            e.Message.Should().Be("Post with ID 24 does not exist");
+            e.PostId.Should().Be(24);
+        }
+    }
+    // edit test (both invalid id and valid)
+
     [Fact]
     public static async Task PaginationWorksTest()
     {
@@ -129,7 +206,7 @@ public class CommentServiceIntegrationTests
         var taxon = (await ProposalServiceIntegrationTests.TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
         var repo = new DatabaseRepository(dbOptions.BisonDbContext);
         var user = await repo.CreateUser("testName", "test@example.com", "testName");
-        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation");
+        var obs = await repo.CreateObservation(user.Id, taxon.DWC_TaxonId, "TestLocation", null);
         var db = new CommentService(repo);
         List<CommentDTO> list = [
             await db.CreateCommentAsync(user.Id, obs.Id, "com1"),

@@ -2,6 +2,7 @@ using Bison.Database;
 using Bison.Database.Services;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,8 +20,19 @@ builder.Services.AddRazorPages();
 logger.LogTrace("Adding DbContext");
 builder.Services.AddDbContext<BisonDbContext>((options) =>
     {
-        if (builder.Configuration["BISONDBPATH"] is string dbPath)
+        if (
+            builder.Configuration["BISONDBPATH"] is string dbPath &&
+            (
+                !File.Exists(dbPath) ||
+                !File.GetAttributes(dbPath).HasFlag(FileAttributes.Directory)
+            )
+        )
         {
+            if (Path.GetDirectoryName(dbPath) is string dirPath)
+            {
+                Directory.CreateDirectory(dirPath);
+                // ensures the directory of the file exists SQLite will fail with error 14
+            }
             options.UseSqlite($"Data Source={dbPath}");
         }
         else
@@ -38,6 +50,8 @@ logger.LogTrace("Adding Repository");
 builder.Services.AddScoped<IDatabaseRepository, DatabaseRepository>();
 logger.LogTrace("Adding Services");
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ITaxonService, TaxonService>();
+builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<IObservationService, ObservationService>();
 builder.Services.AddScoped<IProposalService, ProposalService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
@@ -76,6 +90,12 @@ if (!app.Environment.IsDevelopment())
 logger.LogTrace("Setting up HTTPS and static files");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(builder.Configuration["PictureBasePath"]!),
+    RequestPath = "/pictures"
+});
 
 logger.LogTrace("Setting up HTTP routing");
 app.UseRouting();

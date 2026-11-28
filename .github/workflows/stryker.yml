@@ -7,7 +7,7 @@ env:
 
 jobs:
     coverage-report:
-        name: stryker
+        name: coverage-report
         runs-on: ubuntu-latest
 
         steps:
@@ -17,17 +17,32 @@ jobs:
               with:
                   dotnet-version: ${{ env.DOTNET_VERSION }}
 
+            - name: Setup Z3
+              id: z3
+              uses: cda-tum/setup-z3@v1.7.3
+              with:
+                  add_to_library_path: true
+
             - name: Restore Local Tools
               run: dotnet tool restore
 
             - name: Install Dependencies
               run: dotnet restore
 
+            - name: Build Dafny
+              run: make dafny
+
             - name: Build
               run: dotnet build --no-restore
 
+            - name: Ensure browsers are installed
+              run: pwsh test/Bison.Razor.Tests/bin/Debug/net8.0/playwright.ps1 install --with-deps
+
             - name: Test
               run: dotnet test && make coverage-report
+              env:
+                  authentication__github__clientId: ${{ secrets.AUTHENTICATION__GITHUB__CLIENTID }}
+                  authentication__github__clientSecret: ${{ secrets.AUTHENTICATION__GITHUB__CLIENTSECRET }}
 
             - name: Zip results
               run: zip -j coverage-report.zip coverage-report/*
@@ -49,17 +64,32 @@ jobs:
               with:
                   dotnet-version: ${{ env.DOTNET_VERSION }}
 
+            - name: Setup Z3
+              id: z3
+              uses: cda-tum/setup-z3@v1.7.3
+              with:
+                  add_to_library_path: true
+
             - name: Restore Local Tools
               run: dotnet tool restore
 
             - name: Install Dependencies
               run: dotnet restore
 
+            - name: Build Dafny
+              run: make dafny
+
             - name: Build
               run: dotnet build --no-restore
 
+            - name: Ensure browsers are installed
+              run: pwsh test/Bison.Razor.Tests/bin/Debug/net8.0/playwright.ps1 install --with-deps
+
             - name: Test
-              run: dotnet tool run stryker
+              run: dotnet tool run dotnet-stryker
+              env:
+                  authentication__github__clientId: ${{ secrets.AUTHENTICATION__GITHUB__CLIENTID }}
+                  authentication__github__clientSecret: ${{ secrets.AUTHENTICATION__GITHUB__CLIENTSECRET }}
 
             - name: Save Stryker Result
               uses: actions/upload-artifact@v7
@@ -67,4 +97,3 @@ jobs:
                   name: "stryker-report"
                   path: StrykerOutput/*/reports/*.html
                   retention-days: 7
-                  

@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -e
+
+REPO_ROOT=$(git rev-parse --show-toplevel)
+cd "$REPO_ROOT"
+
+HOOK_PATH=".git/hooks/pre-commit"
+
+mkdir -p .git/hooks
+
+cat << 'EOF' > "$HOOK_PATH"
+#!/usr/bin/env bash
+set -e
+
+STAGED_CS_FILES=$(git diff --cached --name-only --diff-filter=d -- '*.cs')
+
+if [ -n "$STAGED_CS_FILES" ]; then
+    dotnet format --include $STAGED_CS_FILES
+
+    git diff --name-only --cached --diff-filter=d -z -- '*.cs' | while IFS= read -r -d '' file; do
+        git add -- "$file"
+    done
+fi
+EOF
+
+chmod +x "$HOOK_PATH"

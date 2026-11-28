@@ -1,5 +1,6 @@
 using Bison.Database.Exceptions;
 using Bison.Database.Services;
+using Bison.Models;
 
 namespace Bison.Database.Tests;
 
@@ -97,12 +98,12 @@ public class ObservationServiceIntegrationTests
         //Assert
         obs.Author.Id.Should().Be(user.Id);
         obs.Description.Should().Be(description.Item);
-        obs.TaxonName.Should().Be(taxon.VernacularName);
+        obs.Taxon.VernacularName.Should().Be(taxon.VernacularName);
 
         idObs.Id.Should().Be(obs.Id);
         idObs.Author.Id.Should().Be(user.Id);
         idObs.Description.Should().Be(description.Item);
-        idObs.TaxonName.Should().Be(taxon.VernacularName);
+        idObs.Taxon.VernacularName.Should().Be(taxon.VernacularName);
     }
     [Fact]
     public static async Task PaginationWorksTest()
@@ -202,5 +203,60 @@ public class ObservationServiceIntegrationTests
 
         //Assert
         obss.Count.Should().Be(410);
+    }
+
+    [Property]
+    public static async Task ObservationDescriptionCanBeEditedTest(NonWhiteSpaceString newDescription)
+    {
+        //Arrange
+        using var dbOptions = new DbOptions();
+        dbOptions.SeedDatabase();
+        var db = new ObservationService(new DatabaseRepository(dbOptions.BisonDbContext));
+        var obs = await db.GetObservationByIdAsync(1);
+        var oldAuthor = obs.Author;
+        var oldTaxon = obs.Taxon;
+        var oldDescription = obs.Description;
+        var oldPicturePath = obs.PicturePath;
+        var oldId = obs.Id;
+
+        //Act
+        var editedObs = await db.EditObservationAsync(obs.Id, null, newDescription.Item);
+
+        //Assert
+        editedObs.Author.Should().Be(oldAuthor);
+        editedObs.Taxon.Should().Be(oldTaxon);
+        editedObs.Description.Should().NotBe(oldDescription);
+        editedObs.PicturePath.Should().Be(oldPicturePath);
+        editedObs.Id.Should().Be(oldId);
+    }
+
+    [Fact]
+    public static async Task ObservationTaxonCanBeEditedTest()
+    {
+        //Arrange
+        using var dbOptions = new DbOptions();
+        dbOptions.SeedDatabase();
+        var db = new ObservationService(new DatabaseRepository(dbOptions.BisonDbContext));
+        var taxonDb = new TaxonService(new DatabaseRepository(dbOptions.BisonDbContext));
+        var obs = await db.GetObservationByIdAsync(1);
+
+        var newTaxon = (await ProposalServiceIntegrationTests.TaxonGenerator(dbOptions.BisonDbContext)).Generator.Sample(1)[0];
+
+        var oldAuthor = obs.Author;
+        var oldTaxon = obs.Taxon;
+        var oldDescription = obs.Description;
+        var oldPicturePath = obs.PicturePath;
+        var oldId = obs.Id;
+
+        //Act
+        var editedObs = await db.EditObservationAsync(obs.Id, newTaxon.DWC_TaxonId);
+
+        //Assert
+        editedObs.Author.Should().Be(oldAuthor);
+        editedObs.Taxon.Should().NotBe(oldTaxon);
+        editedObs.Taxon.DwCId.Should().Be(newTaxon.DWC_TaxonId);
+        editedObs.Description.Should().Be(oldDescription);
+        editedObs.PicturePath.Should().Be(oldPicturePath);
+        editedObs.Id.Should().Be(oldId);
     }
 }
