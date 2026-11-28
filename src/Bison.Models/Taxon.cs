@@ -29,6 +29,6 @@ public sealed class Taxon : IEquatable<Taxon>
     {
         return
             Id == ancestor.Id ||
-            Parent is not null && Parent.IsSubTaxon(ancestor);
+            (Parent is not null && Parent.IsSubTaxon(ancestor));
     }
 }

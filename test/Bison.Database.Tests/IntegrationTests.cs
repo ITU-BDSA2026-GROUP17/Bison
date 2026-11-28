@@ -8,7 +8,6 @@ public class IntegrationTests
 {
     private static readonly Gen<NonWhiteSpaceString> StringGenerator = ArbMap.Default.GeneratorFor<NonWhiteSpaceString>();
 
-
     [Fact]
     public static async Task Test()
     {
