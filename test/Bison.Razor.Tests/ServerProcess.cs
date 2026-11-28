@@ -67,6 +67,27 @@ public class ServerProcess
         return process;
     }
 
+    static internal async Task CreateUser(IPage page, string name, string userName)
+    {
+        await page.GetByRole(AriaRole.Link, new() { Name = "Register" }).ClickAsync();
+        await page.GetByRole(AriaRole.Textbox, new() { Name = "Name", Exact = true }).FillAsync(name);
+        await page.GetByRole(AriaRole.Textbox, new() { Name = "Name", Exact = true }).PressAsync("Tab");
+        await page.GetByRole(AriaRole.Textbox, new() { Name = "Username" }).FillAsync(userName);
+        await page.GetByRole(AriaRole.Textbox, new() { Name = "Username" }).PressAsync("Tab");
+        await page.GetByRole(AriaRole.Textbox, new() { Name = "Email" }).FillAsync("test@example.com");
+        await page.GetByRole(AriaRole.Textbox, new() { Name = "Email" }).PressAsync("Tab");
+        await page.GetByRole(AriaRole.Textbox, new() { Name = "Password", Exact = true }).FillAsync("Testpass@1234");
+        await page.GetByRole(AriaRole.Textbox, new() { Name = "Password", Exact = true }).PressAsync("Tab");
+        await page.GetByRole(AriaRole.Textbox, new() { Name = "Confirm Password" }).FillAsync("Testpass@1234");
+        await page.GetByRole(AriaRole.Button, new() { Name = "Register" }).ClickAsync();
+        await page.GetByRole(AriaRole.Link, new() { Name = "Click here to confirm your" }).ClickAsync();
+        await page.GetByRole(AriaRole.Link, new() { Name = "Login" }).ClickAsync();
+        await page.GetByRole(AriaRole.Textbox, new() { Name = "Username" }).FillAsync(userName);
+        await page.GetByRole(AriaRole.Textbox, new() { Name = "Username" }).PressAsync("Tab");
+        await page.GetByRole(AriaRole.Textbox, new() { Name = "Password" }).FillAsync("Testpass@1234");
+        await page.GetByRole(AriaRole.Textbox, new() { Name = "Password" }).PressAsync("Enter");
+    }
+
     public async Task StopServer()
     {
         if (_process is not null)

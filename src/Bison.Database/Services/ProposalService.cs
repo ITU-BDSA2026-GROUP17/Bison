@@ -19,6 +19,10 @@ public class ProposalService(IDatabaseRepository databaseRepository) : IProposal
         var ppl = await _repository.CreateProposal(authorId, observationId, taxonId, text);
         return IProposalService.ToProposalDTO(ppl);
     }
+    public Task EditProposalAsync(int proposalId, string? newTaxonId = null, string? newText = null)
+    {
+        return _repository.EditProposal(proposalId, newTaxonId, newText);
+    }
 
     public async Task<Proposal?> ToProposalAsync(ProposalDTO proposalDTO)
     {

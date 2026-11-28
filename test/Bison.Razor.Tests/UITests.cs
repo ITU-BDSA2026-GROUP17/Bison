@@ -41,23 +41,7 @@ public partial class UITests : PageTest
     {
         await Page.GotoAsync("/");
         await Expect(Page.Locator(".observationbox").First).Not.ToBeVisibleAsync();
-        await Page.GetByRole(AriaRole.Link, new() { Name = "Register" }).ClickAsync();
-        await Page.GetByRole(AriaRole.Textbox, new() { Name = "Name", Exact = true }).FillAsync(name);
-        await Page.GetByRole(AriaRole.Textbox, new() { Name = "Name", Exact = true }).PressAsync("Tab");
-        await Page.GetByRole(AriaRole.Textbox, new() { Name = "Username" }).FillAsync(userName);
-        await Page.GetByRole(AriaRole.Textbox, new() { Name = "Username" }).PressAsync("Tab");
-        await Page.GetByRole(AriaRole.Textbox, new() { Name = "Email" }).FillAsync("test@example.com");
-        await Page.GetByRole(AriaRole.Textbox, new() { Name = "Email" }).PressAsync("Tab");
-        await Page.GetByRole(AriaRole.Textbox, new() { Name = "Password", Exact = true }).FillAsync("Testpass@1234");
-        await Page.GetByRole(AriaRole.Textbox, new() { Name = "Password", Exact = true }).PressAsync("Tab");
-        await Page.GetByRole(AriaRole.Textbox, new() { Name = "Confirm Password" }).FillAsync("Testpass@1234");
-        await Page.GetByRole(AriaRole.Button, new() { Name = "Register" }).ClickAsync();
-        await Page.GetByRole(AriaRole.Link, new() { Name = "Click here to confirm your" }).ClickAsync();
-        await Page.GetByRole(AriaRole.Link, new() { Name = "Login" }).ClickAsync();
-        await Page.GetByRole(AriaRole.Textbox, new() { Name = "Username" }).FillAsync(userName);
-        await Page.GetByRole(AriaRole.Textbox, new() { Name = "Username" }).PressAsync("Tab");
-        await Page.GetByRole(AriaRole.Textbox, new() { Name = "Password" }).FillAsync("Testpass@1234");
-        await Page.GetByRole(AriaRole.Textbox, new() { Name = "Password" }).PressAsync("Enter");
+        await ServerProcess.CreateUser(Page, name, userName);
         await Expect(Page.Locator(".observationbox").First).ToBeVisibleAsync();
         await Expect(Page.Locator(".observationbox").First).ToContainTextAsync(name);
     }
@@ -78,9 +62,58 @@ public partial class UITests : PageTest
         await Page.GetByRole(AriaRole.Link, new() { Name = "Previous Page" }).ClickAsync();
         await Expect(Page.Locator("#messagelist")).ToContainTextAsync("About 30 spoonbills at the lagoon, seen through the scope.");
         await Page.GotoAsync("/ob/1");
-        await Expect(Page.Locator("body")).ToMatchAriaSnapshotAsync("- heading \"Observation 1\" [level=2]\n- list:\n  - listitem:\n    - paragraph:\n      - strong:\n        - link \"Roger Histand\":\n          - /url: /obs/RogerHistand\n      - text: /Grey heron standing still in the reeds at the lake\\. — \\(Fiskehejre\\) \\d+\\/\\d+\\/\\d+ \\d+:\\d+:\\d+/\n- list:\n  - listitem:\n    - paragraph:\n      - strong:\n        - link \"Luanna Muro\":\n          - /url: /obs/LuannaMuro\n      - text: /Nice! I saw one there yesterday too\\. — \\d+\\/\\d+\\/\\d+ \\d+:\\d+:\\d+/");
+        await Expect(Page.GetByRole(AriaRole.Main)).ToMatchAriaSnapshotAsync("- heading \"Observation 1\" [level=2]\n- list:\n  - listitem:\n    - paragraph:\n      - strong:\n        - link \"Roger Histand\":\n          - /url: /obs/RogerHistand\n      - text: /Grey heron standing still in the reeds at the lake\\. — \\(Fiskehejre\\) \\d+\\/\\d+\\/\\d+ \\d+:\\d+:\\d+/\n- list:\n  - listitem:\n    - paragraph:\n      - strong:\n        - link \"Luanna Muro\":\n          - /url: /obs/LuannaMuro\n      - text: /Nice! I saw one there yesterday too\\. — \\d+\\/\\d+\\/\\d+ \\d+:\\d+:\\d+/");
         await Page.GotoAsync("/ob/3");
-        await Expect(Page.Locator("body")).ToMatchAriaSnapshotAsync("- heading \"Observation 3\" [level=2]\n- list:\n  - listitem:\n    - paragraph:\n      - strong:\n        - link \"Wendell Ballan\":\n          - /url: /obs/WendellBallan\n      - text: /Large white heron in a wet meadow\\. Yellow bill, black legs\\. — \\(Sølvhejre\\) \\d+\\/\\d+\\/\\d+ \\d+:\\d+:\\d+/\n- list:\n  - listitem:\n    - paragraph:\n      - strong:\n        - link \"Nathan Sirmon\":\n          - /url: /obs/NathanSirmon\n      - text: \"/PROPOSES: \\\"Sølvhejre\\\" Yellow bill and large size fit great egret\\\\. I agree\\\\. — \\\\d+\\\\/\\\\d+\\\\/\\\\d+ \\\\d+:\\\\d+:\\\\d+/\"\n  - listitem:\n    - paragraph:\n      - strong:\n        - link \"Roger Histand\":\n          - /url: /obs/RogerHistand\n      - text: \"/PROPOSES: \\\"Silkehejre\\\" Could it be a little egret\\\\? Check for yellow feet\\\\. — \\\\d+\\\\/\\\\d+\\\\/\\\\d+ \\\\d+:\\\\d+:\\\\d+/\"\n  - listitem:\n    - paragraph:\n      - strong:\n        - link \"Wendell Ballan\":\n          - /url: /obs/WendellBallan\n      - text: /Only a blurry one\\. It looked bigger than a grey heron\\. — \\d+\\/\\d+\\/\\d+ \\d+:\\d+:\\d+/\n  - listitem:\n    - paragraph:\n      - strong:\n        - link \"Roger Histand\":\n          - /url: /obs/RogerHistand\n      - text: /Do you have a photo\\? Size is hard to judge at distance\\. — \\d+\\/\\d+\\/\\d+ \\d+:\\d+:\\d+/");
+        await Expect(Page.GetByRole(AriaRole.Main)).ToMatchAriaSnapshotAsync("- heading \"Observation 3\" [level=2]\n- list:\n  - listitem:\n    - paragraph:\n      - strong:\n        - link \"Wendell Ballan\":\n          - /url: /obs/WendellBallan\n      - text: /Large white heron in a wet meadow\\. Yellow bill, black legs\\. — \\(Sølvhejre\\) \\d+\\/\\d+\\/\\d+ \\d+:\\d+:\\d+/\n- list:\n  - listitem:\n    - paragraph:\n      - strong:\n        - link \"Roger Histand\":\n          - /url: /obs/RogerHistand\n      - text: /Do you have a photo\\? Size is hard to judge at distance\\. — \\d+\\/\\d+\\/\\d+ \\d+:\\d+:\\d+/\n  - listitem:\n    - paragraph:\n      - strong:\n        - link \"Wendell Ballan\":\n          - /url: /obs/WendellBallan\n      - text: /Only a blurry one\\. It looked bigger than a grey heron\\. — \\d+\\/\\d+\\/\\d+ \\d+:\\d+:\\d+/\n  - listitem:\n    - paragraph:\n      - strong:\n        - link \"Roger Histand\":\n          - /url: /obs/RogerHistand\n      - text: \"/PROPOSES: \\\"Silkehejre\\\" Could it be a little egret\\\\? Check for yellow feet\\\\. — \\\\d+\\\\/\\\\d+\\\\/\\\\d+ \\\\d+:\\\\d+:\\\\d+/\"\n  - listitem:\n    - paragraph:\n      - strong:\n        - link \"Nathan Sirmon\":\n          - /url: /obs/NathanSirmon\n      - text: \"/PROPOSES: \\\"Sølvhejre\\\" Yellow bill and large size fit great egret\\\\. I agree\\\\. — \\\\d+\\\\/\\\\d+\\\\/\\\\d+ \\\\d+:\\\\d+:\\\\d+/\"");
+    }
+
+    [Test]
+    public async Task EditPostsWorksCorrectlyTest()
+    {
+        await Page.GotoAsync("/");
+        await Page.GetByRole(AriaRole.Link, new() { Name = "About 30 spoonbills at the" }).ClickAsync();
+        await Expect(Page.Locator("a button", new() { HasText = "Edit" })).Not.ToBeVisibleAsync();
+        await Page.GotoAsync("/");
+        await ServerProcess.CreateUser(Page, "Test User", "testuser");
+
+        await Page.GotoAsync("/ob/426");
+        await Expect(Page.GetByRole(AriaRole.Button, new() { Name = "Edit" })).Not.ToBeVisibleAsync();
+
+        await Page.GotoAsync("/");
+        await Page.Locator("#Input_Observation").FillAsync("Test obs");
+        await Page.Locator("#Input_TaxonId").SelectOptionAsync(["MSTSNM:Arter:ee6dddf8-f785-ea11-aa77-501ac539d1ea"]);
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Share" }).ClickAsync();
+
+        await Page.GetByRole(AriaRole.Link, new() { Name = "Test obs" }).ClickAsync();
+        await Expect(Page.GetByRole(AriaRole.Button, new() { Name = "Edit" })).ToBeVisibleAsync();
+        await Expect(Page.Locator("p", new() { HasText = "Test obs" })).ToContainTextAsync("Test obs");
+
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Edit" }).ClickAsync();
+        await Page.Locator("#Input_Text").FillAsync("Test obs Part 2");
+        await Page.Locator("#Input_TaxonId").SelectOptionAsync(["MSTSNM:Arter:2d66ddf8-f785-ea11-aa77-501ac539d1ea"]);
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Confirm" }).ClickAsync();
+
+        await Expect(Page.Locator("small")).ToContainTextAsync("Nathejre");
+        await Expect(Page.Locator("p", new() { HasText = "Test obs part 2" })).ToContainTextAsync("Test obs Part 2");
+
+        await Page.Locator("#Input_Text").FillAsync("test part 1");
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Share" }).ClickAsync();
+
+        await Page.GetByRole(AriaRole.Paragraph).Filter(new() { HasText = "test part 1" }).GetByRole(AriaRole.Button).ClickAsync();
+        await Page.Locator("#Input_Text").FillAsync("test part 3");
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Confirm" }).ClickAsync();
+        await Expect(Page.GetByRole(AriaRole.Main)).ToContainTextAsync("test part 3");
+
+        await Page.Locator("#Input_Text").FillAsync("propsal 1");
+        await Page.Locator("#Input_TaxonId").SelectOptionAsync(["MSTSNM:Arter:4b50c87f-f904-4fc0-8bb4-b0b500cd367d"]);
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Share" }).ClickAsync();
+        await Expect(Page.GetByRole(AriaRole.Main)).ToContainTextAsync("PROPOSES: \"Eremitibis\" propsal 1");
+
+        await Page.GetByRole(AriaRole.Paragraph).Filter(new() { HasText = "Test User PROPOSES: \"" }).GetByRole(AriaRole.Button).ClickAsync();
+        await Page.Locator("#Input_Text").FillAsync("propsal 3");
+        await Page.Locator("#Input_TaxonId").SelectOptionAsync(["MSTSNM:Arter:ca4d8cf8-f785-ea11-aa77-501ac539d1ea"]);
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Confirm" }).ClickAsync();
+        await Expect(Page.GetByRole(AriaRole.Main)).ToContainTextAsync("PROPOSES: \"Silkehejre\" propsal 3");
     }
 
     [Test]

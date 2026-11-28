@@ -40,6 +40,12 @@ public class ObservationService(IDatabaseRepository databaseRepository) : IObser
         var obs = await _repository.CreateObservation(userId, taxonId, description, picturePath);
         return IObservationService.ToObservationDTO(obs);
     }
+    public async Task<ObservationDTO?> EditObservationAsync(int obsId, string? newTaxonId = null, string? newDescription = null, string? newPicturePath = null)
+    {
+        await _repository.EditObservation(obsId, newTaxonId, newDescription, newPicturePath);
+        return await GetObservationByIdAsync(obsId);
+    }
+
     public async Task<List<SubPostDTO>> GetSubPostsAsync(int id, int? limit = null, int? skip = null)
     {
         var obs = await _repository.GetSubpostsForObservation(id, limit, skip);

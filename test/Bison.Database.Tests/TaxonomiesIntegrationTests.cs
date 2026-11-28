@@ -1,7 +1,5 @@
 using Bison.Database.Services;
 
-using Microsoft.EntityFrameworkCore;
-
 namespace Bison.Database.Tests;
 
 public class TaxonomiesIntegrationTest
@@ -125,5 +123,33 @@ public class TaxonomiesIntegrationTest
             taxon.Should().NotBeNull();
             taxon.Children.Count.Should().Be(parent.Item2);
         }
+    }
+
+    [Fact]
+    public static async Task GetTaxonsAsyncOrderingIsCorrectTest()
+    {
+        // Arrange
+        using var dbOptions = new DbOptions();
+        dbOptions.SeedTaxonsOnly();
+        var db = new TaxonService(new DatabaseRepository(dbOptions.BisonDbContext));
+
+        // Act
+        var taxons = await db.GetTaxonsAsync(10, 5);
+
+        // Assert
+        taxons.Select(t => t.DwCId)
+            .Should()
+            .BeEqualTo([
+                "MSTSNM:Arter:5c5967e4-f785-ea11-aa77-501ac539d1ea",
+            "MSTSNM:Arter:af5967e4-f785-ea11-aa77-501ac539d1ea",
+            "MSTSNM:Arter:7f9ef9f3-f785-ea11-aa77-501ac539d1ea",
+            "MSTSNM:Arter:819ef9f3-f785-ea11-aa77-501ac539d1ea",
+            "MSTSNM:Arter:dca0f9f3-f785-ea11-aa77-501ac539d1ea",
+            "MSTSNM:Arter:74a1f9f3-f785-ea11-aa77-501ac539d1ea",
+            "MSTSNM:Arter:25aaf9f3-f785-ea11-aa77-501ac539d1ea",
+            "MSTSNM:Arter:eeb1f9f3-f785-ea11-aa77-501ac539d1ea",
+            "MSTSNM:Arter:fab9f9f3-f785-ea11-aa77-501ac539d1ea",
+            "MSTSNM:Arter:0aadf9f3-f785-ea11-aa77-501ac539d1ea"
+            ]);
     }
 }

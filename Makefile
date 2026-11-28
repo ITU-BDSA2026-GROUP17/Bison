@@ -47,4 +47,4 @@ zip:
 ci: build zip
 
 clean:
-	rm -rf ./src/**/bin/ ./src/**/obj/ ./test/**/bin/ ./test/**/obj/ ./dist/*.zip
+	rm -rf ./src/**/bin/ ./src/**/obj/ ./test/**/bin/ ./test/**/obj/ ./test/**/coverage/ ./coverage-report/ ./StrykerOutput/ ./dist/*.zip

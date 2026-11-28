@@ -18,16 +18,21 @@ public interface IDatabaseRepository
     public Task<User?> GetUserById(string userId);
     public Task<User?> GetUserByUserName(string name);
 
+    public Task<Post?> GetPost(int id);
+
     public Task<Observation?> GetObservation(int id);
     public Task<List<Observation>> GetObservations(int? limit = null, int? skip = null);
     public Task<List<Observation>> GetObservationsByUser(string userId, int? limit = null, int? skip = null);
     public Task<Observation> CreateObservation(string userId, string taxonId, string observation, string? picturePath = null);
+    public Task EditObservation(int obsId, string? newTaxonId = null, string? newText = null, string? newPicturePath = null);
 
     public Task<List<Post>> GetSubpostsForObservation(int id, int? limit = null, int? skip = null);
 
     public Task<List<Comment>> GetCommentsForObservation(int observationId, int? limit = null, int? skip = null);
     public Task<Comment> CreateComment(string authorId, int observationId, string comment);
+    public Task EditComment(int commentId, string? newText = null);
 
     public Task<List<Proposal>> GetProposalsForObservation(int observationId, int? limit = null, int? skip = null);
     public Task<Proposal> CreateProposal(string authorId, int observationId, string taxonId, string text);
+    public Task EditProposal(int proposalId, string? newTaxonId = null, string? newText = null);
 }
