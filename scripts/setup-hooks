@@ -2,7 +2,7 @@
 
 # make sure to run script from git root
 if [[ $PWD/ == *"scripts/" ]]; then
-    PWD=$(echo ${PWD%/*})
+    PWD=${PWD%/*}
 fi
 
 if [ ! -d ".git/hooks" ]; then
@@ -23,6 +23,6 @@ echo "
 dotnet format
 
 git diff --name-only --cached --diff-filter=d -z | while IFS= read -r -d '' file; do
-    git add -- "$file"
+    git add -- \"$$file\"
 done
 " >> .git/hooks/pre-commit
