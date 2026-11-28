@@ -7,7 +7,6 @@ namespace Bison.Razor.Tests;
 public partial class UITests : PageTest
 {
     private ServerProcess _serverProcess;
-    private static readonly string[] values = new[] { "MSTSNM:Arter:28d4148a-200d-4a20-a727-adf600a57270" };
 
     [SetUp]
     public async Task Init()

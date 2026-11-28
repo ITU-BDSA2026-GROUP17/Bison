@@ -14,9 +14,10 @@ public class PostService(IDatabaseRepository databaseRepository) : IPostService
 
     public async Task<Post?> ToPostAsync(PostDTO postDTO)
     {
-        if (postDTO.Comment is not null == postDTO.Proposal is not null == postDTO.Observation is not null)
+        var count = new bool[] { postDTO.Comment is not null, postDTO.Proposal is not null, postDTO.Observation is not null }.Count(c => c);
+        if (count != 1)
         {
-            throw new ArgumentException("PostDTO contains either all or none of comment, proposal, or observation DTOs");
+            throw new ArgumentException("PostDTO contains either multiple or none of comment, proposal, or observation DTOs");
         }
         if (postDTO.Observation is ObservationDTO observationDTO)
         {

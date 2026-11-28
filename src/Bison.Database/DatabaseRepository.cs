@@ -13,7 +13,7 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
     public async Task<List<Taxon>> GetTaxons(int? limit = null, int? skip = null)
     {
         IQueryable<Taxon> query = _dbContext.Taxons
-            .OrderByDescending(t => t.Id);
+            .OrderBy(t => t.Id);
         if (skip is int skipAmount)
         {
             query = query.Skip(skipAmount);
@@ -204,7 +204,8 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
     }
     public async Task EditComment(int commentId, string? newText = null)
     {
-        var com = (Comment?)await GetPost(commentId) ?? throw new PostDoesNotExistException(commentId);
+        var post = await GetPost(commentId) ?? throw new PostDoesNotExistException(commentId);
+        if (post is not Comment com) throw new PostDoesNotExistException(commentId);
 
         if (newText != null)
         {
@@ -255,7 +256,8 @@ public class DatabaseRepository(BisonDbContext dbContext) : IDatabaseRepository
     }
     public async Task EditProposal(int proposalId, string? newTaxonId = null, string? newText = null)
     {
-        var ppl = (Proposal?)await GetPost(proposalId) ?? throw new PostDoesNotExistException(proposalId);
+        var post = await GetPost(proposalId) ?? throw new PostDoesNotExistException(proposalId);
+        if (post is not Proposal ppl) throw new PostDoesNotExistException(proposalId);
 
         if (newTaxonId != null)
         {
